@@ -101,3 +101,9 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 # Miscellanious Notes
 
 When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the DojoAMDPlugin's registration is significant.  The DojoAMDPlugin resolves `dojo/has` loader extension conditionals in module expressions, and converts the module expression to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after the DojoAMDPlugin, then `data.request` will contain the resolved absMid for the module and `data.originalRequest` will contain the original module expression before transformation by the DojoAMDPlugin.  If the NormalModuleReplacementPlugin is registered before the DojoAMDPlugin, then the NormalModuleReplacementPlugin will get to modify the request before before the DojoAMDPlugin applies its transformations.
+
+# Sample application
+
+See the sample application located in the [sample](https://git.swg.usma.ibm.com/chuckd/dojo-webpack-plugin/tree/master/sample) folder.  It can be built by running the build.js with node.
+
+https://git.swg.usma.ibm.com/pages/chuckd/dojo-webpack-plugin/sample/test.html
