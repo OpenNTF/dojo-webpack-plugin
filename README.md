@@ -1,6 +1,6 @@
 # Introduction
 
-The DojoAMDPlugin is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications (tested with version 1.10).  Features include:
+**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications (tested with version 1.10).  Features include:
 
 * Support for Dojo loader config properties, including `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
@@ -9,7 +9,7 @@ The DojoAMDPlugin is a [Webpack](https://webpack.github.io/) plugin that support
 
 # The Dojo loader
 
-The DojoAMDPlugin uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a reference to a module which is included in the packed assets, it cannot be used to load non-packed modules.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs. 
+**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a reference to a module which is included in the packed assets, it cannot be used to load non-packed modules.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs. 
 
 This package does not include the Dojo loader.  The loader will be built by Webpack based on the location of Dojo specified in the 
 Dojo loader config (see below).  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The build also specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip). 
@@ -23,11 +23,11 @@ The example above will build the loader and place it in the `../release` directo
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 
         plugins: [
-            new DojoAMDPlugin({
-                loaderConfig: require("./loaderConfig"),
-                locales: ["en"],
-                loader: path.join(__directory, "../release/dojo/dojo.js")
-            }),
+          new requre("dojo-webpack-plugin")({
+              loaderConfig: require("./loaderConfig"),
+              locales: ["en"],
+              loader: path.join(__directory, "../release/dojo/dojo.js")
+          }),
         ]
 
 # The Dojo loader config
@@ -45,7 +45,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 * Replace the Dojo loader extension with a compatible Webpack extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
 
         plugins: {
-            new DojoAMDPlugin({...}),
+            new require("dojo-webpack-plugin)({...}),
             new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
                 data.request = data.request.replace(/^dojo\/text!/, "raw!");
             })
@@ -61,7 +61,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 * Use the `dojo/loaderProxy` Webpack loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in the following section.
 
-The DojoAMDPlugin defines the following loader extension replacements:
+**dojo-webpack-plugin** defines the following loader extension replacements:
 
           new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/selector/lite"),
           new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
@@ -69,7 +69,7 @@ The DojoAMDPlugin defines the following loader extension replacements:
               data.request = data.request.replace(/^dojo\/text!/, "raw!");
           })
 
-You can override these replacements by specifying your own replacements in the `plugins` property of your `webpack.config.js` file immediately following the registration of the DojoAMDPlugin.
+You can override these replacements by specifying your own replacements in the `plugins` property of your `webpack.config.js` file immediately following the registration of **dojo-webpack-plugin**.
 
 # The loaderProxy loader extension
 
@@ -100,7 +100,7 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 
 # Miscellanious Notes
 
-When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the DojoAMDPlugin's registration is significant.  The DojoAMDPlugin resolves `dojo/has` loader extension conditionals in module expressions, and converts the module expression to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after the DojoAMDPlugin, then `data.request` will contain the resolved absMid for the module and `data.originalRequest` will contain the original module expression before transformation by the DojoAMDPlugin.  If the NormalModuleReplacementPlugin is registered before the DojoAMDPlugin, then the NormalModuleReplacementPlugin will get to modify the request before before the DojoAMDPlugin applies its transformations.
+When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** resolves `dojo/has` loader extension conditionals in module expressions, and converts the module expression to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the resolved absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before before **dojo-webpack-plugin** applies its transformations.
 
 # Sample application
 
