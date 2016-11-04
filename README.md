@@ -1,6 +1,6 @@
 # Introduction
 
-The DojoAMDPlugin is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo applications.  Features include:
+The DojoAMDPlugin is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications (tested with version 1.10).  Features include:
 
 * Support for Dojo loader config properties, including `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
