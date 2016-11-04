@@ -104,6 +104,6 @@ When using Webpack's NormalModuleReplacementPlugin, the order of the plugin regi
 
 # Sample application
 
-See the sample application located in the [sample](https://git.swg.usma.ibm.com/chuckd/dojo-webpack-plugin/tree/master/sample) folder.  It can be built by running the build.js with node.
+See the sample application located in the [sample](https://git.swg.usma.ibm.com/IBM-Verse/dojo-webpack-plugin/tree/master/sample) folder.  It can be built by running the build.js with node.
 
-https://git.swg.usma.ibm.com/pages/chuckd/dojo-webpack-plugin/sample/test.html
+https://git.swg.usma.ibm.com/pages/IBM-Verse/dojo-webpack-plugin/sample/test.html
