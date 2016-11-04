@@ -1,0 +1,18 @@
+{
+  "name": "my-awesome-package",
+  "version": "1.0.0",
+  "dependencies": {
+  	"webpack": "latest",
+  	"node-mixin": "latest",
+  	"less-loader": "latest",
+  	"less": "latest",
+  	"raw-loader": "latest",
+  	"url-loader": "latest",
+  	"css-loader": "latest",
+  	"style-loader": "latest",
+  	"enhanced-resolve": "~0.9.0",
+  	"loader-utils": "latest",
+	"tmp": "latest",
+	"rimraf": "latest"
+  }
+}
