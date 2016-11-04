@@ -26,7 +26,7 @@ module.exports = function(content) {
 	buf.push("require(\"" + path.join(__dirname, "runner.js") + "\")(");
 	buf.push("\tloader,");
 	buf.push("\t\"" + name + "\",");
-	buf.push("\t__webpack_require__.djr(\"" + issuerAbsMid + "\")");
+	buf.push("\t__webpack_require__.dj.r(\"" + issuerAbsMid + "\")");
 	buf.push(");");
 	buf.push("});");
 	return buf.join("\n");
