@@ -1,4 +1,5 @@
-var DojoAMDPlugin = require("../lib/DojoAMDPlugin");
+var DojoWebpackPlugin = require(/*"dojo-webpack-plugin"*/ "../index.js");	// load locally
+
 var loaderConfig = require("./js/loaderConfig");
 var path = require("path");
 var webpack = require("webpack");
@@ -18,7 +19,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new DojoAMDPlugin({
+        new DojoWebpackPlugin({
         	loaderConfig: loaderConfig,
         	locales: ["en"]
         }),

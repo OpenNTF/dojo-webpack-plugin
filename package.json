@@ -1,6 +1,8 @@
 {
-  "name": "my-awesome-package",
+  "name": "dojo-webpack-plugin",
+  
   "version": "1.0.0",
+  
   "dependencies": {
   	"webpack": "latest",
   	"node-mixin": "latest",
@@ -8,11 +10,19 @@
   	"less": "latest",
   	"raw-loader": "latest",
   	"url-loader": "latest",
+  	"file-loader":"latest",
   	"css-loader": "latest",
   	"style-loader": "latest",
   	"enhanced-resolve": "~0.9.0",
   	"loader-utils": "latest",
 	"tmp": "latest",
 	"rimraf": "latest"
+  },
+  
+  "license": "Apache-2.0",
+  
+  "repository": {
+    "type": "git",
+    "url": "git+https://git.swg.usma.ibm.com/chuckd/dojo-webpack-plugin.git"
   }
 }
