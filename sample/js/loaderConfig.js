@@ -41,7 +41,7 @@ module.exports = {
 	
 	has: {
 		"host-browser":1,
-		"dom":0,
+		"dom":1,
 		"dojo-amd-factory-scan":1,
 		"dojo-loader":1,
 		"dojo-has-api":1,
@@ -52,7 +52,7 @@ module.exports = {
 		"dojo-dom-ready-api":1,
 		"dojo-publish-privates":1,
 		"dojo-config-api":1,
-		"dojo-sniff":0,
+		"dojo-sniff":1,
 		"dojo-sync-loader":0,
 		"dojo-test-sniff":1,
 		"config-deferredInstrumentation":1,
