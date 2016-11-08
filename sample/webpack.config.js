@@ -23,9 +23,9 @@ module.exports = {
         	loaderConfig: loaderConfig,
         	locales: ["en"]
         }),
-		new webpack.NormalModuleReplacementPlugin(/^dojox\/gfx\/renderer!/, "dojox/gfx/canvas"),
         // For plugins registered after the DojoAMDPlugin, data.request has been normalized and
         // resolved to an absMid and loader-config maps and aliases have been applied
+		new webpack.NormalModuleReplacementPlugin(/^dojox\/gfx\/renderer!/, "dojox/gfx/canvas"),
         new webpack.NormalModuleReplacementPlugin(
         	/^js\/css!/, function(data) {
         		data.request = data.request.replace(/^js\/css!/, "!style!css!less!")

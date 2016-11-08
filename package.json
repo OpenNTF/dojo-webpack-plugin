@@ -24,5 +24,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://git.swg.usma.ibm.com/chuckd/dojo-webpack-plugin.git"
+  },
+  "publishConfig" : {
+    "registry" : "https://jenkins.swg.usma.ibm.com/nexus/content/repositories/npm-internal/"
   }
 }

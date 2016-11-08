@@ -71,6 +71,20 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 You can override these replacements by specifying your own replacements in the `plugins` property of your `webpack.config.js` file immediately following the registration of **dojo-webpack-plugin**.
 
+# The dojo/has loader extension
+
+Dojo supports conditionally depending on modules using the `dojo/has` loader extension.  **dojo-webpack-plugin** supports both build-time and run-time resolution of `dojo\has` loader expressions.  Consider the following example:
+
+       define(['require', 'dojo/has!foo?js/foo:js/bar'], function(require, foobar) {
+			...
+       });
+       
+In the above example, if the feature `foo` is truthy in the static `has` features that are defined in the dojo loader config, then the expression will be replaced with the module name `js/foo` at build time.  If `foo` is falsy, but not undefined, then it will be replaced with the module name `js/bar`.  If, on the other hand, the feature `foo` is not defined, then resolution of the expression will be deferred to when the application is loaded in the browser and the run-time value of the feature `foo` will be used to determine which module reference is provided.  Note that for client-side resolution, both resources, `js/foo` and `js/bar`, along with their nested dependencies, will be included in the packed bundle.  
+
+For complex feature expressions that contain a mixture of defined and undefined feature names, the runtime expression will be simplified so that it contains only the undefined feature names, and only the modules needed for resolution of the simplified expression on the client will be included in the packed resources.  Modules that are excluded by build time evaluation of the expression with the static `has` features will not be include in the packed resources, unless they are otherwise include by other dependencies.
+
+The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
+
 # The loaderProxy loader extension
 
 `dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extension may be used this way.  The basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.
