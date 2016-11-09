@@ -30,9 +30,13 @@ module.exports = {
         	/^js\/css!/, function(data) {
         		data.request = data.request.replace(/^js\/css!/, "!style!css!less!")
         	}
-        )
+        ),
+        new webpack.optimize.UglifyJsPlugin({
+        	output: {comments: false}
+        })
     ],
     resolveLoader: { 
     	root: path.join(__dirname, "../node_modules")
     },
-};
+    devtool: "#source-map"
+}

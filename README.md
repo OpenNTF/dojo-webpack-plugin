@@ -4,7 +4,7 @@
 
 * Support for Dojo loader config properties, including `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
-* Webpack loader implementations of standard Dojo loaders (e.g. `dojo/i18n`).
+* Webpack loader implementations of standard Dojo loaders (e.g. `dojo/has`, `dojo/i18n`).
 * Limited support for client side execution of some Dojo loaders.
 
 # The Dojo loader
@@ -16,9 +16,9 @@ Dojo loader config (see below).  The built loader is packaged as a CommonJS modu
 
 The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.  If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
 
-        node buildDojo/build.js ../../dojo/dojo ../release
+        node node_modules/dojo-webpack-loader/buildDojo/build.js ../dojo/dojo ./release
 
-The example above will build the loader and place it in the `../release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../../util` in order for the build to succeed.
+The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../../util` in order for the build to succeed.
 
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 
@@ -26,7 +26,7 @@ To have Webpack use the built loader, specify the location of the loader in the 
           new requre("dojo-webpack-plugin")({
               loaderConfig: require("./loaderConfig"),
               locales: ["en"],
-              loader: path.join(__directory, "../release/dojo/dojo.js")
+              loader: path.join(__directory, "./release/dojo/dojo.js")
           }),
         ]
 
@@ -57,9 +57,9 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
         new NormalModuleReplacementPlugin(/^dojox\/gfx\/renderer!/, "dojox/gfx/canvas")
 
-* Implement the Dojo loader extension as a Webpack loader extension.  This is what is done with the `dojo/i18n` loader extension.
+* Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
 
-* Use the `dojo/loaderProxy` Webpack loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in the following section.
+* Use the `dojo/loaderProxy` Webpack loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-loaderproxy-loader-extension).
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
@@ -73,7 +73,7 @@ You can override these replacements by specifying your own replacements in the `
 
 # The dojo/has loader extension
 
-Dojo supports conditionally depending on modules using the `dojo/has` loader extension.  **dojo-webpack-plugin** supports both build-time and run-time resolution of `dojo\has` loader expressions.  Consider the following example:
+Dojo supports conditionally depending on modules using the `dojo/has` loader extension.  **dojo-webpack-plugin** supports both build-time and run-time resolution of `dojo/has` loader expressions.  Consider the following example:
 
        define(['require', 'dojo/has!foo?js/foo:js/bar'], function(require, foobar) {
 			...
@@ -87,7 +87,7 @@ The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause
 
 # The loaderProxy loader extension
 
-`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extension may be used this way.  The basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.
+`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  The basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.
 
 Consider a simple svg loader extension that loads the specified svg file and fixes up the contents by removing the xml header in the content.  The implementation of the load method might look like this:
 
@@ -114,7 +114,7 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 
 # Miscellanious Notes
 
-When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** resolves `dojo/has` loader extension conditionals in module expressions, and converts the module expression to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the resolved absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before before **dojo-webpack-plugin** applies its transformations.
+When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** converts the module expressions to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before before **dojo-webpack-plugin** applies its transformations.
 
 # Sample application
 
