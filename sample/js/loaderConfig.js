@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 module.exports = {
-	async: true,
 	baseUrl: ".",
 	packages: [
 		{
@@ -37,26 +36,6 @@ module.exports = {
 	paths: {
 		js: "js",
 		theme: "theme",
-	},
-	
-	has: {
-		"host-browser":1,
-		"dom":1,
-		"dojo-amd-factory-scan":1,
-		"dojo-loader":1,
-		"dojo-has-api":1,
-		"dojo-inject-api":1,
-		"dojo-timeout-api":1,
-		"dojo-trace-api":1,
-		"dojo-log-api":1,
-		"dojo-dom-ready-api":1,
-		"dojo-publish-privates":1,
-		"dojo-config-api":1,
-		"dojo-sniff":1,
-		"dojo-sync-loader":0,
-		"dojo-test-sniff":1,
-		"config-deferredInstrumentation":1,
-		"config-tlmSiblingOfDojo":1,
 	},
 	
 	blankGif: "./blank.gif"
