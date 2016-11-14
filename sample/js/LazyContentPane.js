@@ -17,7 +17,8 @@ define([
 	"dojo/_base/lang", 			// lang
 	"dojo/_base/declare",		// declare
 	"dijit/layout/ContentPane",	// parent
-	"dojo/dom-construct"
+	"dojo/dom-construct",
+	"dijit/a11yclick"			// template requirement
 ], function(lang, declare, ContentPane, dconst){
 
 // module:

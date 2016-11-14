@@ -39,5 +39,9 @@ module.exports = {
     resolveLoader: { 
     	root: path.join(__dirname, "../node_modules")
     },
-    devtool: "#source-map"
+    devtool: "#source-map",
+    node: {
+    	process: false,
+    	global: false
+    }
 }

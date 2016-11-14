@@ -24,6 +24,12 @@ module.exports = function(content) {
 	function define(innards) {
 		return innards;
 	}
+	define.amd = true;
+	
+	function require() {
+		throw new Error("Illegal require call when defining language bundle!");
+	}
+	
 	var bundle = eval(content);
 	var absMid;
 	var query = loaderUtils.parseQuery(this.query);
@@ -72,8 +78,6 @@ module.exports = function(content) {
 			
 		}
 	}
-	
-	this._module.isAMD = true;
 	buf.push("module.exports = " + JSON.stringify(bundle));
 	return buf.join("\n");
 }

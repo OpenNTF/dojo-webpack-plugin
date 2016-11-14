@@ -106,7 +106,7 @@ You can use the `dojo/loaderProxy` with the Webpack NormalModuleReplacementPlugi
         new webpack.NormalModuleReplacementPlugin(
        	    /^svg!/, function(data) {
         	        var match = /^svg!(.*)$/.exec(data.request);
-        	        data.request = "dojo/loaderProxy?loader=svg&deps=dojo/text%21" + match[1] + "!" + match[1]);
+        	        data.request = "dojo/loaderProxy?loader=svg&deps=dojo/text%21" + match[1] + "!" + match[1];
             }
         )
 
