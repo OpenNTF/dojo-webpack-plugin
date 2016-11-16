@@ -9,7 +9,7 @@
 
 # The Dojo loader
 
-**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a reference to a module which is included in the packed assets, it cannot be used to load non-packed modules.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs. 
+**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a references to modules which are included in the packed assets, it cannot be used to load non-packed modules, or modules in chunks that have not yet been loaded by Webpack.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs. 
 
 This package does not include the Dojo loader.  The loader will be built by Webpack based on the location of Dojo specified in the 
 Dojo loader config (see below).  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The build also specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip). 
@@ -68,7 +68,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
           new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/selector/lite"),
           new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
           new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
-              data.request = data.request.replace(/^dojo\/text!/, "raw!");
+              data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
           })
 
 You can override these replacements by specifying your own replacements in the `plugins` property of your `webpack.config.js` file immediately following the registration of **dojo-webpack-plugin**.
@@ -77,7 +77,7 @@ You can override these replacements by specifying your own replacements in the `
 
 Dojo supports conditionally depending on modules using the `dojo/has` loader extension.  **dojo-webpack-plugin** supports both build-time and run-time resolution of `dojo/has` loader expressions.  Consider the following example:
 
-       define(['require', 'dojo/has!foo?js/foo:js/bar'], function(require, foobar) {
+       define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
 			...
        });
        

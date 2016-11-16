@@ -19,7 +19,7 @@ define([
 	"dijit/layout/TabContainer",
 	"js/LazyContentPane",
 	"js/css!dijit/themes/claro/claro.css",
-	"js/css!theme/sample.less",
+	"js/css!theme/sample.less"
 ], function() {
 	return {};
 });
