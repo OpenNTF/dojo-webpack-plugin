@@ -1,6 +1,5 @@
 
 var loaderUtils = require("loader-utils");
-
 module.exports = function(content) {
 	
 	this.cacheable && this.cacheable();
@@ -26,10 +25,6 @@ module.exports = function(content) {
 	}
 	define.amd = true;
 	
-	function require() {
-		throw new Error("Illegal require call when defining language bundle!");
-	}
-	
 	var bundle = eval(content);
 	var absMid;
 	var query = loaderUtils.parseQuery(this.query);
@@ -49,7 +44,7 @@ module.exports = function(content) {
 			absMid = segments[segments.length-1];
 		}
 	}
-	this._module.absMid = absMid;
+	this._module.absMid = "dojo/i18n!" + absMid;
 	
 	// Determine if this is the default bundle or a locale specific bundle
 	var buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
@@ -72,13 +67,24 @@ module.exports = function(content) {
 			requestedLocales.forEach(function(requestedLocale) {
 				var availableLocales = getAvailableLocales(requestedLocale, bundle);
 				availableLocales.forEach(function(locale) {
-					buf.push("require(\"" + __filename.replace(/\\/g, "/") + "?name=" + normalizedPath + "/nls/" + locale + "/" + normalizedFile + "!" + path + "/nls/" + locale + "/" + file + "\");\n");
+					var name = normalizedPath + "/nls/" + locale + "/" + normalizedFile;
+					buf.push("require(\"" + name + "?absMid=" + name + "\");");
 				});
 			});
 			
 		}
 	}
-	buf.push("module.exports = " + JSON.stringify(bundle));
+	var runner = require.resolve("./runner.js").replace(/\\/g, "/");
+	var issuer = this._module.issuer;
+	if (issuer) {
+		issuerAbsMid = this._compilation.findModule(issuer).absMid;
+	}
+	if (!issuerAbsMid) {
+		issuerAbsMid = this._module.absMid || "";
+	}
+
+	buf.push("require(\"" + absMid + "?absMid=" + absMid + "\");");
+	buf.push("module.exports = require(\"" + runner + "\")(\"" + absMid + "\");");
 	return buf.join("\n");
 }
 

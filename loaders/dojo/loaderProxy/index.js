@@ -1,14 +1,15 @@
 var path = require("path");
 var loaderUtils = require("loader-utils");
+
 module.exports = function(content) {
 	this.cacheable && this.cacheable();
+	var dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
 	var query = loaderUtils.parseQuery(this.query);
 	var loader = query.loader;
 	if (!loader) {
 		throw new Error("No loader specified");
 	}
-	var segments = this._module.absMid.split("!");
-	var name = segments[segments.length-1];
+	var name = this._module.absMid.split("!").pop();
 	var deps = query.deps ? query.deps.split(",") : [];
 	var issuer = this._module.issuer;
 	if (issuer) {
@@ -19,16 +20,15 @@ module.exports = function(content) {
 	}
 	var buf = [];
 	var runner = require.resolve("./runner.js").replace(/\\/g, "/");
-	buf.push("define([\"" + loader + "\", \"" + runner + "\"");
+	buf.push("var runner = require(\"" + runner + "\");");
+	buf.push("var loader = require(\"" + loader + "?absMid=" + loader + "\");");
 	deps.forEach(function(dep) {
-		buf.push(",\"" + decodeURIComponent(dep) + "\"")
+		dep = decodeURIComponent(dep);
+		dep = dep.split("!").map(function(segment) {
+			return dojoRequire.toAbsMid(segment, issuerAbsMid);
+		}).join("!");
+		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");")
 	});
-	buf.push("], function(loader, runner) {");
-	buf.push("runner(");
-	buf.push("\tloader,");
-	buf.push("\t\"" + name + "\",");
-	buf.push("\t__webpack_require__.dj.c(\"" + issuerAbsMid + "\")");
-	buf.push(");");
-	buf.push("});");
+	buf.push("module.exports = runner(loader,\"" + name + "\");");
 	return buf.join("\n");
 };

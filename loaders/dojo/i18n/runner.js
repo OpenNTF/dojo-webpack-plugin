@@ -1,5 +1,7 @@
-module.exports = function(loader, name) {
-	var result, resultSet, req = __webpack_require__.dj.c();
+module.exports = function(name) {
+	var result, resultSet;
+	var loader = require("dojo/i18n?absMid=dojo/i18n");
+	var req = __webpack_require__.dj.c();
 	loader.load(name,  req, function(data) {
 		result = data;
 		resultSet = true;
