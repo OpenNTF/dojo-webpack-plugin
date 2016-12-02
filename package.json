@@ -11,7 +11,7 @@
 	"rimraf": "2.5.4"
   },
   
-  "license": "Apache-2.0",
+  "license": "(MIT OR Apache-2.0)",
   
   "repository": {
     "type": "git",
