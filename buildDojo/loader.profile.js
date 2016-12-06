@@ -52,7 +52,12 @@ var profile = (function(){
             'config-stripStrict': 0,
             'ie-event-behavior': 0,
             'dom': 0,
-            'host-node': 0
+            'host-node': 0,
+            'host-webworker': 0,
+            'native-xhr': 1,
+            'dojo-force-activex-xhr': 0,
+            'dojo-enforceDefine': 0,
+            'dojo-combo-api': 0
         },
 
         layers: {
