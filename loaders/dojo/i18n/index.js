@@ -34,12 +34,23 @@ module.exports = function(content) {
 		return result;
 	}
 	
-	function define(innards) {
-		return innards;
-	}
-	define.amd = true;
-	
-	var bundle = eval(content);
+	var bundle = (function() {
+		var result;
+		function define(arg1, arg2) {
+			if (!arg2) {
+				result = arg1;
+			} else {
+				if (arg1.length !== 0) {
+					throw new Error("define dependencies not supported in langauge files!");
+				}
+				result = arg2(); // call factory function
+			}
+		}
+		define.amd = true;
+		eval(content);
+		return result;
+	})();
+
 	var absMid;
 	var query = loaderUtils.parseQuery(this.query);
 	// See if the normalized name was provided in the query string
