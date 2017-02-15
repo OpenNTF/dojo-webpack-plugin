@@ -25,7 +25,7 @@ module.exports = function(content) {
 	function getAvailableLocales(requestedLocale, bundle) {
 		var result = [];
 		for (var locale in bundle) {
-			if (locale === requestedLocale || locale.indexOf(requestedLocale) === 0 && requestedLocale.charAt(locale.length) === '-') {
+			if (locale === requestedLocale || locale.indexOf(requestedLocale) === 0 && locale.charAt(requestedLocale.length) === '-') {
 				if (bundle[locale]) {
 					result.push(locale);
 				}
