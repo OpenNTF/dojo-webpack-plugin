@@ -19,16 +19,15 @@ module.exports = function(content) {
 	this.cacheable && this.cacheable();
 
 	// Returns the locales that are enabled in bundle which match the requested locale
-	// A locale matches the requested locale if it is the same, or more specific than
-	// the requested locale.  For example if the requested locale is en, then bundle
-	// locales en, en-us and en-uk will all match.
+	// A locale matches the requested locale if it is the same, or less specific than
+	// the requested locale.  For example if the requested locale is en-us, then bundle
+	// locales en and en-us match.
 	function getAvailableLocales(requestedLocale, bundle) {
-		var result = [];
-		for (var locale in bundle) {
-			if (locale === requestedLocale || locale.indexOf(requestedLocale) === 0 && locale.charAt(requestedLocale.length) === '-') {
-				if (bundle[locale]) {
-					result.push(locale);
-				}
+		var result = [], parts = requestedLocale.split("-"); 
+		for (var current = "", i = 0; i < parts.length; i++) {
+			current += (current ? "-" : "") + parts[i];
+			if(current in bundle){
+				result.push(current);
 			}
 		}
 		return result;
