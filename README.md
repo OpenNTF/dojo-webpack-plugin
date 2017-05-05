@@ -16,9 +16,9 @@ Dojo loader config (see below).  The built loader is packaged as a CommonJS modu
 
 The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.  If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
 
-        node node_modules/dojo-webpack-loader/buildDojo/build.js ../dojo/dojo ./release
+        node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo/dojo ./release
 
-The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../../util` in order for the build to succeed.
+The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../dojo/util` in order for the build to succeed.
 
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 
