@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "dependencies": {
     "node-mixin": "1.0.0",
     "raw-loader": "0.5.1",
