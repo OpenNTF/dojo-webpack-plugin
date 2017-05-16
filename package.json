@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "1.0.23",
+  "version": "1.0.26",
   "dependencies": {
     "node-mixin": "1.0.0",
     "raw-loader": "0.5.1",
@@ -10,7 +10,7 @@
   "license": "(MIT OR Apache-2.0)",
   "repository": {
     "type": "git",
-    "url": "git+https://git.swg.usma.ibm.com/chuckd/dojo-webpack-plugin.git"
+    "url": "git+https://github.ibm.com/IBM-Verse/dojo-webpack-plugin.git"
   },
   "publishConfig": {
     "registry": "https://jenkins.swg.usma.ibm.com/nexus/content/repositories/npm-internal/"
