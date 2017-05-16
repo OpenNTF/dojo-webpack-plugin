@@ -26,7 +26,7 @@ module.exports = function(content) {
 		var result = [], parts = requestedLocale.split("-"); 
 		for (var current = "", i = 0; i < parts.length; i++) {
 			current += (current ? "-" : "") + parts[i];
-			if(current in bundle){
+			if(bundle[current]){
 				result.push(current);
 			}
 		}
