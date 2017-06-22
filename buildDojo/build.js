@@ -25,13 +25,13 @@ if (!releaseDir) {
 	throw Error("Target path not specified");
 }
 var ls = fork(
-	path.resolve(dojoPath), 
+	path.resolve(dojoPath),
 	[
-		"load=build", 
-		"--profile", 
-		path.join(__dirname, "loader.profile.js"), 
-		"--release", 
-		"--releaseDir", 
+		"load=build",
+		"--profile",
+		path.join(__dirname, "loader.profile.js"),
+		"--release",
+		"--releaseDir",
 		path.resolve(releaseDir)
 	]
 );

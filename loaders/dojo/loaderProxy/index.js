@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var path = require("path");
 var loaderUtils = require("loader-utils");
 
-module.exports = function(content) {
+module.exports = function() {
 	this.cacheable && this.cacheable();
 	var dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
 	var query = loaderUtils.parseQuery(this.query);
@@ -26,7 +25,7 @@ module.exports = function(content) {
 	}
 	var name = this._module.absMid.split("!").pop();
 	var deps = query.deps ? query.deps.split(",") : [];
-	var issuer = this._module.issuer;
+	var issuerAbsMid, issuer = this._module.issuer;
 	if (issuer) {
 		issuerAbsMid = this._compilation.findModule(issuer).absMid;
 	}
@@ -42,7 +41,7 @@ module.exports = function(content) {
 		dep = dep.split("!").map(function(segment) {
 			return dojoRequire.toAbsMid(segment, issuerAbsMid);
 		}).join("!");
-		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");")
+		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");");
 	});
 	buf.push("module.exports = runner(loader,\"" + name + "\");");
 	return buf.join("\n");

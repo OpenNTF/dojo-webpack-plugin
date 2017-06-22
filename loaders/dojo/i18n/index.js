@@ -15,7 +15,7 @@
  */
 var loaderUtils = require("loader-utils");
 module.exports = function(content) {
-	
+
 	this.cacheable && this.cacheable();
 
 	// Returns the locales that are enabled in bundle which match the requested locale
@@ -23,7 +23,7 @@ module.exports = function(content) {
 	// the requested locale.  For example if the requested locale is en-us, then bundle
 	// locales en and en-us match.
 	function getAvailableLocales(requestedLocale, bundle) {
-		var result = [], parts = requestedLocale.split("-"); 
+		var result = [], parts = requestedLocale.split("-");
 		for (var current = "", i = 0; i < parts.length; i++) {
 			current += (current ? "-" : "") + parts[i];
 			if(bundle[current]){
@@ -32,7 +32,7 @@ module.exports = function(content) {
 		}
 		return result;
 	}
-	
+
 	var bundle = (function() {
 		var result;
 		function define(arg1, arg2) {
@@ -62,27 +62,24 @@ module.exports = function(content) {
 		res = segments[segments.length-1];
 	}
 	if (!absMid && this._module.absMid) {
-		// Fix up absMid to remove loader 
+		// Fix up absMid to remove loader
 		segments = this._module.absMid.split("!");
 		if (segments) {
 			absMid = segments[segments.length-1];
 		}
 	}
 	this._module.absMid = "dojo/i18n!" + absMid;
-	
+
 	// Determine if this is the default bundle or a locale specific bundle
 	var buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
 	var match = regex.exec(res);
 	if (match && absMid) {
-		var path = match[1], locale, file;
-		if (!match[3]) {
-			file = match[2];
-		} else {
+		var locale;
+		if (match[3]) {
 			locale = match[2];
-			file = match[3]
 		}
 		if (!locale) {
-			// this is the default bundle.  Add any locale specific bundles that match the 
+			// this is the default bundle.  Add any locale specific bundles that match the
 			// requested locale.  Default bundles specify available locales
 			match = regex.exec(absMid);
 			var normalizedPath = match[1];
@@ -90,16 +87,16 @@ module.exports = function(content) {
 			var requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales || [];
 			requestedLocales.forEach(function(requestedLocale) {
 				var availableLocales = getAvailableLocales(requestedLocale, bundle);
-				availableLocales.forEach(function(locale) {
-					var name = normalizedPath + "/nls/" + locale + "/" + normalizedFile;
+				availableLocales.forEach(function(loc) {
+					var name = normalizedPath + "/nls/" + loc + "/" + normalizedFile;
 					buf.push("require(\"" + name + "?absMid=" + name + "\");");
 				});
 			});
-			
+
 		}
 	}
 	var runner = require.resolve("./runner.js").replace(/\\/g, "/");
-	var issuer = this._module.issuer;
+	var issuerAbsMid, issuer = this._module.issuer;
 	if (issuer) {
 		issuerAbsMid = this._compilation.findModule(issuer).absMid;
 	}
@@ -110,6 +107,6 @@ module.exports = function(content) {
 	buf.push("require(\"" + absMid + "?absMid=" + absMid + "\");");
 	buf.push("module.exports = require(\"" + runner + "\")(\"" + absMid + "\");");
 	return buf.join("\n");
-}
+};
 
 module.exports.seperable = true;

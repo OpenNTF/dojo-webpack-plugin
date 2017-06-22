@@ -9,16 +9,16 @@
 
 # The Dojo loader
 
-**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a references to modules which are included in the packed assets, it cannot be used to load non-packed modules, or modules in chunks that have not yet been loaded by Webpack.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs. 
+**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a references to modules which are included in the packed assets, it cannot be used to load non-packed modules, or modules in chunks that have not yet been loaded by Webpack.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs.
 
-This package does not include the Dojo loader.  The loader will be built by Webpack based on the location of Dojo specified in the 
-Dojo loader config (see below).  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The build also specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip). 
+This package does not include the Dojo loader.  The loader will be built by Webpack based on the location of Dojo specified in the
+Dojo loader config (see below).  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The build also specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).
 
 The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.  If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
 
-        node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo/dojo ./release
+        node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo-release-1.10.0-src/dojo/dojo.js ./release
 
-The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../dojo/util` in order for the build to succeed.
+The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../dojo-release-1.10.0-src/util` in this example in order for the build to succeed.
 
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 
@@ -40,7 +40,7 @@ The loader config may be specified as an object, or as a string which represents
 
 # Dojo loader extensions
 
-Loader extensions are used to provide special processing when loading modules.  Loader extensions prefix the module being loaded, separated by the `!` character.  Both Dojo and Webpack have the concept of loader extensions, but the implementation are very different, and they use conflicting terminology.  Dojo refers to them as plugins and Webpack refers to them as loaders.  To avoid confusion, we refer to them both in this document as loader extensions. 
+Loader extensions are used to provide special processing when loading modules.  Loader extensions prefix the module being loaded, separated by the `!` character.  Both Dojo and Webpack have the concept of loader extensions, but the implementation are very different, and they use conflicting terminology.  Dojo refers to them as plugins and Webpack refers to them as loaders.  To avoid confusion, we refer to them both in this document as loader extensions.
 
 Dojo loader extensions generally cannot be used with Webpack.  There are several approaches to dealing with Dojo loader extensions.
 
@@ -52,7 +52,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
                 data.request = data.request.replace(/^dojo\/text!/, "raw!");
             })
         }
-    This replacement (among others) is automatically configured for you, so you don't need to include this in your webpack.config.js.  It is provided here as an example of what you could do with other loader extensions. 
+    This replacement (among others) is automatically configured for you, so you don't need to include this in your webpack.config.js.  It is provided here as an example of what you could do with other loader extensions.
 
 
 * Replace the entire module expression with the desired module.  Some Dojo loader extensions are used to dynamically load one module or another based on runtime conditions.  An example is the gfx loader, which loads the rendering engine supported by the client.  Since all modern browsers support the `canvas` rendering engine, you can replace the module expression that includes the loader with the module expression for the target module.
@@ -80,7 +80,7 @@ Dojo supports conditionally depending on modules using the `dojo/has` loader ext
        define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
 			...
        });
-       
+
 In the above example, if the feature `foo` is truthy in the static `has` features that are defined in the dojo loader config, then the expression will be replaced with the module name `js/foo` at build time.  If `foo` is falsy, but not undefined, then it will be replaced with the module name `js/bar`.  If, on the other hand, the feature `foo` is not defined, then resolution of the expression will be deferred to when the application is loaded in the browser and the run-time value of the feature `foo` will be used to determine which module reference is provided.  Note that for client-side resolution, both resources, `js/foo` and `js/bar`, along with their nested dependencies, will be included in the packed bundle.  
 
 For complex feature expressions that contain a mixture of defined and undefined feature names, the runtime expression will be simplified so that it contains only the undefined feature names, and only the modules needed for resolution of the simplified expression on the client will be included in the packed resources.  Modules that are excluded by build time evaluation of the expression with the static `has` features will not be include in the packed resources, unless they are otherwise include by other dependencies.
