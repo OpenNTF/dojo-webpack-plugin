@@ -19,14 +19,14 @@
  */
 var nodeRequire = require.rawConfig.loaderPatch.nodeRequire;
 var path = nodeRequire("path");
-(function(){
-	var profile, argv = global.process.argv;
+var profile = (function(){
+	var profileArg, argv = global.process.argv;
 	for (var i = 0; i < argv.length; i++) {
 		if (argv[i] === "--profile") {
-			profile = argv[i + 1];
+			profileArg = argv[i + 1];
 		}
 	}
-	var profilePath = path.resolve(profile);
+	var profilePath = path.resolve(profileArg);
 	console.log("Profile path = " + profilePath);
     return {
 			layerOptimize: false,
@@ -72,3 +72,4 @@ var path = nodeRequire("path");
         }
     };
 })();
+profile;	// silence the linter (no-unused-vars)
