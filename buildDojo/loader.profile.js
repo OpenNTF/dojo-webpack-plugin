@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ /*global dojo: false */
 /*
  * Dojo build profile for building the loader
  */
 var nodeRequire = require.rawConfig.loaderPatch.nodeRequire;
 var path = nodeRequire("path");
-var profile = (function(){
+(function(){
 	var profile, argv = global.process.argv;
 	for (var i = 0; i < argv.length; i++) {
 		if (argv[i] === "--profile") {
-			profile = argv[i + 1]; 
+			profile = argv[i + 1];
 		}
 	}
 	var profilePath = path.resolve(profile);
 	console.log("Profile path = " + profilePath);
     return {
-    	layerOptimize: false,
-        releaseDir: "./release",
-        
+			layerOptimize: false,
+			releaseDir: "./release",
+
         packages:[{
             name:"dojo",
             location:dojo.baseUrl,
@@ -68,6 +69,6 @@ var profile = (function(){
         },
         transforms: {
             writeDojo: [path.join(profilePath, "..", "./transforms/writeDojo.js"), "write"]
-        },
+        }
     };
 })();

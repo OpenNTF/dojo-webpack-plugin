@@ -15,17 +15,17 @@
  */
 
 /*
- * This transform is an adaptation of the write transform in dojo/util that has been modified to build 
+ * This transform is an adaptation of the write transform in dojo/util that has been modified to build
  * the dojo loader only, without copying any other sources to the output directory and to avoid minifying
  * the output file.
- * 
+ *
  * See https://github.com/dojo/util/blob/1.10/build/transforms/writeDojo.js
  */
 define([
 	"util/build/buildControl",
 	"util/build/fileUtils",
 	"util/build/fs",
-	"util/build/transforms/writeAmd",
+	"util/build/transforms/writeAmd"
 
 ], function(bc, fileUtils, fs, writeAmd){
 	return function(resource, callback){
