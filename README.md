@@ -1,3 +1,7 @@
+# OpenNTF
+
+This project is an OpenNTF project, and is available under the Apache License V2.0.  All other aspects of the project, including contributions, defect reports, discussions, feature requests and reviews are subject to the OpenNTF Terms of Use - available at http://openntf.org/Internal/home.nsf/dx/Terms_of_Use.
+
 # Introduction
 
 **dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack 1.x to build Dojo 1.x applications (tested with Webpack 1.15 and Dojo 1.10).  Features include:
@@ -120,6 +124,6 @@ When using Webpack's NormalModuleReplacementPlugin, the order of the plugin regi
 
 # Sample application
 
-See the sample application at https://git.swg.usma.ibm.com/IBM-Verse/dojo-webpack-plugin-sample.
+See the sample application at https://github.com/OpenNTF/dojo-webpack-plugin-sample.
 
-https://git.swg.usma.ibm.com/pages/IBM-Verse/dojo-webpack-plugin-sample/test.html
+https://github.com/pages/OpenNTF/dojo-webpack-plugin-sample/test.html
