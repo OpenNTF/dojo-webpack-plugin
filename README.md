@@ -34,7 +34,7 @@ Loader extensions are used to provide special processing when loading modules.  
 
 Dojo loader extensions generally cannot be used with Webpack.  There are several config only approaches to dealing with Dojo loader extensions that don't require changing your application's code.
 
-* Replace the Dojo loader extension with a compatible Webpack extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
+* Use the NormalModuleReplacementPlugin to replace the Dojo loader extension with a compatible Webpack extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
 
         plugins: {
             new require("dojo-webpack-plugin)({...}),
@@ -45,13 +45,13 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
     This replacement (among others) is automatically configured for you, so you don't need to include this in your webpack.config.js.  It is provided here as an example of what you could do with other loader extensions.
 
 
-* Replace the entire module expression with the desired module.  Some Dojo loader extensions are used to dynamically load one module or another based on runtime conditions.  An example is the gfx loader, which loads the rendering engine supported by the client.  Since all modern browsers support the `canvas` rendering engine, you can replace the module expression that includes the loader with the module expression for the target module.
+* Use the NormalModuleReplacementPlugin to replace the entire module expression with the desired module.  Some Dojo loader extensions are used to dynamically load one module or another based on runtime conditions.  An example is the gfx loader, which loads the rendering engine supported by the client.  Since all modern browsers support the `canvas` rendering engine, you can replace the module expression that includes the loader with the module expression for the target module.
 
         new NormalModuleReplacementPlugin(/^dojox\/gfx\/renderer!/, "dojox/gfx/canvas")
 
 * Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
 
-* Use the `dojo/loaderProxy` Webpack loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-loaderproxy-loader-extension).
+* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` Webpack loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-loaderproxy-loader-extension).
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
