@@ -61,7 +61,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
               data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
           })
 
-You can override these replacements by specifying your own replacements in the `plugins` property of your `webpack.config.js` file immediately following the registration of **dojo-webpack-plugin**.
+You can override these replacements by specifying your own replacements in the `plugins` property of your `webpack.config.js file prior to the registration of **dojo-webpack-plugin**.
 
 # The dojo/has loader extension
 
