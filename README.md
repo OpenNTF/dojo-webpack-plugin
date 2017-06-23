@@ -40,9 +40,9 @@ The loader config may be specified as an object, or as a string which represents
 
 # Dojo loader extensions
 
-Loader extensions are used to provide special processing when loading modules.  Loader extensions prefix the module being loaded, separated by the `!` character.  Both Dojo and Webpack have the concept of loader extensions, but the implementation are very different, and they use conflicting terminology.  Dojo refers to them as plugins and Webpack refers to them as loaders.  To avoid confusion, we refer to them both in this document as loader extensions.
+Loader extensions are used to provide special processing when loading modules.  Loader extensions prefix the module being loaded, separated by the `!` character.  Both Dojo and Webpack have the concept of loader extensions and use similar syntax, but the implementation are very different, and they use conflicting terminology.  Dojo refers to them as plugins and Webpack refers to them as loaders.  To avoid confusion, we refer to them both in this document as loader extensions.
 
-Dojo loader extensions generally cannot be used with Webpack.  There are several config only approaches to dealing with Dojo loader extensions that don't require chaning your application's code.
+Dojo loader extensions generally cannot be used with Webpack.  There are several config only approaches to dealing with Dojo loader extensions that don't require changing your application's code.
 
 * Replace the Dojo loader extension with a compatible Webpack extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
 
@@ -89,7 +89,7 @@ The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause
 
 # The loaderProxy loader extension
 
-`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  The basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.
+`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to guarantee that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
 
 Consider a simple svg loader extension that loads the specified svg file and fixes up the contents by removing the xml header in the content.  The implementation of the load method might look like this:
 
@@ -101,7 +101,7 @@ Consider a simple svg loader extension that loads the specified svg file and fix
 
 Here, the load method delegates to a loader extension that is supported by Webpack to load the resource.  If the resource is included in the packed modules, then the `req` callback will be invoked in-line, and thus the `load` method's callback will be invoke in-line.  If the `load` method's callback is not invoked before the `load` method returns, then an exception will be thrown.
 
-You can use the `dojo/loaderProxy` with the Webpack NormalModuleReplacementPlugin as follows:
+You can use `dojo/loaderProxy` with the Webpack NormalModuleReplacementPlugin as follows:
 
         new webpack.NormalModuleReplacementPlugin(
        	    /^svg!/, function(data) {
