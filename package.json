@@ -11,5 +11,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenNTF/dojo-webpack-plugin.git"
-  },
+  }
 }
