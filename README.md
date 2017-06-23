@@ -2,7 +2,7 @@
 
 **dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack 1.x to build Dojo 1.x applications (tested with Webpack 1.15 and Dojo 1.10).  Features include:
 
-* Support for Dojo loader config properties, including `paths`, `packages`, `map` and `aliases`
+* Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
 * Webpack loader implementations of standard Dojo loaders (e.g. `dojo/has`, `dojo/i18n`).
 * Limited support for client side execution of some Dojo loaders.
