@@ -34,7 +34,7 @@ Loader extensions are used to provide special processing when loading modules.  
 
 Dojo loader extensions generally cannot be used with Webpack.  There are several config only approaches to dealing with Dojo loader extensions that don't require changing your application's code.
 
-* Use the NormalModuleReplacementPlugin to replace the Dojo loader extension with a compatible Webpack extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
+* Use the NormalModuleReplacementPlugin to replace the Dojo loader extension with a compatible Webpack loader extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
 
         plugins: {
             new require("dojo-webpack-plugin)({...}),
