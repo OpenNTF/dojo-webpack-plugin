@@ -26,7 +26,7 @@ The loader config defines properties used in resolving module identifiers as des
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client.
 
-The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If you need to do conditional processing within the config on the client, then specify it as a module name, otherwise, all processing will be evaluated at build time.
+The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If you need to do conditional processing within the config based on the environment (node or browser), then specify it as a module name, otherwise, all processing will be evaluated at build time.
 
 # Dojo loader extensions
 
