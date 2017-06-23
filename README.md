@@ -1,6 +1,6 @@
 # Introduction
 
-**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack 1.x to build Dojo 1.x applications (tested with Webpack 1.15 and Dojo 1.10).  Features include:
+**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack 1.x to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This plugin has been tested with Webpack 1.15 and Dojo 1.10.  Features include:
 
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
@@ -9,30 +9,20 @@
 
 # The Dojo loader
 
-**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to enable client-side resolution of modules by the `require()` function.  Client-side `require()` is needed for calls that cannot be transformed by Webpack at build time because of module identifiers that cannot be statically evaluated.  Although the client-side `require()` function may be called to obtain a references to modules which are included in the packed assets, it cannot be used to load non-packed modules, or modules in chunks that have not yet been loaded by Webpack.  However, the `require.toAbsMid()` and `require.toUrl()` functions may be called on the client to resolve module names and module URLs.
+**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables).  Synchronous `require()` (e.g. `require('foo')`), which returns a reference to an already loaded module or else throws an exception, is supported, as are the `require.toAbsMid()` and `require.toUrl()` functions.
 
-This package does not include the Dojo loader.  The loader will be built by Webpack based on the location of Dojo specified in the
-Dojo loader config (see below).  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The build also specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).
-
-The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.  If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
-
-        node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo-release-1.10.0-src/dojo/dojo.js ./release
-
-The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../dojo-release-1.10.0-src/util` in this example in order for the build to succeed.
-
-To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
-
-        plugins: [
-          new requre("dojo-webpack-plugin")({
-              loaderConfig: require("./loaderConfig"),
-              locales: ["en"],
-              loader: path.join(__directory, "./release/dojo/dojo.js")
-          }),
-        ]
+This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the `loader` option.  See [Building the Dojo loader](#building-the-dojo-loader).  
 
 # The Dojo loader config
 
-The loader config defines properties used in resolving module identifiers as described in [Configuring Dojo with dojoConfig](https://dojotoolkit.org/documentation/tutorials/1.7/dojo_config/).  Note that not all properties in the loader config are used by Webpack.  Only properties relating to module name/path resolution are used.  These include `baseUrl`, `packages`, `paths`, `map` and `aliases`.  The loader config may also specify a `has` map of feature-name/value pairs. The `has` features are used in resolving `dojo/has` loader conditionals at build time, and to provide the initial values for the run-time has.js feature detection functionality provided by `dojo/has`.  The loader config is specified by the `loaderConfig` options property.
+The loader config defines properties used in resolving module identifiers as described in [Configuring Dojo with dojoConfig](https://dojotoolkit.org/documentation/tutorials/1.7/dojo_config/).  Note that not all properties in the loader config are used by Webpack.  Only properties relating to module name/path resolution are used.  These include `baseUrl`, `packages`, `paths`, `map` and `aliases`.  The loader config may also specify a `has` map of feature-name/value pairs. The `has` features are used in resolving `dojo/has` loader conditionals at build time, and to provide the initial values for the run-time has.js feature detection functionality provided by `dojo/has`.  The loader config is specified by the `loaderConfig` options property:
+
+    plugins: [
+      new requre("dojo-webpack-plugin")({
+          loaderConfig: require("./loaderConfig"),
+          locales: ["en", "es", "fr"]
+      }),
+    ]
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client.
 
@@ -114,9 +104,33 @@ The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderPr
 
 Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is required by the `svg` loader extension's load method on the client, then the dependency will be resolved in-line and the `load` method's callback will be invoked in-line as required.
 
-# Miscellanious Notes
+# Building the Dojo loader
+
+This plugin uses a custom build of the Dojo loader.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build config specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).
+
+The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.  If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
+
+        node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo-release-1.10.0-src/dojo/dojo.js ./release
+
+The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../dojo-release-1.10.0-src/util` in this example in order for the build to succeed.
+
+To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
+
+        plugins: [
+          new requre("dojo-webpack-plugin")({
+              loaderConfig: require("./loaderConfig"),
+              locales: ["en"],
+              loader: path.join(__directory, "./release/dojo/dojo.js")
+          }),
+        ]
+
+# Order of Plugin Registration
 
 When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** converts the module expressions to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before **dojo-webpack-plugin** applies its transformations.
+
+# Client-side Execution of non-transformed Async require
+
+Webpack normally transforms async `require()` calls into `__webpack_require__()` calls for the purpose of loading modules at application runtime.  However, if the call references dependencies which cannot be evaluated at build time, then the `require()` call will not be transformed.  Instead, `require()`, as implemented by this plugin, will be called at application runtime on the client and will complete synchronously provided the requested modules are available from chunks that have already been loaded in the client.  If any of the modules requested are not available, then an exception is thrown.
 
 # Sample application
 
