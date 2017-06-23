@@ -106,9 +106,9 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 
 # Building the Dojo loader
 
-This plugin uses a custom build of the Dojo loader.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build config specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).
+This plugin uses a custom build of the Dojo loader.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build config specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).  The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.
 
-The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.  If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
+If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
 
         node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo-release-1.10.0-src/dojo/dojo.js ./release
 
