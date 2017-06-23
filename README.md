@@ -5,7 +5,7 @@
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
 * Webpack loader implementations of standard Dojo loaders (e.g. `dojo/has`, `dojo/i18n`).
-* Limited support for client side execution of some Dojo loaders.
+* Limited support for client side execution of some Dojo loader extensions.
 
 # The Dojo loader
 
@@ -51,7 +51,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 * Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
 
-* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` Webpack loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-loaderproxy-loader-extension).
+* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-loaderproxy-loader-extension).
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
@@ -77,7 +77,7 @@ The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause
 
 # The loaderProxy loader extension
 
-`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to guarantee that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
+`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to ensure that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
 
 Consider a simple svg loader extension that loads the specified svg file and fixes up the contents by removing the xml header in the content.  The implementation of the load method might look like this:
 
