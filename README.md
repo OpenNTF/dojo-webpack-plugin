@@ -128,7 +128,9 @@ When using Webpack's NormalModuleReplacementPlugin, the order of the plugin regi
 
 # Client-side Execution of non-transformed Async require
 
-Webpack normally transforms async `require()` calls into `__webpack_require__()` calls for the purpose of loading modules at application runtime.  However, if the call references dependencies which cannot be evaluated at build time, then the `require()` call will not be transformed.  Instead, `require()`, as implemented by this plugin, will be called at application runtime on the client and will complete synchronously (callback invoked prior to returning) provided the requested modules are available from chunks that have already been loaded in the client.  If any of the modules requested are not available, then an exception will be thrown.
+Webpack normally transforms async `require()` calls into `__webpack_require__()` calls for the purpose of loading modules at application runtime.  However, if the call references dependencies which cannot be evaluated at build time, then the `require()` call will not be transformed.  Instead, `require()`, as implemented by this plugin, will be called at application runtime on the client and will complete synchronously (callback invoked prior to returning) provided the requested modules are available from chunks that have already been loaded in the client.  If any of the modules requested are not available, then an exception will be thrown.  This restriction is necessary because webpack uses a synchronous model for resolving dependencies at application runtime.  Only the loading of webpack chunks is allowed to complete asynchronously.
+
+This can be an issue if your application utilizes the Dojo parser's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) capability for loading modules of declaratively instanciated widgets.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
 # Package Location Requirements
 
