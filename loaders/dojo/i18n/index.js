@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var loaderUtils = require("loader-utils");
+const loaderUtils = require("loader-utils");
 module.exports = function(content) {
 
 	this.cacheable && this.cacheable();
@@ -51,10 +51,7 @@ module.exports = function(content) {
 	})();
 
 	var absMid;
-	var query = {};
-	if (this.query) {
-		query = loaderUtils.parseQuery(this.query);
-	}
+	const query = loaderUtils.parseQuery(this.query);
 	// See if the normalized name was provided in the query string
 	if ("name" in query) {
 		absMid = query.name;
@@ -74,34 +71,34 @@ module.exports = function(content) {
 	this._module.absMid = "dojo/i18n!" + absMid;
 
 	// Determine if this is the default bundle or a locale specific bundle
-	var buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
-	var match = regex.exec(res);
-	if (match && absMid) {
+	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
+	const resMatch = regex.exec(res);
+	if (resMatch && absMid) {
 		var locale;
-		if (match[3]) {
-			locale = match[2];
+		if (resMatch[3]) {
+			locale = resMatch[2];
 		}
 		if (!locale) {
 			// this is the default bundle.  Add any locale specific bundles that match the
 			// requested locale.  Default bundles specify available locales
-			match = regex.exec(absMid);
-			var normalizedPath = match[1];
-			var normalizedFile = match[2];
-			var requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales || [];
+			const absMidMatch = regex.exec(absMid);
+			const normalizedPath = absMidMatch[1];
+			const normalizedFile = absMidMatch[2];
+			const requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales || [];
 			requestedLocales.forEach(function(requestedLocale) {
-				var availableLocales = getAvailableLocales(requestedLocale, bundle);
-				availableLocales.forEach(function(loc) {
-					var name = normalizedPath + "/nls/" + loc + "/" + normalizedFile;
+				const availableLocales = getAvailableLocales(requestedLocale, bundle);
+				availableLocales.forEach((loc) => {
+					const name = normalizedPath + "/nls/" + loc + "/" + normalizedFile;
 					buf.push("require(\"" + name + "?absMid=" + name + "\");");
 				});
 			});
 
 		}
 	}
-	var runner = require.resolve("./runner.js").replace(/\\/g, "/");
-	var issuerAbsMid, issuer = this._module.issuer;
-	if (issuer) {
-		issuerAbsMid = this._compilation.findModule(issuer).absMid;
+	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
+	var issuerAbsMid;
+	if (this._module.issuer) {
+		issuerAbsMid = this._module.issuer.absMid;
 	}
 	if (!issuerAbsMid) {
 		issuerAbsMid = this._module.absMid || "";
