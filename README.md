@@ -1,6 +1,6 @@
 # Introduction
 
-**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 2.0 and greater.  The plugin has been tested with Webpack 2.0.0-rc1 and 3.0.0, and Dojo 1.12.  For Webpack 1.x, use the v1 branch of this project.  Features include:
+**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 2 and greater.  The plugin has been tested with Webpack 2.2.0-rc.0 and 3.0.0, and Dojo versions 1.10 and 1.12.  For Webpack 1.x, use the v1 branch of this project.  Features include:
 
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
