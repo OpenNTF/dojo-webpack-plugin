@@ -17,16 +17,17 @@
 /*
  * Dojo build profile for building the loader
  */
-var nodeRequire = require.rawConfig.loaderPatch.nodeRequire;
-var path = nodeRequire("path");
-var profile = (function(){
-	var profileArg, argv = global.process.argv;
+const nodeRequire = require.rawConfig.loaderPatch.nodeRequire;
+const path = nodeRequire("path");
+var profile = (() => {
+	var profileArg;
+	const argv = global.process.argv;
 	for (var i = 0; i < argv.length; i++) {
 		if (argv[i] === "--profile") {
 			profileArg = argv[i + 1];
 		}
 	}
-	var profilePath = path.resolve(profileArg);
+	const profilePath = path.resolve(profileArg);
 	console.log("Profile path = " + profilePath);
     return {
 			layerOptimize: false,

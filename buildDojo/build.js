@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var path = require("path");
-var fork = require("child_process").fork;
+const path = require("path");
+const fork = require("child_process").fork;
 
-var dojoPath = global.process.argv.length > 2 && global.process.argv[2];
-var releaseDir = global.process.argv.length > 3 && global.process.argv[3];
+const dojoPath = global.process.argv.length > 2 && global.process.argv[2];
+const releaseDir = global.process.argv.length > 3 && global.process.argv[3];
 if (!dojoPath) {
 	throw Error("Path to dojo not specified");
 }
 if (!releaseDir) {
 	throw Error("Target path not specified");
 }
-var ls = fork(
+const ls = fork(
 	path.resolve(dojoPath),
 	[
 		"load=build",
@@ -36,6 +36,6 @@ var ls = fork(
 	]
 );
 
-ls.on('close', function(code) {
+ls.on('close', (code) => {
   console.log('child process exited with code ' + code);
 });
