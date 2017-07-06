@@ -8,7 +8,7 @@
     "tmp": "0.0.30"
   },
   "peerDependencies": {
-    "webpack": "2.x"
+    "webpack": ">= 2.2.0"
   },
   "license": "(MIT OR Apache-2.0)",
   "repository": {
