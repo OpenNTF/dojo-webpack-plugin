@@ -51,7 +51,7 @@ module.exports = function(content) {
 	})();
 
 	var absMid;
-	const query = loaderUtils.parseQuery(this.query);
+	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
 	// See if the normalized name was provided in the query string
 	if ("name" in query) {
 		absMid = query.name;
