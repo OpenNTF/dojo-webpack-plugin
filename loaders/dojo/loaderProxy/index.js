@@ -18,7 +18,7 @@ const loaderUtils = require("loader-utils");
 module.exports = function() {
 	this.cacheable && this.cacheable();
 	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
-	const query = loaderUtils.parseQuery(this.query);
+	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
 	const loader = query.loader;
 	if (!loader) {
 		throw new Error("No loader specified");
