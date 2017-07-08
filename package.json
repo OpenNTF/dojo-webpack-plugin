@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.0.1",
+  "version": "2.0.4",
   "dependencies": {
     "node-mixin": "1.0.0",
     "raw-loader": "0.5.1",
@@ -8,7 +8,7 @@
     "tmp": "0.0.30"
   },
   "peerDependencies": {
-    "webpack": "2.x"
+    "webpack": ">= 2.2.0"
   },
   "license": "(MIT OR Apache-2.0)",
   "repository": {
