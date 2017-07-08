@@ -122,6 +122,10 @@ To have Webpack use the built loader, specify the location of the loader in the 
           }),
         ]
 
+# ES6 Promise dependency in Webpack 2.x
+
+Webpack 2.x includes code in your packed application that uses ES6 Promise.  If you need to support browsers that lack ES6 Promise support (e.g. IE 11), then you will need to provide this capability in your application.  The [dojo-webpack-plugin-sample](https://github.com/OpenNTF/dojo-webpack-plugin-sample) project contains a tiny [wrapper](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/dojoES6Promise.js) that implements ES6 Promise using dojo/Deferred.  All you need to do is include this module as an AMD dependency in your application.
+
 # Order of Plugin Registration
 
 When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** converts the module expressions to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before **dojo-webpack-plugin** applies its transformations.
