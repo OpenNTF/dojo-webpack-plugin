@@ -58,7 +58,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 * Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
 
-* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-loaderproxy-loader-extension).
+* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-dojoloaderproxy-loader-extension).
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
