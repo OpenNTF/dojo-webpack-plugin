@@ -84,7 +84,7 @@ For complex feature expressions that contain a mixture of defined and undefined 
 
 The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
 
-# The loaderProxy loader extension
+# The dojo/loaderProxy loader extension
 
 `dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to ensure that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
 
@@ -110,6 +110,25 @@ new webpack.NormalModuleReplacementPlugin(
 The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderProxy?loader=<loader>&deps=<dependencies>!<resource>` where *loader* specifies the Dojo loader extension to run on the client and *dependencies* specifies a comma separated list of module dependencies to add to the packed resources.  In the example above, if the client code specifies the module as `svg!closeBtn.svg`, then the translated module will be `dojo/loaderProxy?loader=svg&deps=dojo/text%21closeBtn.svg!closeBtn.svg`.  Note the need to URL encode the `!` character so as not to trip up parsing.
 
 Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is required by the `svg` loader extension's load method on the client, then the dependency will be resolved in-line and the `load` method's callback will be invoked in-line as required.
+
+# Options
+
+The plugin is instantiated with a properties map specifying the following options:
+<dl>
+<dt>loaderConfig</dt>
+<dd>This property is required and specifies the Dojo loader config.  See <a href="#the-dojo-loader-config">The Dojo loader config</a> for details.</dd>
+<dt>loader</dt>
+<dd>This property is optional and specifies the module path of the built Dojo loader.  See <a href="#building-the-dojo-loader">Building the Dojo loader</a> for details.  If not specified, then the loader will be built as part of the Webpack build.</dd>
+<dt>locales</dt>
+<dd>This property is required and specifies which locale resources should be included in the build.  The property is specified as an array of strings</dd>
+<dt>cjsRequirePatterns</dt>
+<dd><p>This property is optional and specifies an array of regular expressions to use in identifying CommonJS module identifiers within AMD modules.</p>
+<p>Dojo supports a form of require, called synchronous require, that can be used to synchronously obtain a reference to an already loaded module, but throws an exception if the module is not already loaded.  Dojo synchronous require has the exact same function signature as CommonJS require, making it impossible to differentiate them.  This is not normally an issue because CommonJS require calls do not typically appear inside of AMD modules, however, some Webpack plugins (e.g. ProvidePlugin) can inject CommonJS require statements directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.</p>
+<p>If not specified, the default pattern <code>(imports-loader|exports-loader)[?!]</code> is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify <strong>replaces</strong> the default value.</p></dd>
+<dt>coerceUndefinedToFalse</dt>
+<dd>This property is optional.  If the value is truthy, then undefined features will be treated as false for the purpose of dojo/has loader plugin feature evaluation at build time.  See <a href="#the-dojohas-loader-extension">The dojo/has loader extension</a> for more information.</dd>
+</dl>
+
 
 # Building the Dojo loader
 

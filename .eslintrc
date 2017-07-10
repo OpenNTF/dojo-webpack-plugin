@@ -15,7 +15,7 @@
     "comma-dangle": 2,
     "no-dupe-args": 2,
     "no-dupe-keys": 2,
-    "no-mixed-spaces-and-tabs": 2,
+    "no-mixed-spaces-and-tabs": [2, "smart-tabs"],
     "no-shadow": 2,
     "no-trailing-spaces": 2,
     "no-undef": 2,
