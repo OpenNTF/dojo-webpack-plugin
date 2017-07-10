@@ -114,21 +114,30 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 # Options
 
 The plugin is instantiated with a properties map specifying the following options:
-<dl>
-<dt>loaderConfig</dt>
-<dd>This property is required and specifies the Dojo loader config.  See <a href="#the-dojo-loader-config">The Dojo loader config</a> for details.</dd>
-<dt>loader</dt>
-<dd>This property is optional and specifies the module path of the built Dojo loader.  See <a href="#building-the-dojo-loader">Building the Dojo loader</a> for details.  If not specified, then the loader will be built as part of the Webpack build.</dd>
-<dt>locales</dt>
-<dd>This property is required and specifies which locale resources should be included in the build.  The property is specified as an array of strings</dd>
-<dt>cjsRequirePatterns</dt>
-<dd><p>This property is optional and specifies an array of regular expressions to use in identifying CommonJS module identifiers within AMD modules.</p>
-<p>Dojo supports a form of require, called synchronous require, that can be used to synchronously obtain a reference to an already loaded module, but throws an exception if the module is not already loaded.  Dojo synchronous require has the exact same function signature as CommonJS require, making it impossible to differentiate them.  This is not normally an issue because CommonJS require calls do not typically appear inside of AMD modules, however, some Webpack plugins (e.g. ProvidePlugin) can inject CommonJS require statements directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.</p>
-<p>If not specified, the default pattern <code>(imports-loader|exports-loader)[?!]</code> is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify <strong>replaces</strong> the default value.</p></dd>
-<dt>coerceUndefinedToFalse</dt>
-<dd>This property is optional.  If the value is truthy, then undefined features will be treated as false for the purpose of dojo/has loader plugin feature evaluation at build time.  See <a href="#the-dojohas-loader-extension">The dojo/has loader extension</a> for more information.</dd>
-</dl>
 
+### loaderConfig
+
+This property is required and specifies the Dojo loader config.  See [The Dojo loader config](#the-dojo-loader-config) for details.
+
+### loader
+
+This property is optional and specifies the module path of the built Dojo loader.  See [Building the Dojo loader](#building-the-dojo-loader) for details.  If not specified, then the loader will be built as part of the Webpack build.
+
+### locales
+
+This property is required and specifies which locale resources should be included in the build.  The property is specified as an array of strings.
+
+### cjsRequirePatterns
+
+This property is optional and specifies an array of regular expressions to use in identifying CommonJS module identifiers within AMD modules.
+
+Dojo supports a form of require, called synchronous require, that can be used to synchronously obtain a reference to an already loaded module, but throws an exception if the module is not already loaded.  Dojo synchronous require has the exact same function signature as CommonJS require, making it impossible to differentiate them.  This is not normally an issue because CommonJS require calls do not typically appear inside of AMD modules, however, some Webpack plugins (e.g. ProvidePlugin) can inject CommonJS require statements directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.
+
+If not specified, the default pattern `imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replaces** the default value.
+
+### coerceUndefinedToFalse
+
+This property is optional.  If the value is truthy, then undefined features will be treated as false for the purpose of dojo/has loader plugin feature evaluation at build time.  See [The dojo/has loader extension](#the-dojohas-loader-extension) for more information.
 
 # Building the Dojo loader
 
