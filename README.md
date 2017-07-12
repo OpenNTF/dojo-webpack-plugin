@@ -28,7 +28,7 @@ plugins: [
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client or if you want to support non-packed versions of the app (e.g. for development).  See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that works both with and without webpack.
 
-The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.
+The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If specified as an object, then the config expressions are evaluated at build time.  If specified as a string, then the config expressions will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.
 
 # Dojo loader extensions
 
@@ -81,6 +81,8 @@ define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
 In the above example, if the feature `foo` is truthy in the static `has` features that are defined in the dojo loader config, then the expression will be replaced with the module name `js/foo` at build time.  If `foo` is falsy, but not undefined, then it will be replaced with the module name `js/bar`.  If, on the other hand, the feature `foo` is not defined, then resolution of the expression will be deferred to when the application is loaded in the browser and the run-time value of the feature `foo` will be used to determine which module reference is provided.  Note that for client-side resolution, both resources, `js/foo` and `js/bar`, along with their nested dependencies, will be included in the packed assets.  
 
 For complex feature expressions that contain a mixture of defined and undefined feature names at build time, the runtime expression will be simplified so that it contains only the undefined feature names, and only the modules needed for resolution of the simplified expression on the client will be included in the packed resources.  Modules that are excluded by build time evaluation of the expression with the static `has` features will not be include in the packed resources, unless they are otherwise include by other dependencies.
+
+This plugin defines the `webpack` feature with a value of true.
 
 The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
 
@@ -162,7 +164,7 @@ plugins: [
 
 # ES6 Promise dependency in Webpack 2.x
 
-Webpack 2.x includes code in your packed application that uses ES6 Promise.  If you need to support browsers that lack ES6 Promise support (e.g. IE 11), then you will need to provide this capability in your application.  The [dojo-webpack-plugin-sample](https://github.com/OpenNTF/dojo-webpack-plugin-sample) project includes a tiny [wrapper](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/dojoES6Promise.js) that implements ES6 Promise using dojo/Deferred.  All you need to do is include this module as an AMD dependency in your application.
+Webpack 2.x includes code in your packed application that uses ES6 Promise.  If you need to support browsers that lack ES6 Promise support (e.g. IE 11), then you will need to provide this capability in your application.  This plugin provides a tiny wrapper module named [dojoES6Promise](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/amd/dojoES6Promise.js) that implements ES6 Promise using dojo/Deferred.  All you need to do is include this module as an AMD dependency in your application.  See [bootstrap.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/bootstrap.js) in the sample application for an example.
 
 # Order of Plugin Registration
 
