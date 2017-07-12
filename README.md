@@ -28,7 +28,7 @@ plugins: [
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client or if you want to support non-packed versions of the app (e.g. for development).  See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that works both with and without webpack.
 
-The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If you need to do conditional processing within the config based on the environment (node or browser), then specify it as a module name, otherwise, all processing will be evaluated at build time.
+The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.
 
 # Dojo loader extensions
 
@@ -58,7 +58,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 * Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
 
-* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The loaderProxy loader extension](#the-dojoloaderproxy-loader-extension).
+* Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension).
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
