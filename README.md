@@ -82,7 +82,7 @@ In the above example, if the feature `foo` is truthy in the static `has` feature
 
 For complex feature expressions that contain a mixture of defined and undefined feature names at build time, the runtime expression will be simplified so that it contains only the undefined feature names, and only the modules needed for resolution of the simplified expression on the client will be included in the packed resources.  Modules that are excluded by build time evaluation of the expression with the static `has` features will not be include in the packed resources, unless they are otherwise include by other dependencies.
 
-This plugin defines the `webpack` feature with a value of true.
+This plugin defines the `webpack` feature with a value of true if it is not already defined by the app.
 
 The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
 
