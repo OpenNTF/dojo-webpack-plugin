@@ -176,15 +176,15 @@ Webpack normally transforms async `require()` calls into `__webpack_require__()`
 
 This can be an issue if your application utilizes the Dojo parser's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) capability for loading modules of declaratively instanciated widgets.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
-# Package Location Requirements
+# Dependency requirements
 
-**dojo-webpack-plugin** must be installed in the same `node_modules` directory that Webpack is installed and run from, and flat tree dependency resolution (the default for npm v3 and above) must be used.  Otherwise, **dojo-webpack-plugin** may not be able to load some dependencies.  Errors similar to the following:
+**dojo-webpack-plugin** has a peer dependency on webpack.  **dojo-webpack-plugin**'s webpack dependencies must resolve to the same modules as your applicaiton's webpack dependencies, otherwise you may encounter errors similar to the following when building.
 
 ````
 Error: Cannot find module 'webpack-core/lib/ConcatSource'
 ````
 
-may result if this requirement is not met.
+The best way to ensure that the requirement is met is to make sure that both this plugin and webpack are installed in the same `node_modules` directory, and to use flat, rather than hierarchical, tree dependency resolution (the default for npm v3 and above) when using npm to install the packages.
 
 # Sample application
 
