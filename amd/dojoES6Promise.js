@@ -15,62 +15,71 @@
  */
 
 /*
- * A thin wrapper that implements ES6 promises using Dojo Deferred.  Much smaller than a polyfill if the
- * Dojo modules are already being used and support for ES6 Promises needs to be provided for non-Dojo code
- * (e.g. Webpack 2.x bootstrap code)
+ * A thin wrapper that implements an ES6 Promise polyfill using Dojo promises.
+ * Much smaller than other Promise polyfills if the Dojo modules are already
+ * being used.
  */
  define([
-  "dojo/Deferred",
-  "dojo/promise/all",
-  "dojo/promise/first",
-  "dojo/_base/declare"
-], function(Deferred, all, first, declare) {
-  "use strict";
+	"dojo/Deferred",
+	"dojo/promise/all",
+	"dojo/promise/first",
+	"dojo/_base/lang",
+	"dojo/_base/array"
+], function(
+	Deferred,
+	all,
+	first,
+	lang,
+	array
+) {
+	"use strict";
 
-  var Promise, freezeObject = Object.freeze || function(){};
+	var Promise, freezeObject = Object.freeze || function(){};
 
-  function wrap(dojoPromise) {
-    var result = new Promise();
-    result.promise = dojoPromise;
-    freezeObject(result);
-    return result;
-  }
+	function wrap(dojoPromise) {
+		var result = new Promise();
+		result.promise = dojoPromise;
+		freezeObject(result);
+		return result;
+	}
 
-  Promise = declare([], {
-    constructor: function(executor) {
-      if (executor) {
-        // Create a new dojo/Deferred
-        var dfd = new Deferred();
-        this.promise = dfd.promise;
-        try {
-          executor(dfd.resolve, dfd.reject);
-        } catch (err) {
-          dfd.reject(err);
-        }
-        freezeObject(this);
-      }
-    },
-    catch: function(onRejected) {
-      return wrap(this.promise.otherwise(onRejected));
-    },
-    then: function(onFullfilled, onRejected) {
-      return wrap(this.promise.then(onFullfilled, onRejected));
-    },
-  });
-  Promise.all = function(iterable) {
-    return wrap(all(iterable));
-  };
-  Promise.race = function(iterable) {
-    return wrap(first(iterable));
-  };
-  Promise.reject = function(reason) {
-    return wrap((new Deferred()).reject(reason));
-  };
-  Promise.resolve = function(value) {
-    return wrap((new Deferred()).resolve(value));
-  };
-  if (!window.Promise) {
-    window.Promise = Promise;
-  };
-  return Promise;
+	Promise = lang.extend(function PromiseWrapper(executor) {
+		if (executor) {
+			// Create a new dojo/Deferred
+			var dfd = new Deferred();
+			this.promise = dfd.promise;
+			try {
+				executor(
+					function(value) { dfd.resolve(value, false); },
+					function (reason) { dfd.reject(reason, false); }
+				);
+			} catch (err) {
+				dfd.reject(err);
+			}
+			freezeObject(this);
+		}
+	}, {
+		'catch': function(onRejected) {
+			return wrap(this.promise.otherwise(onRejected));
+		},
+		then: function(onFullfilled, onRejected) {
+			return wrap(this.promise.then(onFullfilled, onRejected));
+		}
+	});
+	Promise.all = function(iterable) {
+		return wrap(all(array.map(iterable, function(wrapped) {return wrapped.promise;})));
+	};
+	Promise.race = function(iterable) {
+		return wrap(first(array.map(iterable, function(wrapped) {return wrapped.promise;})));
+	};
+	Promise.reject = function(reason) {
+		return wrap((new Deferred()).reject(reason));
+	};
+	Promise.resolve = function(value) {
+		return wrap((new Deferred()).resolve(value));
+	};
+	if (!window.Promise) {
+		window.Promise = Promise;
+	};
+	return Promise;
 });
