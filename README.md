@@ -28,7 +28,7 @@ plugins: [
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client or if you want to support non-packed versions of the app (e.g. for development).  See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that works both with and without webpack.
 
-The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If specified as an object, then the config expressions are evaluated at build time.  If specified as a string, then the config expressions will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.
+The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If specified as an object, then the config expressions are evaluated at build time.  If specified as a string, then the config expressions will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.  In addition, instead of exporting the config, the module may export a function that returns the config.  The function will be called with the value of the [environment](#environment) option.  This mechanism allows for multi-compiler runs that use different configs.  
 
 # Dojo loader extensions
 
@@ -120,6 +120,10 @@ The plugin is instantiated with a properties map specifying the following option
 ### loaderConfig
 
 This property is required and specifies the Dojo loader config.  See [The Dojo loader config](#the-dojo-loader-config) for details.
+
+### environment
+
+Used only if the `loaderConfig` is a string specifying the name of a module and that module exports a function which returns the config.  The environment is passed to the function when it is called to get the config.  This should be a JSON type object because it gets stringified for export to the client.
 
 ### loader
 
