@@ -19,6 +19,18 @@
  */
 const nodeRequire = require.rawConfig.loaderPatch.nodeRequire;
 const path = nodeRequire("path");
+const version = nodeRequire(path.resolve(dojo.baseUrl, "./package.json")).version;
+const versionParts = version.split(".");
+const majorVersion = parseInt(versionParts[0]), minorVersion = parseInt(versionParts[1]), patchVersion = parseInt(versionParts[2]);
+if (majorVersion !== 1) {
+	throw new Error("Unsupported Dojo Version");
+}
+const hasInjectApiFix =	/* True if the version of Dojo has https://github.com/dojo/dojo/pull/266 */
+	minorVersion > 12 ||
+	minorVersion === 12 && patchVersion >= 3 ||
+	minorVersion === 11 && patchVersion >= 5 ||
+	minorVersion === 10 && patchVersion >= 9;
+
 var profile = (() => {
 	var profileArg;
 	const argv = global.process.argv;
@@ -41,7 +53,7 @@ var profile = (() => {
 
         staticHasFeatures:{
             'dojo-config-api': 1,
-            'dojo-inject-api': 1,
+            'dojo-inject-api': hasInjectApiFix ? 0 : 1,
             'dojo-built': 1,
             'config-dojo-loader-catches': 0,
             'config-tlmSiblingOfDojo': 0,
