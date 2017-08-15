@@ -11,7 +11,7 @@
 
 **dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables).  Synchronous `require()` (e.g. `require('foo')`), which returns a reference to an already loaded module or else throws an exception, is supported, as are the `require.toAbsMid()` and `require.toUrl()` functions.
 
-This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader).  
+This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the `loader` option.  See [Building the Dojo loader](#building-the-dojo-loader).  
 
 # The Dojo loader config
 
@@ -85,8 +85,6 @@ For complex feature expressions that contain a mixture of defined and undefined 
 This plugin defines the `webpack` feature with a value of true if it is not already defined by the app.
 
 The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
-
-You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-plugin) if you want to perform has.js filtering of source code at build time using statically defined features.  
 
 # The dojo/loaderProxy loader extension
 
@@ -191,12 +189,6 @@ Error: Cannot find module 'webpack-core/lib/ConcatSource'
 ````
 
 The best way to ensure that the requirement is met is to make sure that both this plugin and webpack are installed in the same `node_modules` directory, and to use flat, rather than hierarchical, tree dependency resolution (the default for npm v3 and above) when using npm to install the packages.
-
-# Related plugins
-
-* [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-plugin) - Performs has.js filtering of source code at build time based on statically defined features.
-
-* [webpack-i18n-extractor-plugin](https://www.npmjs.com/package/webpack-i18n-extractor-plugin) - Extracts NLS resources from the application chunks and places them in language/chunk specific bundles that are automatically loaded as needed for the current locale.
 
 # Sample application
 
