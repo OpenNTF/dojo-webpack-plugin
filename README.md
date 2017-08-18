@@ -28,7 +28,9 @@ plugins: [
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client or if you want to support non-packed versions of the app (e.g. for development).  See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that works both with and without webpack.
 
-The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If specified as an object, then the config expressions are evaluated at build time.  If specified as a string, then the config expressions will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.  In addition, instead of exporting the config, the module may export a function that returns the config.  The function will be called with the value of the [environment](#environment) option.  This mechanism allows for multi-compiler runs that use different configs.  
+The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If specified as an object, then the config expressions are evaluated at build time and the object is mixed with the `window.dojoConfig` property defined by the client.  
+
+If the config is specified as a module name, then the config module will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.  In addition, instead of exporting the config, the module may export a function that returns the config.  The function will be called with the value of the [environment](#environment) option.  This mechanism allows for multi-compiler runs that use different configs.  
 
 # Dojo loader extensions
 
@@ -149,13 +151,13 @@ This property is optional.  If the value is truthy, then undefined features will
 
 # Building the Dojo loader
 
-This plugin uses a custom build of the Dojo loader.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build config specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).  The Dojo loader builder assumes that the Dojo `util` directory is a sibling of the `dojo` directory.
+This plugin uses a custom build of the Dojo loader.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build config specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).  The Dojo loader builder requires that the Dojo util directory is a sibling of the `dojo` directory and is named either `util` or `dojo-util`.
 
 If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the `loader` option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
 
-        node node_modules/dojo-webpack-plugin/buildDojo/build.js ../dojo-release-1.10.0-src/dojo/dojo.js ./release
+        node node_modules/dojo-webpack-plugin/buildDojo/build.js node_modules/dojo/dojo.js ./release
 
-The example above will build the loader and place it in the `./release` directory, relative to the current directory.  Again, the Dojo util directory must be located at `../dojo-release-1.10.0-src/util` in this example in order for the build to succeed.
+The example above will build the loader and place it in the `./release` directory, relative to the current directory.  
 
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 ````javascript
