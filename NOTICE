@@ -11,6 +11,7 @@ https://github.com/webpack/webpack/blob/v1.14.0/lib/dependencies/AMDDefineDepend
 https://github.com/webpack/webpack/blob/v1.14.0/lib/dependencies/ModuleDependencyTemplateAsRequireId.js
 https://github.com/webpack/webpack/blob/v1.14.0/lib/dependencies/AMDRequireArrayDependency.js
 https://github.com/webpack/webpack/blob/v1.14.0/lib/dependencies/AMDRequireDependenciesBlockParserPlugin.js
+https://github.com/webpack/webpack/blob/v1.14.0/lib/dependencies/CommonJsRequireDependencyParserPlugin.js
 
 The product includes third party code that has been modified and adapted from the following file, originating in the Dojo Util project, and licensed under the Dojo License - http://dojotoolkit.org/license:
 https://github.com/dojo/util/blob/1.10/build/transforms/writeDojo.js 
