@@ -20,11 +20,14 @@ This package does not include the Dojo loader.  A custom build of the Dojo loade
 The loader config defines properties used in resolving module identifiers as described in [Configuring Dojo with dojoConfig](https://dojotoolkit.org/documentation/tutorials/1.7/dojo_config/).  Note that not all properties in the loader config are used by Webpack.  Only properties relating to module name/path resolution are used.  These include `baseUrl`, `packages`, `paths`, `map` and `aliases`.  The loader config may also specify a `has` map of feature-name/value pairs. The `has` features are used in resolving `dojo/has` loader conditionals at build time, and to provide the initial values for the run-time has.js feature detection functionality provided by `dojo/has`.  The loader config is specified by the `loaderConfig` options property:
 
 ````javascript
+const DojoWebpackPlugin = require('dojo-webpack-plugin');
+...
 plugins: [
-	new requre("dojo-webpack-plugin")({
+	new DojoWebpackPlugin({
 		loaderConfig: require("./loaderConfig"),
 		locales: ["en", "es", "fr"]
 	}),
+	...
 ]
 ````
 
@@ -45,11 +48,14 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 * Use the NormalModuleReplacementPlugin to replace the Dojo loader extension with a compatible Webpack loader extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
 
 	````javascript
+	const DojoWebpackPlugin = require('dojo-webpack-plugin');
+	...
 	plugins: [
-		new require("dojo-webpack-plugin")({...}),
+		new DojoWebpackPlugin({...}),
 		new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
 			data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
-		})
+		}),
+		...
 	]
 	````
 
