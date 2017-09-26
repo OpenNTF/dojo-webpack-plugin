@@ -48,17 +48,17 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 * Use the NormalModuleReplacementPlugin to replace the Dojo loader extension with a compatible Webpack loader extension.  For example, the `dojo/text` loader extension can be replaced with the Webpack `raw` loader extension.  This can be done with code similar to the following in your `webpack.config.js`.
 
-	<!-- eslint-skip -->
+	<!-- eslint-disable no-undef, semi, comma-dangle -->
 	```javascript
 	const DojoWebpackPlugin = require('dojo-webpack-plugin');
-	...
+	//...
 	plugins: [
-		new DojoWebpackPlugin({...}),
+		new DojoWebpackPlugin({/*...*/}),
 		new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
 			data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
 		}),
-		...
-	}
+		//...
+	]
 	```
 
   This replacement (among others) is automatically configured for you, so you don't need to include this in your webpack.config.js.  It is provided here as an example of what you could do with other loader extensions.
