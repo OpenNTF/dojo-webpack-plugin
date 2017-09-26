@@ -63,7 +63,6 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
   This replacement (among others) is automatically configured for you, so you don't need to include this in your webpack.config.js.  It is provided here as an example of what you could do with other loader extensions.
 
-
 * Use the NormalModuleReplacementPlugin to replace the entire module expression with the desired module.  Some Dojo loader extensions are used to dynamically load one module or another based on runtime conditions.  An example is the gfx loader, which loads the rendering engine supported by the client.  Since all modern browsers support the `canvas` rendering engine, you can replace the module expression that includes the loader with the module expression for the target module.
 
 	<!-- eslint-disable no-undef, semi-->
