@@ -27,5 +27,9 @@
     }],
     # Prevents usage of things before they're defined (except for hoisted function declarations).
     "no-use-before-define": [2, "nofunc"]
-  }
+  },
+  "plugins": [
+    "json",
+    "markdown"
+  ]
 }
