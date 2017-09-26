@@ -19,18 +19,18 @@ This package does not include the Dojo loader.  A custom build of the Dojo loade
 
 The loader config defines properties used in resolving module identifiers as described in [Configuring Dojo with dojoConfig](https://dojotoolkit.org/documentation/tutorials/1.7/dojo_config/).  Note that not all properties in the loader config are used by Webpack.  Only properties relating to module name/path resolution are used.  These include `baseUrl`, `packages`, `paths`, `map` and `aliases`.  The loader config may also specify a `has` map of feature-name/value pairs. The `has` features are used in resolving `dojo/has` loader conditionals at build time, and to provide the initial values for the run-time has.js feature detection functionality provided by `dojo/has`.  The loader config is specified by the `loaderConfig` options property:
 
-	<!-- eslint-skip -->
-	```javascript
-	const DojoWebpackPlugin = require('dojo-webpack-plugin');
-	...
-	plugins: [
-		new DojoWebpackPlugin({
-			loaderConfig: require("./loaderConfig"),
-			locales: ["en", "es", "fr"]
-		})
-		...
-	],
-	```
+<!-- eslint-disable no-undef, semi, comma-dangle-->
+```javascript
+const DojoWebpackPlugin = require('dojo-webpack-plugin');
+//...
+plugins: [
+	new DojoWebpackPlugin({
+		loaderConfig: require("./loaderConfig"),
+		locales: ["en", "es", "fr"]
+	})
+	//...
+]
+```
 
 Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client or if you want to support non-packed versions of the app (e.g. for development).  See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that works both with and without webpack.
 
@@ -77,25 +77,25 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
-	<!-- eslint-disable no-undef, semi-->
-	```javascript
-	new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/selector/lite"),
-	new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
-	new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
-		data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
-	})
-	```
+<!-- eslint-disable no-undef, semi-->
+```javascript
+new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/selector/lite"),
+new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
+new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
+	data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
+})
+```
 
 # The dojo/has loader extension
 
 Dojo supports conditionally depending on modules using the `dojo/has` loader extension.  **dojo-webpack-plugin** supports both build-time and run-time resolution of `dojo/has` loader expressions.  Consider the following example:
 
-	<!-- eslint-skip -->
-	```javascript
-	define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
-	  ...
-	});
-	```
+<!-- eslint-disable no-undef, semi, no-unused-vars -->
+```javascript
+define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
+	//...
+});
+```
 	
 In the above example, if the feature `foo` is truthy in the static `has` features that are defined in the dojo loader config, then the expression will be replaced with the module name `js/foo` at build time.  If `foo` is falsy, but not undefined, then it will be replaced with the module name `js/bar`.  If, on the other hand, the feature `foo` is not defined, then resolution of the expression will be deferred to when the application is loaded in the browser and the run-time value of the feature `foo` will be used to determine which module reference is provided.  Note that for client-side resolution, both resources, `js/foo` and `js/bar`, along with their nested dependencies, will be included in the packed assets.  
 
@@ -113,27 +113,28 @@ You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-p
 
 Consider a simple svg loader extension that loads the specified svg file and fixes up the contents by removing the xml header in the content.  The implementation of the load method might look like this:
 
-	<!-- eslint-skip -->
-	```js
-	load: function(name, req, callback) {
-		req(["dojo/text!" + name], function(text) {
-			callback(stripHeader(text).trim());
-		});
-	}
-	```
+<!-- eslint-disable no-undef, no-unused-vars-->
+```javascript
+function load(name, req, callback) {
+	req(["dojo/text!" + name], function(text) {
+		callback(stripHeader(text).trim());
+	});
+}
+```
+
 Here, the load method delegates to a loader extension that is supported by Webpack to load the resource.  If the resource is included in the packed modules, then the `req` callback will be invoked in-line, and thus the `load` method's callback will be invoke in-line.  If the `load` method's callback is not invoked before the `load` method returns, then an exception will be thrown.
 
 You can use `dojo/loaderProxy` with the Webpack NormalModuleReplacementPlugin as follows:
 
-	<!-- eslint-disable no-undef, semi, comma-dangle-->
-	```javascript
-	new webpack.NormalModuleReplacementPlugin(
-		/^svg!/, function(data) {
-			var match = /^svg!(.*)$/.exec(data.request);
-			data.request = "dojo/loaderProxy?loader=svg&deps=dojo/text%21" + match[1] + "!" + match[1];
-		}
-	),
-	```
+<!-- eslint-disable no-undef, semi, comma-dangle-->
+```javascript
+new webpack.NormalModuleReplacementPlugin(
+	/^svg!/, function(data) {
+		var match = /^svg!(.*)$/.exec(data.request);
+		data.request = "dojo/loaderProxy?loader=svg&deps=dojo/text%21" + match[1] + "!" + match[1];
+	}
+)
+```
 	
 The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderProxy?loader=<loader>&deps=<dependencies>!<resource>` where *loader* specifies the Dojo loader extension to run on the client and *dependencies* specifies a comma separated list of module dependencies to add to the packed resources.  In the example above, if the client code specifies the module as `svg!closeBtn.svg`, then the translated module will be `dojo/loaderProxy?loader=svg&deps=dojo/text%21closeBtn.svg!closeBtn.svg`.  Note the need to URL encode the `!` character so as not to trip up parsing.
 
@@ -183,15 +184,15 @@ The example above will build the loader and place it in the `./release` director
 
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 
-	<!-- eslint-disable no-undef, semi, comma-dangle-->
-	```javascript
-	plugins: [
-		new requre("dojo-webpack-plugin")({
-			loaderConfig: require("./loaderConfig"),
-			locales: ["en"],
-			loader: path.join(__directory, "./release/dojo/dojo.js")
-		}),
-	]
+<!-- eslint-disable no-undef, semi, comma-dangle-->
+```javascript
+plugins: [
+	new requre("dojo-webpack-plugin")({
+		loaderConfig: require("./loaderConfig"),
+		locales: ["en"],
+		loader: path.join(__directory, "./release/dojo/dojo.js")
+	}),
+]
 ```
 
 # ES6 Promise dependency in Webpack 2.x
@@ -212,9 +213,9 @@ This can be an issue if your application utilizes the Dojo parser's [Auto-Requir
 
 **dojo-webpack-plugin** has a peer dependency on webpack.  **dojo-webpack-plugin**'s webpack dependencies must resolve to the same modules as your applicaiton's webpack dependencies, otherwise you may encounter errors similar to the following when building.
 
-````
+```
 Error: Cannot find module 'webpack-core/lib/ConcatSource'
-````
+```
 
 The best way to ensure that the requirement is met is to make sure that both this plugin and webpack are installed in the same `node_modules` directory, and to use flat, rather than hierarchical, tree dependency resolution (the default for npm v3 and above) when using npm to install the packages.
 
