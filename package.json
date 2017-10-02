@@ -1,10 +1,13 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.0.15",
+  "version": "2.0.16-rc1",
+  "author": "Chuck Dumont",
+  "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
-    "lint": "eslint . --ext .json --ext .md",
-    "pretest": "npm run lint",
-    "test": "echo \"No tests\""
+    "lint": "eslint . --ext .json --ext .md --ext .js",
+    "pretest": "npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js",
+    "test": "mocha --harmony",
+    "travis:test": "npm run -s test"
   },
   "dependencies": {
     "raw-loader": "0.5.1",
@@ -20,8 +23,15 @@
     "url": "git+https://github.com/OpenNTF/dojo-webpack-plugin.git"
   },
   "devDependencies": {
+    "webpack": ">= 2.2.0",
     "eslint": "^4.7.2",
     "eslint-plugin-json": "^1.2.0",
-    "eslint-plugin-markdown": "^1.0.0-beta.6"
+    "eslint-plugin-markdown": "^1.0.0-beta.6",
+    "mocha": "^3.5.3",
+    "should": "^13.1.0",
+    "dojo": "1.12.2",
+    "dijit": "1.12.2",
+    "dojox": "1.12.2",
+    "dojo-util": "1.12.2"
   }
 }
