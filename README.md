@@ -1,5 +1,4 @@
-<img src="https://travis-ci.org/chuckdumont/dojo-webpack-plugin.svg?branch=master"/>
-<img src="https://coveralls.io/repos/chuckdumont/dojo-webpack-plugin/badge.svg?branch=master"/>
+<img src="https://travis-ci.org/chuckdumont/dojo-webpack-plugin.svg?branch=master"/> <img src="https://coveralls.io/repos/chuckdumont/dojo-webpack-plugin/badge.svg?branch=master"/>
 
 # Introduction
 
