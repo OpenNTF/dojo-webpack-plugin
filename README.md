@@ -1,6 +1,7 @@
 <div>
 <img src="https://travis-ci.org/OpenNTF/dojo-webpack-plugin.svg?branch=master"/>&nbsp;
 <img src="https://coveralls.io/repos/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master"/>
+<img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield"/>
 </div>
 
 # Introduction
