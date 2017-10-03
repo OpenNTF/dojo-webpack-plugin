@@ -5,6 +5,8 @@
 </div>
 
 # Introduction
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin?ref=badge_shield)
+
 
 **dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 2 and greater.  The plugin has been tested with Webpack 2.2.0 and 3.0.0, and Dojo versions 1.10 and 1.12.  For Webpack 1.x, use the v1 branch of this project.  Features include:
 
@@ -235,3 +237,7 @@ The best way to ensure that the requirement is met is to make sure that both thi
 See the sample application at https://github.com/OpenNTF/dojo-webpack-plugin-sample.
 
 https://openntf.github.io/dojo-webpack-plugin-sample/test.html.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin?ref=badge_large)
