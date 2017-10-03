@@ -20,6 +20,7 @@
     "no-trailing-spaces": 2,
     "no-undef": 2,
     "semi": 2,
+    "no-debugger": "error",
     # Helps ensure we don't require unused modules.
     "no-unused-vars": [2, {
        "args": "all",
