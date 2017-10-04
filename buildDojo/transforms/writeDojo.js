@@ -25,9 +25,10 @@ define([
 	"util/build/buildControl",
 	"util/build/fileUtils",
 	"util/build/fs",
-	"util/build/transforms/writeAmd"
+	"util/build/transforms/writeAmd",
+	"dojo/text!dojo/package.json"
 
-], function(bc, fileUtils, fs, writeAmd){
+], function(bc, fileUtils, fs, writeAmd, pkg){
 	return function(resource, callback){
 		var
 			waitCount = 1, // matches *1*
@@ -51,8 +52,9 @@ define([
 
 		// the writeDojo transform...
 		try{
+			const version = JSON.stringify(JSON.parse(pkg).version);
 			// assemble and write the dojo layer
-			resource.uncompressedText = "module.exports = " + resource.getText() + ";";
+			resource.uncompressedText = "module.exports = function(userConfig, defaultConfig, global, window) { this.loaderVersion = " + version + "; " + resource.getText() + ".call(this, userConfig, defaultConfig);};";
 			doWrite(writeAmd.getDestFilename(resource), resource.uncompressedText);
 
 			onWriteComplete(0); // matches *1*
