@@ -1,8 +1,7 @@
-<div>
-<a href="https://travis-ci.org/OpenNTF/dojo-webpack-plugin"><img src="https://travis-ci.org/OpenNTF/dojo-webpack-plugin.svg?branch=master" alt="Build Status"/></a>&nbsp;
-<a href='https://coveralls.io/github/OpenNTF/dojo-webpack-plugin?branch=master'><img src='https://coveralls.io/repos/github/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master' alt='Coverage Status' /></a>&nbsp;
-<a href="https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield" alt="License Scan"/></a>
-</div>
+[![npm][npm]][npm-url]
+[![builds][builds]][builds-url]
+[![coverage][cover]][cover-url]
+[![licenses][licenses]][licenses-url]
 
 # Introduction
 
@@ -246,3 +245,12 @@ The versions of Dojo listed below require version 2.1.0 of this plugin to work c
 * 1.10.9 and later
 
 In addition, Dojo loaders built with earlier versions of the plugin will not work with 2.1.0 or later, even if you have not changed the version of Dojo you are building with.  If you are using a pre-built loader with the [loader](#loader) config option, then you will need to rebuild it when upgrading to 2.1.
+
+[npm]: https://img.shields.io/npm/v/dojo-webpack-plugin.svg
+[npm-url]: https://npmjs.com/package/dojo-webpack-plugin
+[builds-url]: https://travis-ci.org/OpenNTF/dojo-webpack-plugin
+[builds]: https://travis-ci.org/OpenNTF/dojo-webpack-plugin.svg?branch=master
+[cover-url]: https://coveralls.io/github/OpenNTF/dojo-webpack-plugin?branch=master
+[cover]: https://coveralls.io/repos/github/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master
+[licenses-url]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin
+[licenses]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield
