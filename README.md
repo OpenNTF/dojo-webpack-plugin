@@ -1,7 +1,7 @@
 <div>
-<img src="https://travis-ci.org/OpenNTF/dojo-webpack-plugin.svg?branch=master"/>&nbsp;
-<img src="https://coveralls.io/repos/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master"/>
-<img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield"/>
+<a href="https://travis-ci.org/OpenNTF/dojo-webpack-plugin"><img src="https://travis-ci.org/OpenNTF/dojo-webpack-plugin.svg?branch=master" alt="Build Status"/></a>&nbsp;
+<a href='https://coveralls.io/github/OpenNTF/dojo-webpack-plugin?branch=master'><img src='https://coveralls.io/repos/github/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master' alt='Coverage Status' /></a>&nbsp;
+<a href="https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield" alt="License Scan"/></a>
 </div>
 
 # Introduction
