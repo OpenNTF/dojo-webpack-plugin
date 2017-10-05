@@ -9,8 +9,6 @@
   <img width="200" height="200" vspace="" hspace="25" alt="Dojo" title="Dojo"
       src="https://cdn.worldvectorlogo.com/logos/dojo.svg">
   </a>
-  <img width="100" height="100" vspace="" hspace=""
-      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAdarEplhUJ6Aauu166r7znHjhCIxxzAzWtTMM8uDhat48ZTDM"/>
   <a href="https://github.com/webpack/webpack">
   <img width="200" height="200" vspace="" hspace="25" alt="webpack" title="webpack"
       src="https://cdn.worldvectorlogo.com/logos/webpack.svg">
