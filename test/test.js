@@ -99,7 +99,10 @@ describe("TestCases", () => {
 								var p = path.join(outputDirectory, bundlePath);
 								content = fs.readFileSync(p, "utf-8");
 								var module = {exports: {}};
-								var context = vm.createContext({console: console});
+								var context = vm.createContext({
+									console: console,
+									process: process
+								});
 								context.global = context;
 								context.it = _it;
 								Object.defineProperty(context, "should", {
