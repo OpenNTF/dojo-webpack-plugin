@@ -2,6 +2,8 @@
 [![builds][builds]][builds-url]
 [![coverage][cover]][cover-url]
 [![licenses][licenses]][licenses-url]
+[![Apache 2.0 License][apache2]][apache2-url]
+
 
 # Introduction
 
@@ -256,3 +258,5 @@ In addition, Dojo loaders built with earlier versions of the plugin will not wor
 [cover]: https://coveralls.io/repos/github/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master
 [licenses-url]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin
 [licenses]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield
+[apache2]: https://img.shields.io/badge/license-Apache%202-blue.svg
+[apache2-url]: https://www.apache.org/licenses/LICENSE-2.0.txt
