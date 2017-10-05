@@ -11,7 +11,7 @@
   </a>
   <a href="https://github.com/webpack/webpack">
   <img width="200" height="200" vspace="" hspace="25" alt="webpack" title="webpack"
-      src="https://cdn.worldvectorlogo.com/logos/webpack.svg">
+      src="https://cdn.worldvectorlogo.com/logos/webpack-icon.svg">
   </a>
   <h1>dojo-webpack-plugin</h1>
   <p>Build Dojo 1.x applications with webpack<p>
