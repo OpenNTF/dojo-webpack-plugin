@@ -4,6 +4,19 @@
 [![licenses][licenses]][licenses-url]
 [![Apache 2.0 License][apache2]][apache2-url]
 
+<div align="center">
+  <a href="https://dojotoolkit.org">
+  <img width="200" height="200" vspace="" hspace="25" alt="Dojo" title="Dojo"
+      src="https://cdn.worldvectorlogo.com/logos/dojo.svg">
+  </a>
+  <a href="https://github.com/webpack/webpack">
+  <img width="200" height="200" vspace="" hspace="25" alt="webpack" title="webpack"
+      src="https://cdn.worldvectorlogo.com/logos/webpack.svg">
+  </a>
+  <h1>dojo-webpack-plugin</h1>
+  <p>Build Dojo 1.x applications with webpack<p>
+</div>
+
 
 # Introduction
 
