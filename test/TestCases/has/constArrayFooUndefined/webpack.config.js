@@ -10,5 +10,8 @@ module.exports = {
 			},
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
-	]
+	],
+	output: {
+		pathinfo: true
+	}
 };
