@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ /*
+ 	MIT License http://www.opensource.org/licenses/mit-license.php
+ 	Author Tobias Koppers @sokra
+ */
 
 /*eslint no-shadow: [, { "allow": ["options"] }]*/
 var should = require("should");

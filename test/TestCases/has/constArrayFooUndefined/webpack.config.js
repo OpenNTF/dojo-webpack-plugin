@@ -4,7 +4,10 @@ module.exports = {
 	entry: "test/index",
 	plugins: [
 		new DojoWebpackPlugin({
-			loaderConfig: require.resolve("./loaderConfig"),
+			loaderConfig: {
+				paths:{test: "."},
+				has: {"host-browser": false}
+			},
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	]
