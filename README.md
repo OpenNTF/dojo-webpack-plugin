@@ -87,6 +87,10 @@ new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/sel
 new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
 new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
 	data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
+}),
+new NormalModuleReplacementPlugin(/^dojo\/query!/, data => {
+	var match = /^dojo\/query!(.*)$/.exec(data.request);
+	data.request = "dojo/loaderProxy?loader=dojo/query&name=" + match[1] + "!";
 })
 ```
 
@@ -140,9 +144,11 @@ new webpack.NormalModuleReplacementPlugin(
 )
 ```
 	
-The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderProxy?loader=<loader>&deps=<dependencies>!<resource>` where *loader* specifies the Dojo loader extension to run on the client and *dependencies* specifies a comma separated list of module dependencies to add to the packed resources.  In the example above, if the client code specifies the module as `svg!closeBtn.svg`, then the translated module will be `dojo/loaderProxy?loader=svg&deps=dojo/text%21closeBtn.svg!closeBtn.svg`.  Note the need to URL encode the `!` character so as not to trip up parsing.
+The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderProxy?loader=<loader>&deps=<dependencies>&name=<resource>!<resource>` where *loader* specifies the Dojo loader extension to run on the client and *dependencies* specifies a comma separated list of module dependencies to add to the packed resources.  In the example above, if the client code specifies the module as `svg!closeBtn.svg`, then the translated module will be `dojo/loaderProxy?loader=svg&deps=dojo/text%21closeBtn.svg!closeBtn.svg`.  Note the need to URL encode the `!` character so as not to trip up parsing.
 
 Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is required by the `svg` loader extension's load method on the client, then the dependency will be resolved in-line and the `load` method's callback will be invoked in-line as required.
+
+The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`. 
 
 # Options
 
