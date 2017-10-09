@@ -4,11 +4,15 @@ module.exports = {
 	entry: "test/index",
 	plugins: [
 		new DojoWebpackPlugin({
-			loaderConfig: require.resolve("./loaderConfig"),
+			loaderConfig: {
+				paths:{test: "."}
+			},
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	],
-	output: {
-		pathinfo: true
+	resolve: {
+		alias: {
+			'dojo/request/xhr': path.join(__dirname, "./request.js")
+		}
 	}
 };

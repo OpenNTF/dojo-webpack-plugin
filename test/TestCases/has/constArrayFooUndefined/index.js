@@ -1,4 +1,4 @@
-define("dojo/has,dojo/has!foo?./a:./b".split(","), function(has, m1) {
+define("require,dojo/has,dojo/has!foo?./a:./b".split(","), function(require, has, m1) {
   it("should load module based on runtime value of foo", function(done) {
     has("webpack").should.be.true;
 		(typeof(has('foo')) === 'undefined').should.be.true;
