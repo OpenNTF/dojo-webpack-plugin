@@ -2,15 +2,32 @@
 [![builds][builds]][builds-url]
 [![coverage][cover]][cover-url]
 [![licenses][licenses]][licenses-url]
+[![Apache 2.0 License][apache2]][apache2-url]
+
+<div align="center">
+  <a href="https://dojotoolkit.org">
+  <img width="200" height="200" vspace="" hspace="25" alt="Dojo" title="Dojo"
+      src="https://cdn.worldvectorlogo.com/logos/dojo.svg">
+  </a>
+  <a href="https://github.com/webpack/webpack">
+  <img width="200" height="200" vspace="" hspace="25" alt="webpack" title="webpack"
+      src="https://cdn.worldvectorlogo.com/logos/webpack-icon.svg">
+  </a>
+  <h1>dojo-webpack-plugin</h1>
+  <p>Build Dojo 1.x applications with webpack<p>
+</div>
+
 
 # Introduction
 
-**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 2 and greater.  The plugin has been tested with Webpack 2.2.0 and 3.0.0, and Dojo versions 1.10 through 1.13.  For Webpack 1.x, use the v1 branch of this project.  Features include:
+**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 2 and greater.  The plugin has been tested with Webpack 2.2.0 and 3.6.0, and Dojo versions 1.10 through 1.13.  For Webpack 1.x, use the v1 branch of this project.  Features include:
 
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
 * Webpack loader implementations of standard Dojo loaders (e.g. `dojo/has`, `dojo/i18n`).
 * Limited support for client side execution of some Dojo loader extensions.
+
+See the [Release Notes](#release-notes) for important information about upgrading to from earlier versions of this plugin to 2.1+.
 
 # The Dojo loader
 
@@ -264,3 +281,5 @@ In addition, Dojo loaders built with earlier versions of the plugin will not wor
 [cover]: https://coveralls.io/repos/github/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master
 [licenses-url]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin
 [licenses]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin.svg?type=shield
+[apache2]: https://img.shields.io/badge/license-Apache%202-blue.svg
+[apache2-url]: https://www.apache.org/licenses/LICENSE-2.0.txt
