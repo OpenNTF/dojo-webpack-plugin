@@ -5,7 +5,8 @@ module.exports = {
 		new DojoWebpackPlugin({
 			loaderConfig: {
 				paths:{test: "."}
-			}
+			},
+			noConsole: true
 		})
 	]
 };

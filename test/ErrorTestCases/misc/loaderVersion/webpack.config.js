@@ -13,7 +13,8 @@ module.exports = {
 			loaderConfig: {
 				paths:{test: "."}
 			},
-			loader: loaderPath
+			loader: loaderPath,
+			noConsole: true
 		})
 	]
 };
