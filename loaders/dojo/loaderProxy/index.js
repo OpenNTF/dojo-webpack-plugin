@@ -23,7 +23,7 @@ module.exports = function() {
 	if (!loader) {
 		throw new Error("No loader specified");
 	}
-	const name = this._module.absMid.split("!").pop();
+	const name = query.name || this._module.absMid.split("!").pop();
 	const deps = query.deps ? query.deps.split(",") : [];
 	var issuerAbsMid, issuer = this._module.issuer;
 	if (issuer) {
