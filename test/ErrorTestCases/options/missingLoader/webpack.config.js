@@ -4,11 +4,10 @@ module.exports = {
 	entry: "test/index",
 	plugins: [
 		new DojoWebpackPlugin({
-			loaderConfig: require.resolve("./loaderConfig"),
-			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
+			loaderConfig: {
+				paths:{test: "."}
+			},
+			loader: path.join(__dirname, "dojo.js")
 		})
-	],
-	output: {
-		pathinfo: true
-	}
+	]
 };
