@@ -5,7 +5,8 @@ module.exports = {
 		new DojoWebpackPlugin({
 			loaderConfig: {
 				paths:{test: "."},
-				packages:[{name: "dojo", location: "../../../../node_modules/dojo"}]
+				packages:[{name: "dojo", location: "../../../../node_modules/dojo"}],
+				noConsole: true
 			}
 		})
 	],

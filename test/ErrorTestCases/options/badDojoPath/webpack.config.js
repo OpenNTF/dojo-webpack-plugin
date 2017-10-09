@@ -6,7 +6,8 @@ module.exports = {
 			loaderConfig: {
 				paths:{test: "."},
 				packages:[{name: "dojo", location: "./dojo"}]
-			}
+			},
+			noConsole: true
 		})
 	]
 };

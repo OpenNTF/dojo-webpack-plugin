@@ -199,6 +199,10 @@ If not specified, the default pattern `imports-loader|exports-loader)[?!]` is us
 
 This property is optional.  If the value is truthy, then undefined features will be treated as false for the purpose of dojo/has loader plugin feature evaluation at build time.  See [The dojo/has loader extension](#the-dojohas-loader-extension) for more information.
 
+### noConsole
+
+This property is optional.  If the value is truthy, then console output from building the Dojo loader will be suppressed.
+
 # Building the Dojo loader
 
 This plugin uses a custom build of the Dojo loader.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build config specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~4KB after uglify and gzip).  The Dojo loader builder requires that the Dojo util directory is a sibling of the `dojo` directory and is named either `util` or `dojo-util`.
