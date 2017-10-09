@@ -31,7 +31,14 @@ var NodeRequireEnsurePatchPlugin = require("./plugins/NodeRequireEnsurePatchPlug
 
 
 describe("TestCases", () => {
-	var casesPath = path.join(__dirname, "TestCases");
+	runTestCases(path.join(__dirname, "TestCases"));
+});
+
+describe("ErrorTestCases", () => {
+	runTestCases(path.join(__dirname, "ErrorTestCases"), true);
+});
+
+function runTestCases(casesPath, isErrorTest) {
 	var categories = fs.readdirSync(casesPath);
 	categories = categories.map(function(cat) {
 		return {
@@ -45,7 +52,7 @@ describe("TestCases", () => {
 		describe(category.name, function() {
 			category.tests.forEach(function(testName) {
 				var suite = describe(testName, function() {});
-				it(testName + " should compile", function(done) {
+				it(testName + isErrorTest ? " should fail" : " should compile", function(done) {
 					this.timeout(60000);
 					var testDirectory = path.join(casesPath, category.name, testName);
 					var outputDirectory = path.join(__dirname, "js", "TestCases", category.name, testName);
@@ -64,7 +71,9 @@ describe("TestCases", () => {
 						options.plugins.push(new NodeRequireEnsurePatchPlugin());
 					});
 					webpack(options, function(err, stats) {
-						if(err) return done(err);
+						if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
+							return;
+						}
 						var statOptions = Stats.presetToOptions("verbose");
 						statOptions.colors = false;
 						fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
@@ -129,7 +138,26 @@ describe("TestCases", () => {
 			});
 		});
 	});
-});
+}
+
+function checkExpectedError(isErrorTest, testDirectory, error, done) {
+	if (isErrorTest) {
+		if (error) {
+			const expectedError = require(path.join(testDirectory, "expectedError"));
+			if (expectedError.test(error)) {
+				done();
+			} else {
+				done(new Error("Unexpected error message: " + error));
+			}
+		} else {
+			done(new Error("Expected error but test passed."));
+		}
+		return true;
+	} else if (error) {
+		done(error);
+		return true;
+	}
+}
 
 function checkArrayExpectation(testDirectory, object, kind, filename, upperCaseKind, done) {
 	if(!done) {
