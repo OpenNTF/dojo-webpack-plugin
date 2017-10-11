@@ -35,10 +35,10 @@ describe("TestCases", () => {
 });
 
 describe("ErrorTestCases", () => {
-	runTestCases(path.join(__dirname, "ErrorTestCases"), true);
+	runTestCases(path.join(__dirname, "ErrorTestCases"));
 });
 
-function runTestCases(casesPath, isErrorTest) {
+function runTestCases(casesPath) {
 	var categories = fs.readdirSync(casesPath);
 	categories = categories.map(function(cat) {
 		return {
@@ -52,9 +52,12 @@ function runTestCases(casesPath, isErrorTest) {
 		describe(category.name, function() {
 			category.tests.forEach(function(testName) {
 				var suite = describe(testName, function() {});
-				it(testName + isErrorTest ? " should fail" : " should compile", function(done) {
+				var testDirectory = path.join(casesPath, category.name, testName);
+				const isErrorTest = fs.existsSync(path.join(testDirectory, "expectedError.js"));
+				const isCompilerErrors = fs.existsSync(path.join(testDirectory, "errors.js"));
+				const isCompilerWarnings = fs.existsSync(path.join(testDirectory, "warnings.js"));
+				it(testName + (isErrorTest ? " should fail" : " should compile") + (isCompilerErrors ? " with errors" : isCompilerWarnings ? " with warnings" : ""), function(done) {
 					this.timeout(60000);
-					var testDirectory = path.join(casesPath, category.name, testName);
 					var outputDirectory = path.join(__dirname, "js", "TestCases", category.name, testName);
 					var options = require(path.join(testDirectory, "webpack.config.js"));
 					var optionsArr = [].concat(options);
@@ -183,6 +186,7 @@ function checkArrayExpectation(testDirectory, object, kind, filename, upperCaseK
 			} else if(!expected[i].test(array[i]))
 				return done(new Error(`${upperCaseKind} ${i}: ${array[i]} doesn't match ${expected[i].toString()}`)), true;
 		}
+		return done(), true;
 	} else if(array.length > 0) {
 		return done(new Error(`${upperCaseKind}s while compiling:\n\n${array.join("\n\n")}`)), true;
 	}
