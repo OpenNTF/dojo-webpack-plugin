@@ -52,7 +52,7 @@ function runTestCases(casesPath, isErrorTest) {
 		describe(category.name, function() {
 			category.tests.forEach(function(testName) {
 				var suite = describe(testName, function() {});
-				it(testName + isErrorTest ? " should fail" : " should compile", function(done) {
+				it(testName + (isErrorTest ? " should fail" : " should compile"), function(done) {
 					this.timeout(60000);
 					var testDirectory = path.join(casesPath, category.name, testName);
 					var outputDirectory = path.join(__dirname, "js", "TestCases", category.name, testName);
