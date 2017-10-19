@@ -39,6 +39,15 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 		});
 	});
 
+	it("runtime require", function (done) {
+		var deps = ["missingModule", "test/dep"];
+		require(deps, function (reqMissingModule, reqDep) {
+			(typeof reqMissingModule).should.be.eql("undefined");
+			reqDep.should.be.eql(dep);
+			done();
+		});
+	});
+
 	dep.runTests();
 
 });
