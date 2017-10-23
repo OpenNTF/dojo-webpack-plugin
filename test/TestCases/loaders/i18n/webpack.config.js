@@ -1,7 +1,7 @@
 var path = require("path");
 var DojoWebpackPlugin = require("../../../../index");
 
-module.exports = [undefined, "en-us", "fr", "es", "de"].map(locale => {
+module.exports = [undefined, "en-us", "fr", "es", "de", "zh-hk"].map(locale => {
 	return {
 		entry: "test/index",
 		plugins: [
