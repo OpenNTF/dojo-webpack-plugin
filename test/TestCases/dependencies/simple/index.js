@@ -56,13 +56,15 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 			var handle = require.on("error", function(error) {
 				handle.remove();
 				error.info.length.should.be.eql(2);
+				error.info[0].mid.should.be.eql("missing");
+				error.info[1].mid.should.be.eql("test/asyncDep2");
 				resolve();
 			});
 		});
 		// Runtime async require should fail because the chunk hasn't been loaded yet.
 		var deps = ["missing", "test/asyncDep2"];
 		require(deps, function() {
-			done(new Error("rutime require callback should not be called"));
+			should.fail("rutime require callback should not be called");
 		});
 
 		waitForError.then(function() {
@@ -82,9 +84,10 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 						resolve();
 					});
 				});
-				// This time, runtime async require should succeed because chunk is loaded
+				// Async require should still fail because of "missing", but "test/asyncDep2"
+				// should have been loaded and initialized.
 				require(deps, function() {
-					done(new Error("rutime require callback should not be called"));
+					should.fail("rutime require callback should not be called");
 				});
 				waitForError.then(function() {
 					require("test/asyncDep2").should.be.eql("asyncDep2");

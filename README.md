@@ -179,6 +179,10 @@ This property is required and specifies the Dojo loader config.  See [The Dojo l
 
 Used only if the `loaderConfig` is a string specifying the name of a module and that module exports a function which returns the config.  The environment is passed to the function when it is called to get the config.  This should be a JSON type object because it gets stringified for export to the client.
 
+### buildEnvironment
+
+Simialr to `environment`, but used exclusively at build time.  If both are specified, then `buildEnvironment` will be passed to the `loaderConfig` function when building, and `environment` will be passed to the `loaderConfig` function when the built application is loaded in the browser.  This facilitates specifying different `loaderConfig` paths (e.g. `baseUrl`) for build vs. run.  If only `environment` is specified, then it is used for both.
+
 ### loader
 
 This property is optional and specifies the module path of the built Dojo loader.  See [Building the Dojo loader](#building-the-dojo-loader) for details.  If not specified, then the loader will be built as part of the Webpack build.
