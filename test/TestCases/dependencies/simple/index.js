@@ -1,3 +1,4 @@
+var should = require("should");
 define(["exports", "module", "./dep"], function(exports, module, dep) {
 	it("should compile", function(done) {
 		done();
@@ -39,12 +40,61 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 		});
 	});
 
-	it("runtime require", function (done) {
-		var deps = ["missingModule", "test/dep"];
-		require(deps, function (reqMissingModule, reqDep) {
-			(typeof reqMissingModule).should.be.eql("undefined");
-			reqDep.should.be.eql(dep);
-			done();
+	it("runtime require failures", function(done) {
+		var notTrue;
+		if (notTrue) {
+			// async require we don't execute just so webpack knows about the dependency
+			require(["test/asyncDep2"], function() {});
+		}
+		// Synchronous require should fail
+		try {
+			require('test/asyncDep2');
+			should.fail("Expected exception thrown");
+		} catch(ignore) {}
+
+		var waitForError = new Promise(function(resolve) {
+			var handle = require.on("error", function(error) {
+				handle.remove();
+				error.info.length.should.be.eql(2);
+				error.info[0].mid.should.be.eql("missing");
+				error.info[1].mid.should.be.eql("test/asyncDep2");
+				resolve();
+			});
+		});
+		// Runtime async require should fail because the chunk hasn't been loaded yet.
+		var deps = ["missing", "test/asyncDep2"];
+		require(deps, function() {
+			should.fail("rutime require callback should not be called");
+		});
+
+		waitForError.then(function() {
+			// Call webpack's require.ensure to load the chunk containing test/asyncDep2
+			require.ensure(["test/asyncDep2"], function() {
+				// Synchonous require should still fail because module hasn't been defined.
+				try {
+					require('test/asyncDep2');
+					should.fail("Expected exception thrown");
+				} catch(ignore) {}
+
+				waitForError = new Promise(function(resolve) {
+					var handle = require.on("error", function(error) {
+						handle.remove();
+						error.info.length.should.be.eql(1);
+						error.info[0].mid.should.be.eql("missing");
+						resolve();
+					});
+				});
+				// Async require should still fail because of "missing", but "test/asyncDep2"
+				// should have been loaded and initialized.
+				require(deps, function() {
+					should.fail("rutime require callback should not be called");
+				});
+				waitForError.then(function() {
+					require("test/asyncDep2").should.be.eql("asyncDep2");
+					done();
+				});
+
+			});
 		});
 	});
 
