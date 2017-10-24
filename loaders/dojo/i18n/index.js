@@ -23,6 +23,11 @@ module.exports = function(content) {
 	// the requested locale.  For example if the requested locale is en-us, then bundle
 	// locales en and en-us and en-us-xyz all match.
 	function getAvailableLocales(requestedLocale, bundle) {
+		if (requestedLocale === "*") {
+			return Object.keys(bundle).filter(locale => {
+				return locale !== "root" && !!bundle[locale];
+			});
+		}
 		var result = [], parts = requestedLocale.split("-");
 		// Add root locales (less spcific) first
 		for (var current = "", i = 0; i < parts.length; i++) {
@@ -80,6 +85,8 @@ module.exports = function(content) {
 	// Determine if this is the default bundle or a locale specific bundle
 	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
 	const resMatch = regex.exec(res);
+	const bundledLocales = [];
+	const requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales;
 	if (resMatch && absMid) {
 		var locale;
 		if (resMatch[3]) {
@@ -91,10 +98,10 @@ module.exports = function(content) {
 			const absMidMatch = regex.exec(absMid);
 			const normalizedPath = absMidMatch[1];
 			const normalizedFile = absMidMatch[2];
-			const requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales || [];
-			requestedLocales.forEach(function(requestedLocale) {
+			(requestedLocales || ["*"]).forEach(function(requestedLocale) {
 				const availableLocales = getAvailableLocales(requestedLocale, bundle);
 				availableLocales.forEach((loc) => {
+					bundledLocales.push(loc);
 					const name = normalizedPath + "/nls/" + loc + "/" + normalizedFile;
 					buf.push("require(\"" + name + "?absMid=" + name + "\");");
 				});
@@ -111,7 +118,12 @@ module.exports = function(content) {
 		issuerAbsMid = this._module.absMid || "";
 	}
 
-	buf.push("require(\"" + absMid + "?absMid=" + absMid + "\");");
+	if (bundle.root && requestedLocales) {
+		buf.push("require(\"dojo/i18nRootModifier?absMid=" + absMid +
+		  "&bundledLocales=" + bundledLocales.toString().replace(/,/g,"|") + "!" + absMid + "\");");
+	} else {
+		buf.push("require(\"" + absMid + "?absMid=" + absMid + "\");");
+	}
 	buf.push("module.exports = require(\"" + runner + "\")(\"" + absMid + "\");");
 	return buf.join("\n");
 };

@@ -1,4 +1,4 @@
-var should = require("should");
+var should = require("should").default;
 define(["exports", "module", "./dep"], function(exports, module, dep) {
 	it("should compile", function(done) {
 		done();
