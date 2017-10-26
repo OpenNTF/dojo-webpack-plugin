@@ -1,3 +1,0 @@
-define({
-	hello: 'G\'day'
-});
