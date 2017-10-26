@@ -36,10 +36,10 @@ See the [Release Notes](#release-notes) for important information about upgradin
 Dojo supports a form of `require` (known as synchronous `require`) that has the same signature as CommonJS `require`.  In Dojo, synchronous `require` returns a reference to an already loaded module, or else throws an exception if the module has not already been loaded and initialized.  With this plugin, `require` calls matching the CommonJS/synchronous `require` signature which appear followng the first `define` call in an AMD modules are treated as Dojo synchronous `require` calls.  If you wish to load a CommonJS module from within an AMD module, you may do so by calling `require` before the first `define` call, or else by using the `cjsRequire` function that is supported by the plugin.
 
 ```javascript
-var lodash = require("lodash");       // CommonJS require
+var lodash = require("lodash");			// CommonJS require
 define([], function() {
-  var query = require("dojo/query");  // Dojo synchronous require
-  var async = cjsRequire("async");    // CommonJS require
+	var query = require("dojo/query");	// Dojo synchronous require
+	var async = cjsRequire("async");	// CommonJS require
 });
 ```
 
