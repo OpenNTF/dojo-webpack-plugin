@@ -48,7 +48,7 @@ define([], function() {
 });
 ```
 
-If CommonJS require calls are being injected into your module by third-party code (e.g. by [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)), then you can use the [cjsRequirePatterns](#cjsrequirepatterns) option to specify regular expression patterns to match against module names that should be loaded using CommonJS require. 
+If CommonJS `require` calls are being injected into your module by third-party code (e.g. by [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)), then you can use the [cjsRequirePatterns](#cjsrequirepatterns) option to specify regular expression patterns to match against module names that should be loaded using CommonJS `require`. 
 
 # The Dojo loader config
 
