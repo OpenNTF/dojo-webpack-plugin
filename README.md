@@ -129,7 +129,7 @@ define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
 	//...
 });
 ```
-	
+
 In the above example, if the feature `foo` is truthy in the static `has` features that are defined in the dojo loader config, then the expression will be replaced with the module name `js/foo` at build time.  If `foo` is falsy, but not undefined, then it will be replaced with the module name `js/bar`.  If, on the other hand, the feature `foo` is not defined, then resolution of the expression will be deferred to when the application is loaded in the browser and the run-time value of the feature `foo` will be used to determine which module reference is provided.  Note that for client-side resolution, both resources, `js/foo` and `js/bar`, along with their nested dependencies, will be included in the packed assets.  
 
 For complex feature expressions that contain a mixture of defined and undefined feature names at build time, the runtime expression will be simplified so that it contains only the undefined feature names, and only the modules needed for resolution of the simplified expression on the client will be included in the packed resources.  Modules that are excluded by build time evaluation of the expression with the static `has` features will not be include in the packed resources, unless they are otherwise include by other dependencies.
@@ -168,12 +168,12 @@ new webpack.NormalModuleReplacementPlugin(
 	}
 )
 ```
-	
+
 The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderProxy?loader=<loader>&deps=<dependencies>&name=<resource>!<resource>` where *loader* specifies the Dojo loader extension to run on the client and *dependencies* specifies a comma separated list of module dependencies to add to the packed resources.  In the example above, if the client code specifies the module as `svg!closeBtn.svg`, then the translated module will be `dojo/loaderProxy?loader=svg&deps=dojo/text%21closeBtn.svg!closeBtn.svg`.  Note the need to URL encode the `!` character so as not to trip up parsing.
 
 Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is required by the `svg` loader extension's load method on the client, then the dependency will be resolved in-line and the `load` method's callback will be invoked in-line as required.
 
-The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`. 
+The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`.
 
 # Options
 
@@ -197,7 +197,7 @@ This property is optional and specifies the module path of the built Dojo loader
 
 ### locales
 
-This property is required and specifies which locale resources should be included in the build.  The property is specified as an array of strings.
+This property optional and specifies which locale resources should be included in the build.  The property is specified as an array of strings.  If not specified, then all available locales resources will be included.  If specified as an empty array, then only the default (root) locale resources will be included.
 
 ### cjsRequirePatterns
 
