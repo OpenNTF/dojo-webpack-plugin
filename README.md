@@ -33,18 +33,22 @@ See the [Release Notes](#release-notes) for important information about upgradin
 
 **dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables), as well as Dojo's `require.toAbsMid()` and `require.toUrl()` functions.
 
+This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader). 
+
+### CommonJS require vs. Dojo synchronous require
+
 Dojo supports a form of `require` (known as synchronous `require`) that has the same signature as CommonJS `require`.  In Dojo, synchronous `require` returns a reference to an already loaded module, or else throws an exception if the module has not already been loaded and initialized.  With this plugin, `require` calls matching the CommonJS/synchronous `require` signature which appear followng the first `define` call in an AMD modules are treated as Dojo synchronous `require` calls.  If you wish to load a CommonJS module from within an AMD module, you may do so by calling `require` before the first `define` call, or else by using the `cjsRequire` function that is supported by the plugin.
 
 <!-- eslint-disable no-undef, no-unused-vars -->
 ```javascript
-var lodash = require("lodash");			// CommonJS require
+var lodash = require("lodash");       // CommonJS require
 define([], function() {
-	var query = require("dojo/query");	// Dojo synchronous require
-	var async = cjsRequire("async");	// CommonJS require
+  var query = require("dojo/query");  // Dojo synchronous require
+  var async = cjsRequire("async");    // CommonJS require
 });
 ```
 
-This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader).  
+If CommonJS require calls are being injected into your module by third-party code (e.g. by [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)), then you can us the [cjsRequirePatterns](#cjsrequirepatterns) option to specify regular expression patterns to match against module names that should be loaded using CommonJS require. 
 
 # The Dojo loader config
 
@@ -130,7 +134,7 @@ define(['dojo/has!foo?js/foo:js/bar'], function(foobar) {
 	//...
 });
 ```
-
+	
 In the above example, if the feature `foo` is truthy in the static `has` features that are defined in the dojo loader config, then the expression will be replaced with the module name `js/foo` at build time.  If `foo` is falsy, but not undefined, then it will be replaced with the module name `js/bar`.  If, on the other hand, the feature `foo` is not defined, then resolution of the expression will be deferred to when the application is loaded in the browser and the run-time value of the feature `foo` will be used to determine which module reference is provided.  Note that for client-side resolution, both resources, `js/foo` and `js/bar`, along with their nested dependencies, will be included in the packed assets.  
 
 For complex feature expressions that contain a mixture of defined and undefined feature names at build time, the runtime expression will be simplified so that it contains only the undefined feature names, and only the modules needed for resolution of the simplified expression on the client will be included in the packed resources.  Modules that are excluded by build time evaluation of the expression with the static `has` features will not be include in the packed resources, unless they are otherwise include by other dependencies.
@@ -169,12 +173,12 @@ new webpack.NormalModuleReplacementPlugin(
 	}
 )
 ```
-
+	
 The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderProxy?loader=<loader>&deps=<dependencies>&name=<resource>!<resource>` where *loader* specifies the Dojo loader extension to run on the client and *dependencies* specifies a comma separated list of module dependencies to add to the packed resources.  In the example above, if the client code specifies the module as `svg!closeBtn.svg`, then the translated module will be `dojo/loaderProxy?loader=svg&deps=dojo/text%21closeBtn.svg!closeBtn.svg`.  Note the need to URL encode the `!` character so as not to trip up parsing.
 
 Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is required by the `svg` loader extension's load method on the client, then the dependency will be resolved in-line and the `load` method's callback will be invoked in-line as required.
 
-The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`.
+The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`. 
 
 # Options
 
@@ -198,15 +202,15 @@ This property is optional and specifies the module path of the built Dojo loader
 
 ### locales
 
-This property optional and specifies which locale resources should be included in the build.  The property is specified as an array of strings.  If not specified, then all available locales resources will be included.  If specified as an empty array, then only the default (root) locale resources will be included.
+This property is required and specifies which locale resources should be included in the build.  The property is specified as an array of strings.
 
 ### cjsRequirePatterns
 
 This property is optional and specifies an array of regular expressions to use in identifying CommonJS module identifiers within AMD modules.
 
-Dojo supports a form of require, called synchronous require, that can be used to synchronously obtain a reference to an already loaded module, but throws an exception if the module is not already loaded.  Dojo synchronous require has the exact same function signature as CommonJS require, making it impossible to differentiate them.  This is not normally an issue because CommonJS require calls do not typically appear inside of AMD modules, however, some Webpack plugins (e.g. ProvidePlugin) can inject CommonJS require statements directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.
+See [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require).  Some Webpack plugins (e.g. [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)) can inject CommonJS calls directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.
 
-If not specified, the default pattern `imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replaces** the default value.
+If not specified, the default pattern `imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replace** the default value.
 
 ### coerceUndefinedToFalse
 

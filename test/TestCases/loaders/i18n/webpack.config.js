@@ -1,53 +1,19 @@
 var path = require("path");
 var DojoWebpackPlugin = require("../../../../index");
 
-module.exports =
- [undefined, "en-us", "fr", "es", "de", "zh-hk"].map(locale => {
+module.exports = [undefined, "fr", "es", "de"].map(locale => {
 	return {
 		entry: "test/index",
 		plugins: [
 			new DojoWebpackPlugin({
 				loaderConfig: {
 					paths:{test: "."},
-					has: {"host-browser": 0, "dojo-config-api": 1},
-					locale: locale
+					has: {"host-browser": 0, "dojo-config-api": 1}
 				},
-				locales: ["en", "fr", "es", "de"],
-				loader: path.join(__dirname, "../../../js/dojo/dojo.js")
+				locales: ["fr", "es", "de"],
+				loader: path.join(__dirname, "../../../js/dojo/dojo.js"),
+				locale: locale
 			})
 		]
 	};
-}).concat(
-	[undefined, "en-us", "fr", "es", "de", "zh-hk"].map(locale => {
-	return {
-		entry: "test/index",
-		plugins: [
-			new DojoWebpackPlugin({
-				loaderConfig: {
-					paths:{test: "."},
-					has: {"host-browser": 0, "dojo-config-api": 1},
-					locale: locale
-				},
-				loader: path.join(__dirname, "../../../js/dojo/dojo.js")
-			})
-		]
-	};
- })
-).concat(
-	[undefined, "en-us", "fr", "es", "de", "zh-hk"].map(locale => {
-	return {
-		entry: "test/index",
-		plugins: [
-			new DojoWebpackPlugin({
-				loaderConfig: {
-					paths:{test: "."},
-					has: {"host-browser": 0, "dojo-config-api": 1, "empty-locales": 1},
-					locale: locale
-				},
-				locales: [],
-				loader: path.join(__dirname, "../../../js/dojo/dojo.js")
-			})
-		]
-	};
- })
-);
+});
