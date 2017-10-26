@@ -33,8 +33,13 @@ See the [Release Notes](#release-notes) for important information about upgradin
 
 **dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables), as well as Dojo's `require.toAbsMid()` and `require.toUrl()` functions.
 
+This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader). 
+
+### CommonJS require vs. Dojo synchronous require
+
 Dojo supports a form of `require` (known as synchronous `require`) that has the same signature as CommonJS `require`.  In Dojo, synchronous `require` returns a reference to an already loaded module, or else throws an exception if the module has not already been loaded and initialized.  With this plugin, `require` calls matching the CommonJS/synchronous `require` signature which appear followng the first `define` call in an AMD modules are treated as Dojo synchronous `require` calls.  If you wish to load a CommonJS module from within an AMD module, you may do so by calling `require` before the first `define` call, or else by using the `cjsRequire` function that is supported by the plugin.
 
+<!-- eslint-disable no-undef, no-unused-vars -->
 ```javascript
 var lodash = require("lodash");       // CommonJS require
 define([], function() {
@@ -43,7 +48,7 @@ define([], function() {
 });
 ```
 
-This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader).  
+If CommonJS require calls are being injected into your module by third-party code (e.g. by [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)), then you can us the [cjsRequirePatterns](#cjsrequirepatterns) option to specify regular expression patterns to match against module names that should be loaded using CommonJS require. 
 
 # The Dojo loader config
 
@@ -203,9 +208,9 @@ This property is required and specifies which locale resources should be include
 
 This property is optional and specifies an array of regular expressions to use in identifying CommonJS module identifiers within AMD modules.
 
-Dojo supports a form of require, called synchronous require, that can be used to synchronously obtain a reference to an already loaded module, but throws an exception if the module is not already loaded.  Dojo synchronous require has the exact same function signature as CommonJS require, making it impossible to differentiate them.  This is not normally an issue because CommonJS require calls do not typically appear inside of AMD modules, however, some Webpack plugins (e.g. ProvidePlugin) can inject CommonJS require statements directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.
+See [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require).  Some Webpack plugins (e.g. [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)) can inject CommonJS calls directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.
 
-If not specified, the default pattern `imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replaces** the default value.
+If not specified, the default pattern `imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replace** the default value.
 
 ### coerceUndefinedToFalse
 
