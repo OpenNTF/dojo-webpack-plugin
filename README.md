@@ -73,7 +73,7 @@ The loader config may be specified as an object, or as a string which represents
 
 If the config is specified as a module name, then the config module will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.  Note that if you want webpack to process the config module (i.e. perform build time variable substitution, etc.) then you must specify the config as a module name.
 
-In addition, instead of exporting the config, the module may export a function that returns the config.  The function will be called with the value of the [environment](#environment) option.  This mechanism allows for multi-compiler runs that use different configs.  
+In addition, instead of exporting the config, the module may export a function that returns the config.  The function will be called with the value of the [environment](#environment) option when loaded at run-time, or the value of the [buildEnvironment](#buildEnvironment) option when loaded at build-time.  This mechanism facilitates specifying different config values (e.g. `baseUrl`) at run-time vs. build-time, and multi-compiler runs that use different configs.  
 
 # Dojo loader extensions
 
