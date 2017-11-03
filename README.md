@@ -67,13 +67,13 @@ plugins: [
 ]
 ```
 
-Because the loader config is used to resolve module paths both at build time, and on the client, you may need to conditionally specify some properties, such as `baseUrl`, depending on whether the current environment is node or a browser.  This may be necessary if you need `require.toUrl()` to return a valid URLs on the client or if you want to support non-packed versions of the app (e.g. for development).  See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that works both with and without webpack.
+The loader config may be specified as an object, a function that returns the config object, or as a string which represents the name of a CommonJS module that exports the config (object or function).  If specified as an object or a function, then the config expressions are evaluated at build time and the config is exported to the client as a JSON object that is mixed with the `window.dojoConfig` property at application load time.
 
-The loader config may be specified as an object, or as a string which represents the name of a CommonJS module that exports the config.  If specified as an object, then the config expressions are evaluated at build time and the config is exported to the client as a JSON object that is mixed with the `window.dojoConfig` property at application load time.  
+If the config is specified as a module name, then the config module will be evaluated both at build time (for the purpose of resolving modules for webpack), and then again at application run time when the config module is loaded on the client.  Note that if you want webpack to process the config module (i.e. perform build time variable substitution, etc.) then you must specify the config as a module name.   
 
-If the config is specified as a module name, then the config module will be evaluated both at build-time (for the purpose of resolving modules for webpack), and then again at application run-time when the config module is loaded on the client.  Note that if you want webpack to process the config module (i.e. perform build time variable substitution, etc.) then you must specify the config as a module name.
+If you want the config to specify different properties at build time vs. run time, then specify the config as a function that returns the config object and use the [environment](#environment) and [buildEnvironment](#buildenvironment) options so set the properties who's values change depending on the target environment.  This works both when the config is evaluated at build time (specified as a function) and when the config is evaluated at build time and runtime (specified as the name of a CommonJS module that exports a function).
 
-In addition, instead of exporting the config, the module may export a function that returns the config.  The function will be called with the value of the [environment](#environment) option when loaded at run-time, or the value of the [buildEnvironment](#buildEnvironment) option when loaded at build-time.  This mechanism facilitates specifying different config values (e.g. `baseUrl`) at run-time vs. build-time, and multi-compiler runs that use different configs.  
+See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that uses the [environment](#environment) and [buildEnvironment](#buildenvironment) options to specify different config paths for build time vs run time.  The config also supports running the sample app as a non-packed application with Dojo loaded from a CDN.
 
 # Dojo loader extensions
 
@@ -190,11 +190,11 @@ This property is required and specifies the Dojo loader config.  See [The Dojo l
 
 ### environment
 
-Used only if the `loaderConfig` is a string specifying the name of a module and that module exports a function which returns the config.  The environment is passed to the function when it is called to get the config.  This should be a JSON type object because it gets stringified for export to the client.
+If the loader config evaluates to a function, then this property specifies the object that is passed to the function when it is called to get the config object.  This should be a JSON type object because it may get stringified for export to the client.
 
 ### buildEnvironment
 
-Simialr to `environment`, but used exclusively at build time.  If both are specified, then `buildEnvironment` will be passed to the `loaderConfig` function when building, and `environment` will be passed to the `loaderConfig` function when the built application is loaded in the browser.  This facilitates specifying different `loaderConfig` paths (e.g. `baseUrl`) for build vs. run.  If only `environment` is specified, then it is used for both.
+Simialr to `environment`, but used exclusively at build time.  If both are specified, then `buildEnvironment` will be passed to the `loaderConfig` function when building, and `environment` will be passed to the `loaderConfig` function when the config is evaluated for use in the browser.  This facilitates specifying different `loaderConfig` paths (e.g. `baseUrl`) for build vs. run.  If only `environment` is specified, then it is used for both.
 
 ### loader
 
