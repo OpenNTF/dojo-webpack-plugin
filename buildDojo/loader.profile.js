@@ -73,7 +73,6 @@ var profile = (() => {
 				}],
 
         staticHasFeatures:{
-            'foreign-loader': 1,
             'dojo-config-api': 1,
             'dojo-inject-api': hasInjectApiFix ? 0 : 1,
             'csp-restrictions': 1,
