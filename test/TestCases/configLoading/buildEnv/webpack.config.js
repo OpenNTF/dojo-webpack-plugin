@@ -1,6 +1,7 @@
 var path = require("path");
 var DojoWebpackPlugin = require("../../../../index");
-module.exports = {
+module.exports = [
+{
 	entry: "./index",
 	plugins: [
 		new DojoWebpackPlugin({
@@ -10,4 +11,15 @@ module.exports = {
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	]
-};
+},
+{
+	entry: "./index",
+	plugins: [
+		new DojoWebpackPlugin({
+			loaderConfig: require("./loaderConfig"),
+			environment: {foopath: "/foo"},
+			buildEnvironment: {foopath: "test/foo"},
+			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
+		})
+	]
+}];
