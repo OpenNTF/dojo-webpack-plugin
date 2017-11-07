@@ -235,7 +235,7 @@ To have Webpack use the built loader, specify the location of the loader in the 
 <!-- eslint-disable no-undef, semi, comma-dangle-->
 ```javascript
 plugins: [
-	new requre("dojo-webpack-plugin")({
+	new require("dojo-webpack-plugin")({
 		loaderConfig: require("./loaderConfig"),
 		locales: ["en"],
 		loader: path.join(__directory, "./release/dojo/dojo.js")
