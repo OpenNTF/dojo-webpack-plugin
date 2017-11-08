@@ -5,7 +5,7 @@
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
     "lint": "eslint . --ext .json --ext .md --ext .js",
-    "pretest": "npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js",
+    "pretest": "npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
     "test": "mocha --harmony",
     "travis:test": "npm run -s test",
     "cover": "istanbul cover -x **/*.runtime.js node_modules/mocha/bin/_mocha",
