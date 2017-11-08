@@ -18,6 +18,7 @@ const fork = require("child_process").fork;
 
 const dojoPath = global.process.argv.length > 2 && global.process.argv[2];
 const releaseDir = global.process.argv.length > 3 && global.process.argv[3];
+const featureOverrides = global.process.argv.length > 4 && global.process.argv[4]  || "{}";
 if (!dojoPath) {
 	throw Error("Path to dojo not specified");
 }
@@ -34,7 +35,9 @@ const ls = fork(
 		path.join(__dirname, "loader.profile.js"),
 		"--release",
 		"--releaseDir",
-		path.resolve(releaseDir)
+		path.resolve(releaseDir),
+		"--has",
+		featureOverrides
 	]
 );
 

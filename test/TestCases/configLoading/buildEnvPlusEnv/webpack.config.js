@@ -20,4 +20,16 @@ module.exports = [
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	]
+},
+{
+	entry: "./index",
+	plugins: [
+		new DojoWebpackPlugin({
+			noConsole: true,
+			loaderConfig: function(env) {
+				return Object.assign(require("./loaderConfig")(env), {has:{'dojo-config-api':0}});
+			},
+			buildEnvironment: {foopath: "test/foo"}
+		})
+	]
 }];

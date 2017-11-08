@@ -20,12 +20,14 @@ const nodeRequire = require.rawConfig && require.rawConfig.loaderPatch.nodeRequi
 const path = nodeRequire("path");
 const fs = nodeRequire("fs");
 
-var profilePath, dojoPath;
+var profilePath, dojoPath, featureOverrides = {};
 process.argv.forEach((arg, i) => {
 	if (arg === '--profile') {
 		profilePath = process.argv[i+1];
 	} else if (arg === '--dojoPath') {
 		dojoPath = process.argv[i+1];
+	} else if (arg === '--has') {
+		featureOverrides = JSON.parse(process.argv[i+1]);
 	}
 });
 if (!profilePath) {
@@ -35,17 +37,24 @@ if (!dojoPath) {
 	throw new Error("--dojoPath command line option not specified");
 }
 
-const version = nodeRequire(path.resolve(dojoPath, "../", "./package.json")).version;
-const versionParts = version.split(".");
-const majorVersion = parseInt(versionParts[0]), minorVersion = parseInt(versionParts[1]), patchVersion = parseInt(versionParts[2]);
-if (majorVersion !== 1) {
-	throw new Error("Unsupported Dojo Version");
+function getLoaderDefaultFeatures() {
+	const version = nodeRequire(path.resolve(dojoPath, "../", "./package.json")).version;
+	const versionParts = version.split(".");
+	const majorVersion = parseInt(versionParts[0]), minorVersion = parseInt(versionParts[1]), patchVersion = parseInt(versionParts[2]);
+	if (majorVersion !== 1) {
+		throw new Error("Unsupported Dojo Version");
+	}
+	const hasInjectApiFix =	/* True if the version of Dojo has https://github.com/dojo/dojo/pull/266 */
+		minorVersion > 12 ||
+		minorVersion === 12 && patchVersion >= 3 ||
+		minorVersion === 11 && patchVersion >= 5 ||
+		minorVersion === 10 && patchVersion >= 9;
+
+	var features = nodeRequire(path.join(process.argv[1], "../loaderDefaultFeatures"));
+	features = Object.assign({}, features, featureOverrides);
+	features['dojo-inject-api'] = !hasInjectApiFix;
+	return features;
 }
-const hasInjectApiFix =	/* True if the version of Dojo has https://github.com/dojo/dojo/pull/266 */
-	minorVersion > 12 ||
-	minorVersion === 12 && patchVersion >= 3 ||
-	minorVersion === 11 && patchVersion >= 5 ||
-	minorVersion === 10 && patchVersion >= 9;
 
 var profile = (() => {
 	const profileDir = path.resolve(profilePath);
@@ -54,6 +63,7 @@ var profile = (() => {
 	if (!fs.existsSync(path.resolve(dojoDir, util))) {
 		util = "../util";
 	}
+
   return {
 			layerOptimize: false,
 			releaseDir: "./release",
@@ -72,32 +82,7 @@ var profile = (() => {
 					trees: [[".", ".", /\.*/]]
 				}],
 
-        staticHasFeatures:{
-            'dojo-config-api': 1,
-            'dojo-inject-api': hasInjectApiFix ? 0 : 1,
-            'csp-restrictions': 1,
-            'dojo-built': 1,
-            'config-dojo-loader-catches': 0,
-            'config-tlmSiblingOfDojo': 0,
-            'dojo-log-api': 0,
-            'dojo-publish-privates': 0,
-            'dojo-sync-loader': 0,
-            'dojo-timeout-api': 0,
-            'dojo-trace-api': 0,
-            'dojo-sniff': 0,
-            'dojo-test-sniff': 0,
-            'dojo-cdn': 0,
-            'dojo-loader-eval-hint-url': 0,
-            'config-stripStrict': 0,
-            'ie-event-behavior': 0,
-            'dom': 0,
-            'host-node': 0,
-            'host-rhino': 0,
-            'host-webworker': 0,
-            'dojo-force-activex-xhr': 0,
-            'dojo-enforceDefine': 0,
-            'dojo-combo-api': 0
-        },
+        staticHasFeatures: getLoaderDefaultFeatures(),
 
         layers: {
             "dojo/dojo": {

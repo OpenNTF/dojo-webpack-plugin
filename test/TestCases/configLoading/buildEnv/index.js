@@ -3,6 +3,6 @@ define(["foo"], function(foo) {
 		foo.should.be.eql("foo");
 	});
 	it ("Should resolve foo as defined by environment", function() {
-		require.rawConfig.paths.foo.should.be.eql("/foo");
+		require.toUrl("foo").should.be.eql("/foo");
 	});
 });
