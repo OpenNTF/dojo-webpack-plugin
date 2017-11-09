@@ -27,10 +27,8 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.0",
-    "dijit": "1.12.2",
-    "dojo": "1.12.2",
-    "dojo-util": "1.12.2",
-    "dojox": "1.12.2",
+    "dojo": "1.13.0",
+    "dojo-util": "1.13.0",
     "eslint": "^4.7.2",
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-markdown": "^1.0.0-beta.6",
