@@ -4,6 +4,7 @@ module.exports = function(env) {
 		env.foopath.should.be.defined;
 	});
 	return {
-		paths: {foo: env.foopath}
+		paths: {foo: env.foopath},
+		aliases: [[/^fooalias$/, function() {return env.foopath;}]]
 	};
 };
