@@ -4,6 +4,7 @@ module.exports = function(env) {
 		Object.keys(env).length.should.be.eql(0);
 	});
 	return {
-		paths: {foo: "/test/foo"}
+		paths: {foo: "/test/foo"},
+		aliases: [[/^fooalias(\/.*)?$/, function(__, $1) {return "/test/foo" + $1;}]]
 	};
 };

@@ -14,7 +14,7 @@ module.exports = [
 	entry: "./index",
 	plugins: [
 		new DojoWebpackPlugin({
-			loaderConfig: require.resolve("./loaderConfig"),
+			loaderConfig: require("./loaderConfig"),
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	]
