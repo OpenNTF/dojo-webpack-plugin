@@ -16,9 +16,9 @@
 
 module.exports = {
 	'dojo-config-api': 1,
-	'dojo-inject-api': 1,
 	'csp-restrictions': 1,
 	'dojo-built': 1,
+	/*'dojo-inject-api': 0,*/ // Set in loader.profile.js based on Dojo version
 	'config-dojo-loader-catches': 0,
 	'config-tlmSiblingOfDojo': 0,
 	'dojo-log-api': 0,
