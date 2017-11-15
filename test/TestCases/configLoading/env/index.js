@@ -5,6 +5,6 @@ define(["foo", "fooalias"], function(foo, fooalias) {
 	});
 
 	it ("Should resolve foo as defined by environment", function() {
-		require.rawConfig.paths.foo.should.be.eql("test/foo");
+		require.toUrl("foo").should.be.eql("test/foo");
 	});
 });

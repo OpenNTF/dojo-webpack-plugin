@@ -9,7 +9,7 @@ module.exports =
 			new DojoWebpackPlugin({
 				loaderConfig: {
 					paths:{test: "."},
-					has: {"host-browser": 0, "dojo-config-api": 1},
+					has: {"host-browser": 0, "dojo-config-api": 0},
 					locale: locale
 				},
 				locales: ["en", "fr", "es", "de"],
