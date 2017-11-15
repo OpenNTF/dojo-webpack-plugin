@@ -38,7 +38,7 @@ module.exports = function(content) {
 		}
 		// Add locales with greater specificity
 		Object.keys(bundle).forEach(function(loc) {
-			if (loc.startsWith(requestedLocale + "-")) {
+			if (bundle[loc] && loc.startsWith(requestedLocale + "-")) {
 				result.push(loc);
 			}
 		});
