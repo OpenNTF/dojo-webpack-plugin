@@ -71,9 +71,7 @@ The loader config may be specified as an object, a function that returns the con
 
 If the config is specified as a module name, then the config module will be evaluated both at build time (for the purpose of resolving modules for webpack), and then again at application run time when the config module is loaded on the client.  Note that if you want webpack to process the config module (i.e. perform build time variable substitution, etc.) then you must specify the config as a module name.   
 
-If you want the config to specify different properties at build time vs. run time, then specify the config as a function that returns the config object and use the [environment](#environment) and [buildEnvironment](#buildenvironment) options so set the properties who's values change depending on the target environment.  This works both when the config is evaluated at build time (specified as a function) and when the config is evaluated at build time and runtime (specified as the name of a CommonJS module that exports a function).
-
-There is a small size benefit (~0.5KB after uglify and gzip) to specifying the loader config as an object or function vs. as a module name, because the embedded Dojo loader can be built without the code needed for parsing the Dojo loader config.  When using an embedded Dojo loader that does not include the config api, post-processed config objects generated at build time are serialized to the application and used to initialize the embedded loader at application run-time.  This plugin will automatically build the embedded Dojo loader with, or without, the config api depending on the value type of the [loaderConfig](#loaderconfig) option, unless the loader config specifies a value for the `dojo-config-api` feature in the `has` property (in which case the embedded Dojo loader is built using the specified value for the feature), or unless you specify a previously built loader using the [loader](#loader) option.  See [Overriding profile features](#overriding-profile-features) for details on how to build the loader without the config api.  Note that the plugin is able to detect at application build time whether or not the embedded Dojo loader has the config API and can work with either one, with the caveat that the config api is required if the loader config is specified as a module name.  
+If you want the config to specify different properties at build time vs. run time, then specify the config as a function that returns the config object and use the [environment](#environment) and [buildEnvironment](#buildenvironment) options to set the properties who's values change depending on the target environment.  This works both when the config is evaluated at build time (specified as a function) and when the config is evaluated at build time and runtime (specified as the name of a CommonJS module that exports a function).
 
 See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that uses the [environment](#environment) and [buildEnvironment](#buildenvironment) options to specify different config paths for build time vs run time.  The config also supports running the sample app as a non-packed application with Dojo loaded from a CDN.
 
@@ -247,9 +245,36 @@ plugins: [
 
 #### Overriding profile features
 
-By default, the embedded loader is built using the static has features defined [here](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/buildDojo/loaderDefaultFeatures.js).  You may override these features by providing an optional, third argument to the build script which specifies the features you want to override as a JSON string.  For example, if you specify the [loaderConfig](#loaderconfig) option as an object, or a function that returns an object (as opposed to specifying it as a module name), then you can make the embedded loader smaller by omitting the config api.  This would be done as follows:
+By default, the embedded loader is built using the static features defined [here](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/buildDojo/loaderDefaultFeatures.js).  You may override these features by providing an optional, third argument to the build script which specifies the features you want to override as a JSON string.  For example, if you specify the [loaderConfig](#loaderconfig) option as an object, or a function that returns an object (as opposed to specifying it as a module name), then you can make the embedded loader smaller by omitting the config api.  See [The `dojo-config-api` feature](#the-dojo-config-api-feature).  This would be done as follows:
 
       node node_modules/dojo-webpack-plugin/buildDojo/build.js node_modules/dojo/dojo.js ./release {\"dojo-config-api\":false}
+
+# The `dojo-config-api` feature
+
+A modest reduction in the size of the bootstrap code can be realized by excluding the code needed for loading and parsing the Dojo loader config from the embedded Dojo loader.  This can only be done if the [loaderConfig](#loaderconfig) option is specified as an object or function.  It cannot be done if the [loaderConfig](#loaderconfig) option is specified as a module name because of the need for the embedded Dojo loader to process the loader config on the client.
+
+When using an embedded Dojo loader that does not include the config API, post-processed config objects generated at build time are serialized to the application and used to initialize the embedded loader at application run-time. The pre-processed config object (e.g. `paths`, `packages`, `aliases`, `maps`, etc.) are not serialized to the application because they are not needed by Dojo.  If your application requires access to these config properties at runtime (e.g. from `dojoConfig` or `require.rawConfig`), then don't use this feature.
+
+This plugin detects at application build time whether or not the embedded Dojo loader includes the config API and emits the code for initiailzing the application as appropriate for the type of loader provided.
+
+There are two ways to use the embedded Dojo loader without the config API.
+
+1. If the plugin is building the loader automatically at application build time (i.e. you are not specifying the [loader](#loader) option), then you can specify the `dojo-config-api` has feature with a value of 0 or false in the Dojo loader config.  Note that the `dojo-config-api` has feature is ignored if the [loaderConfig](#loaderconfig) option specifies a module name.
+	<!-- eslint-disable no-undef, semi -->
+	```javascript
+	plugins: [
+		new DojoWebpackPlugin({
+			loaderConfig: {
+				paths: {/*...*/},
+				packages: [/*...*/],
+				has: {'dojo-config-api':false}
+			}
+			// ...
+		})
+	]
+	```
+
+1. If you are specifying a pre-built embedded loader using the [loader](#loader) option, then build the loader without the config API as described in [Overriding profile features](#overriding-profile-features).  Note that an exception will be thrown if the [loaderConfig](#loaderconfig) option specifies a module name and the provided loader does not include the config API.
 
 # ES6 Promise dependency in Webpack 2.x
 
