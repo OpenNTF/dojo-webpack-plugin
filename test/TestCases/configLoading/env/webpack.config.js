@@ -16,8 +16,9 @@ module.exports = [
 	plugins: [
 		new DojoWebpackPlugin({
 			loaderConfig: require("./loaderConfig"),
-			environment: {foopath: "test/foo"},
-			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
+			// dojo-config-api feature overriden by provided loader
+			environment: {foopath: "test/foo", has:{'dojo-config-api':1}, noConfigApi:true},
+			loader: path.join(__dirname, "../../../js/noconfig/dojo/dojo.js")
 		})
 	]
 },

@@ -10,6 +10,7 @@ module.exports = function(env) {
 		paths: {foo: env.foopath},
 		packages: [{name:"dojo", location:env.dojoRoot + "/dojo"}],
 		aliases: [[/^fooalias$/, function() {return env.foopath;}]],
-		has: {"host-browser":0}
+		has: {"host-browser":0},
+		noConfigApi: !!env.noConfigApi
 	};
 };

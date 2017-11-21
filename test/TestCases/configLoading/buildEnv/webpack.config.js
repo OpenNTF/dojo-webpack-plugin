@@ -17,9 +17,9 @@ module.exports = [
 	plugins: [
 		new DojoWebpackPlugin({
 			loaderConfig: require("./loaderConfig"),
-			environment: {foopath: "/foo", dojoRoot: "release"},
+			environment: {foopath: "/foo", dojoRoot: "release", noConfigApi:true},
 			buildEnvironment: {foopath: "test/foo", dojoRoot:"../../../../node_modules"},
-			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
+			loader: path.join(__dirname, "../../../js/noconfig/dojo/dojo.js")
 		})
 	]
 },

@@ -5,6 +5,7 @@ module.exports = function(env) {
 	});
 	return {
 		paths: {foo: env.foopath},
-		aliases: [[/^fooalias$/, function() {return env.foopath;}]]
+		aliases: [[/^fooalias$/, function() {return env.foopath;}]],
+		noConfigApi:!!env.noConfigApi
 	};
 };

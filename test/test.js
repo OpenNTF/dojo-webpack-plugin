@@ -28,6 +28,7 @@ var Test = require("mocha/lib/test");
 var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
 var NodeRequireEnsurePatchPlugin = require("./plugins/NodeRequireEnsurePatchPlugin");
+var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
 
 
 describe("TestCases", () => {
@@ -72,6 +73,7 @@ function runTestCases(casesPath) {
 						if(!options.output.chunkFilename) options.output.chunkFilename = "[id].bundle" + idx + ".js";
 					  options.plugins = options.plugins || [];
 						options.plugins.push(new NodeRequireEnsurePatchPlugin());
+						options.plugins.push(new MainTemplatePlugin());
 					});
 					webpack(options, function(err, stats) {
 						if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
