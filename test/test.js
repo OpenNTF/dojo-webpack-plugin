@@ -27,7 +27,6 @@ var Test = require("mocha/lib/test");
 
 var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
-var NodeRequireEnsurePatchPlugin = require("./plugins/NodeRequireEnsurePatchPlugin");
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
 
 
@@ -65,14 +64,15 @@ function runTestCases(casesPath) {
 					optionsArr.forEach(function(options, idx) {
 						if(!options.context) options.context = testDirectory;
 						if(!options.entry) options.entry = "./index.js";
-						if(!options.target) options.target = "async-node";
+						if(!options.target) options.target = "web";
 						if(!options.output) options.output = {};
 						if(!options.output.path) options.output.path = outputDirectory;
 						if(typeof options.output.pathinfo === "undefined") options.output.pathinfo = true;
 						if(!options.output.filename) options.output.filename = "bundle" + idx + ".js";
 						if(!options.output.chunkFilename) options.output.chunkFilename = "[id].bundle" + idx + ".js";
+						if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
+
 					  options.plugins = options.plugins || [];
-						options.plugins.push(new NodeRequireEnsurePatchPlugin());
 						options.plugins.push(new MainTemplatePlugin());
 					});
 					webpack(options, function(err, stats) {
@@ -113,10 +113,6 @@ function runTestCases(casesPath) {
 							var bundlePath = testConfig.findBundle(i, optionsArr[i]);
 							if(bundlePath) {
 								filesCount++;
-								var content;
-								var p = path.join(outputDirectory, bundlePath);
-								content = fs.readFileSync(p, "utf-8");
-								var module = {exports: {}};
 								var context = vm.createContext({
 									console: console,
 									process: process
@@ -130,8 +126,15 @@ function runTestCases(casesPath) {
 							    },
 							    configurable: true
 							  });
-								var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global) {should.extend('should', Object.prototype);\n" + content + "\n})", context, p);
-								fn.call(context, require, module, module.exports, path.dirname(p), p, context);
+								const bundlePaths = Array.isArray(bundlePath) ? bundlePath : [bundlePath];
+								bundlePaths.forEach(bundlePath => {
+									var content;
+									var p = path.join(outputDirectory, bundlePath);
+									content = fs.readFileSync(p, "utf-8");
+									var module = {exports: {}};
+									var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {should.extend('should', Object.prototype);\n" + content + "\n})", context, p);
+									fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
+								});
 							}
 						}
 						// give a free pass to compilation that generated an error
