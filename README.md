@@ -210,7 +210,7 @@ This property is optional and specifies an array of regular expressions to use i
 
 See [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require).  Some Webpack plugins (e.g. [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/)) can inject CommonJS calls directly into your AMD modules.  This property provides a mechanism for those modules to be loaded as CommonJS modules.  If any of the regular expressions specified match the module identifier in a candidate require call (within an AMD module), then the module will be loaded as a CommonJS module.  If none of the patterns match, then the require call will be processed as a Dojo synchronous require call.
 
-If not specified, the default pattern `imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replace** the default value.
+If not specified, the default pattern `(imports-loader|exports-loader)[?!]` is used.  This pattern will match many of the common use cases for the ProvidePlugin.  Note that if you specify this property, the values you specify **replace** the default value.
 
 ### coerceUndefinedToFalse
 
@@ -274,7 +274,7 @@ There are two ways to use the embedded Dojo loader without the config API.
 	]
 	```
 
-1. If you are specifying a pre-built embedded loader using the [loader](#loader) option, then build the loader without the config API as described in [Overriding profile features](#overriding-profile-features).  Note that an exception will be thrown if the [loaderConfig](#loaderconfig) option specifies a module name and the provided loader does not include the config API.
+1. If you are specifying a pre-built embedded loader using the [loader](#loader) option, then build the loader without the config API as described in [Overriding profile features](#overriding-profile-features).  Note that a build-time exception will be thrown if the [loaderConfig](#loaderconfig) option specifies a module name and the provided loader does not include the config API.
 
 # ES6 Promise dependency in Webpack 2.x
 
@@ -288,11 +288,11 @@ When using Webpack's NormalModuleReplacementPlugin, the order of the plugin regi
 
 Webpack normally transforms async `require()` calls into `__webpack_require__()` calls for the purpose of loading modules at application runtime.  However, if the call references dependencies which cannot be evaluated at build time, then the `require()` call will not be transformed.  Instead, `require()`, as implemented by this plugin, will be called at application runtime on the client and will complete synchronously (callback invoked prior to returning) provided the requested modules are available from chunks that have already been loaded in the client.  If any of the modules requested are not available, then an exception will be thrown.  This restriction is necessary because webpack uses a synchronous model for resolving dependencies at application runtime.  Only the loading of webpack chunks is allowed to complete asynchronously.
 
-This can be an issue if your application utilizes the Dojo parser's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) capability for loading modules of declaratively instanciated widgets.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
+This can be an issue if your application utilizes the Dojo parser's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) capability for loading modules of declaratively instantiated widgets.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
 # Dependency requirements
 
-**dojo-webpack-plugin** has a peer dependency on webpack.  **dojo-webpack-plugin**'s webpack dependencies must resolve to the same modules as your applicaiton's webpack dependencies, otherwise you may encounter errors similar to the following when building.
+**dojo-webpack-plugin** has a peer dependency on webpack.  **dojo-webpack-plugin**'s webpack dependencies must resolve to the same modules as your application's webpack dependencies, otherwise you may encounter errors similar to the following when building.
 
 ```
 Error: Cannot find module 'webpack-core/lib/ConcatSource'
