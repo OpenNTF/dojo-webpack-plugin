@@ -1,14 +1,13 @@
 var path = require("path");
 var DojoWebpackPlugin = require("../../../../index");
 module.exports = {
-	entry: "test/index",
+	entry: "dojo/loaderProxy?loader=test/fooLoader&deps=test/foo!test/foo",
 	plugins: [
 		new DojoWebpackPlugin({
 			loaderConfig: {
 				paths:{test: "."}
 			},
-			loader: path.join(__dirname, "../../../js/dojo/dojo.js"),
-			cjsRequirePatterns: [/cjsModule3/]
+			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	]
 };

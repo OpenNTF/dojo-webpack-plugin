@@ -20,7 +20,6 @@ module.exports = function() {
 	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
 	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
 	const loader = query.loader;
-	/* istanbul ignore if */
 	if (!loader) {
 		throw new Error("No loader specified");
 	}

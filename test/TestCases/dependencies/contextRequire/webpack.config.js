@@ -8,7 +8,7 @@ module.exports = {
 				paths:{test: "."}
 			},
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js"),
-			cjsRequirePatterns: [/cjsModule3/]
+			cjsRequirePatterns: [/subdir/]
 		})
 	]
 };

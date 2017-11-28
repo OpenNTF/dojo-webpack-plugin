@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const loaderUtils = require("loader-utils");
 module.exports = function(content) {
 
 	this.cacheable && this.cacheable();
@@ -63,11 +62,6 @@ module.exports = function(content) {
 	})();
 
 	var absMid;
-	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
-	// See if the normalized name was provided in the query string
-	if ("name" in query) {
-		absMid = query.name;
-	}
 	var res = this._module.request.replace(/\\/g, "/");
 	var segments = res.split("!");
 	if (segments) {

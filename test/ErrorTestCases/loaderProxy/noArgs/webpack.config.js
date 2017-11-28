@@ -7,8 +7,7 @@ module.exports = {
 			loaderConfig: {
 				paths:{test: "."}
 			},
-			loader: path.join(__dirname, "../../../js/dojo/dojo.js"),
-			cjsRequirePatterns: [/cjsModule3/]
+			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		})
 	]
 };

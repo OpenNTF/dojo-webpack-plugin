@@ -7,4 +7,7 @@ define(["./amdModule"], function(amd) {
 			done();
 		});
 	});
+	it("should load CommonJS module using cjsRequirePatterns option", function() {
+		require("./cjsModule3").should.be.eql("cjs3");
+	});
 });
