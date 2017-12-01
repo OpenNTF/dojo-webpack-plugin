@@ -25,13 +25,7 @@ module.exports = function() {
 	}
 	const name = query.name || this._module.absMid.split("!").pop();
 	const deps = query.deps ? query.deps.split(",") : [];
-	var issuerAbsMid, issuer = this._module.issuer;
-	if (issuer) {
-		issuerAbsMid = issuer.absMid;
-	}
-	if (!issuerAbsMid) {
-		issuerAbsMid = this._module.absMid || "";
-	}
+	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
 	const buf = [];
 	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
 	buf.push("var runner = require(\"" + runner + "\");");
