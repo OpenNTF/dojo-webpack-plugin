@@ -16,8 +16,12 @@
 const loaderUtils = require("loader-utils");
 
 module.exports = function() {
-	this.cacheable && this.cacheable();
 	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
+	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
+	function toAbsMid(request) {
+		return dojoRequire.toAbsMid(request, {mid:issuerAbsMid});
+	}
+	this.cacheable && this.cacheable();
 	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
 	const loader = query.loader;
 	if (!loader) {
@@ -25,15 +29,14 @@ module.exports = function() {
 	}
 	const name = query.name || this._module.absMid.split("!").pop();
 	const deps = query.deps ? query.deps.split(",") : [];
-	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
 	const buf = [];
 	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
 	buf.push("var runner = require(\"" + runner + "\");");
-	buf.push("var loader = require(\"" + loader + "?absMid=" + loader + "\");");
+	buf.push("var loader = require(\"" + loader + "?absMid=" + toAbsMid(loader)  + "\");");
 	deps.forEach((dep) => {
 		dep = decodeURIComponent(dep);
 		dep = dep.split("!").map((segment) => {
-			return dojoRequire.toAbsMid(segment, issuerAbsMid);
+			return toAbsMid(segment);
 		}).join("!");
 		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");");
 	});

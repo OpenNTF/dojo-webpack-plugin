@@ -31,14 +31,15 @@ var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
 
 
 describe("TestCases", () => {
-	runTestCases(path.join(__dirname, "TestCases"));
+	runTestCases("TestCases");
 });
 
 describe("ErrorTestCases", () => {
-	runTestCases(path.join(__dirname, "ErrorTestCases"));
+	runTestCases("ErrorTestCases");
 });
 
-function runTestCases(casesPath) {
+function runTestCases(casesName) {
+	var casesPath = path.join(__dirname, casesName);
 	var categories = fs.readdirSync(casesPath);
 	categories = categories.map(function(cat) {
 		return {
@@ -58,7 +59,7 @@ function runTestCases(casesPath) {
 				const isCompilerWarnings = fs.existsSync(path.join(testDirectory, "warnings.js"));
 				it(testName + (isErrorTest ? " should fail" : " should compile") + (isCompilerErrors ? " with errors" : isCompilerWarnings ? " with warnings" : ""), function(done) {
 					this.timeout(60000);
-					var outputDirectory = path.join(__dirname, "js", "TestCases", category.name, testName);
+					var outputDirectory = path.join(__dirname, "js", casesName, category.name, testName);
 					var options = require(path.join(testDirectory, "webpack.config.js"));
 					var optionsArr = [].concat(options);
 					optionsArr.forEach(function(options, idx) {

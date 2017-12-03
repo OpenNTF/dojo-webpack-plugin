@@ -24,7 +24,7 @@
 
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
-* Webpack loader implementations of standard Dojo loaders (e.g. `dojo/has`, `dojo/i18n`).
+* Webpack loader implementations of standard Dojo loaders (e.g. `dojo/text`, `dojo/has`, `dojo/i18n`).
 * Limited support for client side execution of some Dojo loader extensions.
 
 See the [Release Notes](#release-notes) for important information about upgrading to from earlier versions of this plugin to 2.1+.
@@ -90,7 +90,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 	plugins: [
 		new DojoWebpackPlugin({/*...*/}),
 		new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
-			data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
+			data.request = data.request.replace(/^dojo\/text!/, "!!raw-loader!");
 		}),
 		//...
 	]
@@ -105,23 +105,51 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 	new NormalModuleReplacementPlugin(/^dojox\/gfx\/renderer!/, "dojox/gfx/canvas")
 	```
 
-* Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
+* Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/text` and `dojo/i18n` loader extensions.
 
 * Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension).
+
+#### The absMid request query arg
+
+Because the `NormalModuleReplacementPlugin` re-maps module identifiers early on in the module resolution process, the original module identifiers are not available at build render time.  This means that if your app needs to use client-side synchronous require to obtain a reference to the named module at runtime using the original, un-remapped identifier, the operation will fail.  For example, if the `dojo/gfx/renderer!` identifier was remapped as in the previous example, then the code below will fail.
+
+```javascript
+define(["dojo/gfx/renderer!"], function() {
+	var renderer = require("dojo/gfx/renderer!"); // fails because name was remapped
+});
+```
+
+You can fix this by using the `absMid` request query arg to specify the name that the module should be known by on the client.
+
+<!-- eslint-disable no-undef, semi-->
+```javascript
+new NormalModuleReplacementPlugin(
+	/^dojox\/gfx\/renderer!/,
+	"dojox/gfx/canvas?absMid=dojox/gfx/renderer%21"
+);
+```
+
+Note the need to url encode the `!` character in order to not trip up the parser.
 
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
 <!-- eslint-disable no-undef, semi-->
 ```javascript
-new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/selector/lite"),
-new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
-new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
-	data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
-}),
-new NormalModuleReplacementPlugin(/^dojo\/query!/, data => {
-	var match = /^dojo\/query!(.*)$/.exec(data.request);
-	data.request = "dojo/loaderProxy?loader=dojo/query&name=" + match[1] + "!";
-})
+new NormalModuleReplacementPlugin(
+	/^dojo\/selector\/_loader!$/,
+	"dojo/selector/lite?absMid=dojo/selector/_loader%21"
+),
+new NormalModuleReplacementPlugin(
+	/^dojo\/request\/default!$/,
+	"dojo/request/xhr?absMid=dojo/request/default%21"
+),
+new NormalModuleReplacementPlugin(
+	/^dojo\/query!/, data => {
+		var match = /^dojo\/query!(.*)$/.exec(data.request);
+		data.request = "dojo/loaderProxy?loader=dojo/query&name=" + match[1] + "&absMid=dojo/query%21" + match[1] + "!";
+	}
+)
+
 ```
 
 # The dojo/has loader extension
