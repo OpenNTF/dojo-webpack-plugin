@@ -109,40 +109,12 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 * Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension).
 
-#### The absMid request query arg
-
-Because the `NormalModuleReplacementPlugin` re-maps module identifiers early on in the module resolution process, the original module identifiers are not available at build render time.  This means that if your app needs to use client-side synchronous require to obtain a reference to the named module at runtime using the original, un-remapped identifier, the operation will fail.  For example, if the `dojo/gfx/renderer!` identifier was remapped as in the previous example, then the code below will fail.
-
-```javascript
-define(["dojo/gfx/renderer!"], function() {
-	var renderer = require("dojo/gfx/renderer!"); // fails because name was remapped
-});
-```
-
-You can fix this by using the `absMid` request query arg to specify the name that the module should be known by on the client.
-
-<!-- eslint-disable no-undef, semi-->
-```javascript
-new NormalModuleReplacementPlugin(
-	/^dojox\/gfx\/renderer!/,
-	"dojox/gfx/canvas?absMid=dojox/gfx/renderer%21"
-);
-```
-
-Note the need to url encode the `!` character in order to not trip up the parser.
-
 **dojo-webpack-plugin** defines the following loader extension replacements:
 
 <!-- eslint-disable no-undef, semi-->
 ```javascript
-new NormalModuleReplacementPlugin(
-	/^dojo\/selector\/_loader!$/,
-	"dojo/selector/lite?absMid=dojo/selector/_loader%21"
-),
-new NormalModuleReplacementPlugin(
-	/^dojo\/request\/default!$/,
-	"dojo/request/xhr?absMid=dojo/request/default%21"
-),
+new NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!default$/, "dojo/selector/lite"),
+new NormalModuleReplacementPlugin(/^dojo\/request\/default!$/, "dojo/request/xhr"),
 new NormalModuleReplacementPlugin(
 	/^dojo\/query!/, data => {
 		var match = /^dojo\/query!(.*)$/.exec(data.request);

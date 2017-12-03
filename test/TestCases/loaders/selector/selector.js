@@ -1,3 +1,3 @@
 define([], function() {
-	return "dojo/selector/lite";
+	return "test/selector/lite";
 });
