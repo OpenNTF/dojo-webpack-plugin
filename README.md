@@ -113,14 +113,12 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 <!-- eslint-disable no-undef, semi-->
 ```javascript
-new NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!default$/, "dojo/selector/lite"),
-new NormalModuleReplacementPlugin(/^dojo\/request\/default!$/, "dojo/request/xhr"),
-new NormalModuleReplacementPlugin(
-	/^dojo\/query!/, data => {
+new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!default$/, "dojo/selector/lite"),
+new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!$/, "dojo/request/xhr"),
+new webpack.NormalModuleReplacementPlugin(/^dojo\/query!/, data => {
 		var match = /^dojo\/query!(.*)$/.exec(data.request);
 		data.request = "dojo/loaderProxy?loader=dojo/query&name=" + match[1] + "&absMid=dojo/query%21" + match[1] + "!";
-	}
-)
+})
 
 ```
 

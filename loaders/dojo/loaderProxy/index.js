@@ -41,5 +41,10 @@ module.exports = function() {
 		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");");
 	});
 	buf.push("module.exports = runner(loader,\"" + name + "\");");
+
+	this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
+		return !/loaderProxy/.test(absMid);
+	});
+
 	return buf.join("\n");
 };
