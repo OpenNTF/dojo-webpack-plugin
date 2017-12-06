@@ -24,7 +24,7 @@
 
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
-* Webpack loader implementations of standard Dojo loaders (e.g. `dojo/has`, `dojo/i18n`).
+* Webpack loader implementations of standard Dojo loaders (e.g. `dojo/text`, `dojo/has`, `dojo/i18n`).
 * Limited support for client side execution of some Dojo loader extensions.
 
 See the [Release Notes](#release-notes) for important information about upgrading to from earlier versions of this plugin to 2.1+.
@@ -90,7 +90,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 	plugins: [
 		new DojoWebpackPlugin({/*...*/}),
 		new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
-			data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
+			data.request = data.request.replace(/^dojo\/text!/, "!!raw-loader!");
 		}),
 		//...
 	]
@@ -105,7 +105,7 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 	new NormalModuleReplacementPlugin(/^dojox\/gfx\/renderer!/, "dojox/gfx/canvas")
 	```
 
-* Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/i18n` loader extension.
+* Implement the Dojo loader extension as a Webpack loader extension.  This is what has been done with the `dojo/text` and `dojo/i18n` loader extensions.
 
 * Use the NormalModuleReplacementPlugin with the `dojo/loaderProxy` loader extension provided by this package to proxy Dojo loader extensions on the client.  More information on this is provided in [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension).
 
@@ -113,15 +113,13 @@ Dojo loader extensions generally cannot be used with Webpack.  There are several
 
 <!-- eslint-disable no-undef, semi-->
 ```javascript
-new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!/, "dojo/selector/lite"),
-new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!/, "dojo/request/xhr"),
-new webpack.NormalModuleReplacementPlugin(/^dojo\/text!/, function(data) {
-	data.request = data.request.replace(/^dojo\/text!/, "!!raw!");
-}),
-new NormalModuleReplacementPlugin(/^dojo\/query!/, data => {
-	var match = /^dojo\/query!(.*)$/.exec(data.request);
-	data.request = "dojo/loaderProxy?loader=dojo/query&name=" + match[1] + "!";
+new webpack.NormalModuleReplacementPlugin(/^dojo\/selector\/_loader!default$/, "dojo/selector/lite"),
+new webpack.NormalModuleReplacementPlugin(/^dojo\/request\/default!$/, "dojo/request/xhr"),
+new webpack.NormalModuleReplacementPlugin(/^dojo\/query!/, data => {
+		var match = /^dojo\/query!(.*)$/.exec(data.request);
+		data.request = "dojo/loaderProxy?loader=dojo/query&name=" + match[1] + "&absMid=dojo/query%21" + match[1] + "!";
 })
+
 ```
 
 # The dojo/has loader extension

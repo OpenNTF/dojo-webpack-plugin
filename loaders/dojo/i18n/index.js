@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const path = require("path");
 module.exports = function(content) {
-
 	this.cacheable && this.cacheable();
 
 	// Returns the locales that are enabled in bundle which match the requested locale
@@ -22,6 +22,9 @@ module.exports = function(content) {
 	// the requested locale.  For example if the requested locale is en-us, then bundle
 	// locales en and en-us and en-us-xyz all match.
 	function getAvailableLocales(requestedLocale, bundle) {
+		if (!bundle.root || typeof bundle.root !== 'object') {
+			return [];
+		}
 		if (requestedLocale === "*") {
 			return Object.keys(bundle).filter(locale => {
 				return locale !== "root" && !!bundle[locale];
@@ -61,64 +64,67 @@ module.exports = function(content) {
 		return result;
 	})();
 
+	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
 	var absMid;
-	var res = this._module.request.replace(/\\/g, "/");
-	var segments = res.split("!");
-	if (segments) {
-		res = segments[segments.length-1];
-	}
-	if (!absMid && this._module.absMid) {
+	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
+	if (this._module.absMid) {
 		// Fix up absMid to remove loader
-		segments = this._module.absMid.split("!");
-		if (segments) {
-			absMid = segments[segments.length-1];
+		absMid = this._module.absMid.split("!").pop();
+	}
+	if (!absMid && this._module.issuer.absMid) {
+		// Fix up absMid to remove loader
+		absMid = dojoRequire.toAbsMid(this._module.rawRequest.split("!").pop(), {mid:this._module.issuer.absMid});
+	}
+	if (!absMid) {
+		const rawRequest = this._module.rawRequest.split("!").pop();
+		if (!path.isAbsolute(rawRequest) && !rawRequest.startsWith('.')) {
+			absMid = rawRequest;
+		} else {
+			absMid = res;
 		}
 	}
-	this._module.absMid = "dojo/i18n!" + absMid;
+	this._module.absMid = this._module.absMid || "dojo/i18n!" + absMid;
 
 	// Determine if this is the default bundle or a locale specific bundle
 	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
 	const resMatch = regex.exec(res);
-	const bundledLocales = [];
 	const requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales;
-	if (resMatch && absMid) {
-		var locale;
-		if (resMatch[3]) {
-			locale = resMatch[2];
-		}
-		if (!locale) {
-			// this is the default bundle.  Add any locale specific bundles that match the
-			// requested locale.  Default bundles specify available locales
-			const absMidMatch = regex.exec(absMid);
-			const normalizedPath = absMidMatch[1];
-			const normalizedFile = absMidMatch[2];
-			(requestedLocales || ["*"]).forEach(function(requestedLocale) {
-				const availableLocales = getAvailableLocales(requestedLocale, bundle);
-				availableLocales.forEach((loc) => {
-					bundledLocales.push(loc);
-					const name = normalizedPath + "/nls/" + loc + "/" + normalizedFile;
-					buf.push("require(\"" + name + "?absMid=" + name + "\");");
-				});
-			});
+	const bundledLocales = [];
 
-		}
+	if (!resMatch) {
+		throw new Error(`Unsupported resource path for dojo/i18n loader.  ${res} must be in an nls directory`);
+	}
+	var locale;
+	if (resMatch[3]) {
+		locale = resMatch[2];
+	}
+	if (!locale) {
+		// this is the default bundle.  Add any locale specific bundles that match the
+		// requested locale.  Default bundles specify available locales
+		let absMidMatch = regex.exec(absMid);
+		(requestedLocales || ["*"]).forEach(function(requestedLocale) {
+			const availableLocales = getAvailableLocales(requestedLocale, bundle);
+			availableLocales.forEach((loc) => {
+				const localeRes = `${resMatch[1]}/nls/${loc}/${resMatch[2]}`;
+				if (absMidMatch) {
+					var localeAbsMid = `${absMidMatch[1]}/nls/${loc}/${absMidMatch[2]}`;
+				}
+				bundledLocales.push(loc);
+				buf.push(`require("${localeRes}?absMid=${(localeAbsMid || localeRes)}");`);
+			});
+		});
+
 	}
 	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
-	var issuerAbsMid;
-	if (this._module.issuer) {
-		issuerAbsMid = this._module.issuer.absMid;
-	}
-	if (!issuerAbsMid) {
-		issuerAbsMid = this._module.absMid || "";
-	}
+	const rootLocales = getAvailableLocales("*", bundle);
 
-	if (bundle.root && requestedLocales) {
-		buf.push("require(\"dojo/i18nRootModifier?absMid=" + absMid +
-		  "&bundledLocales=" + bundledLocales.toString().replace(/,/g,"|") + "!" + absMid + "\");");
+	if (rootLocales.length !== bundledLocales.length) {
+		const locs = bundledLocales.toString().replace(/,/g,"|");
+		buf.push(`require("dojo/i18nRootModifier?absMid=${absMid}&bundledLocales=${locs}!${absMid}");`);
 	} else {
-		buf.push("require(\"" + absMid + "?absMid=" + absMid + "\");");
+		buf.push(`require("${res}?absMid=${absMid}");`);
 	}
-	buf.push("module.exports = require(\"" + runner + "\")(\"" + absMid + "\");");
+	buf.push(`module.exports = require("${runner}")("${absMid}");`);
 	return buf.join("\n");
 };
 

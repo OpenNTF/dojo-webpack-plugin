@@ -1,7 +1,7 @@
 var path = require("path");
 var DojoWebpackPlugin = require("../../../../index");
 
-module.exports =
+module.exports = (
  [undefined, "en-us", "fr", "es", "de", "zh-hk"].map(locale => {
 	return {
 		entry: "test/index",
@@ -12,12 +12,13 @@ module.exports =
 					has: {"host-browser": 0, "dojo-config-api": 0},
 					locale: locale
 				},
-				locales: ["en", "fr", "es", "de"],
+				locales: ["en", "fr", "es", "de", "zh-hk"],
 				loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 			})
 		]
 	};
-}).concat(
+ })
+).concat(
 	[undefined, "en-us", "fr", "es", "de", "zh-hk"].map(locale => {
 	return {
 		entry: "test/index",
@@ -49,5 +50,5 @@ module.exports =
 			})
 		]
 	};
- })
+})
 );

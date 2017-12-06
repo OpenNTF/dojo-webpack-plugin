@@ -12,9 +12,9 @@ module.exports = {
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		}),
 		new webpack.NormalModuleReplacementPlugin(
-			/^test\/addHeaderPlugin!/, function(data) {
-				var match = /^test\/addHeaderPlugin!(.*)$/.exec(data.request);
-				data.request = "dojo/loaderProxy?loader=test/addHeaderPlugin&deps=dojo/text%21" + match[1] + "!" + match[1];
+			/^namePlugin!/, function(data) {
+				var match = /^namePlugin!(.*)$/.exec(data.request);
+				data.request = "dojo/loaderProxy?loader=test/namePlugin&deps=dojo/text%21test/content.txt&name=" + match[1] + "!";
 			}
 		)	]
 };
