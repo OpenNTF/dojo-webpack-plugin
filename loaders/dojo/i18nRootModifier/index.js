@@ -17,9 +17,6 @@ const loaderUtils = require("loader-utils");
 module.exports = function(content) {
   this.cacheable && this.cacheable();
   const query = this.query ? loaderUtils.parseQuery(this.query) : {};
-  if (query.absMid) {
-    this._module.absMid = query.absMid;
-  }
 
   var bundle = (function() {
     var result;
@@ -37,7 +34,6 @@ module.exports = function(content) {
     eval(content);
     return result;
   })();
-
   if (!bundle.root || typeof query.bundledLocales === undefined) {
     return content;
   }

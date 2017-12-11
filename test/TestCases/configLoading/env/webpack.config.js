@@ -7,7 +7,7 @@ module.exports = [
 		new DojoWebpackPlugin({
 			loaderConfig: require.resolve("./loaderConfig"),
 			environment: {foopath: "test/foo"},
-			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
+			noConsole: true
 		})
 	]
 },
