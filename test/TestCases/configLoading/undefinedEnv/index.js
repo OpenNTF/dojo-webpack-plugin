@@ -6,7 +6,6 @@ define([], function() {
 		require.toAbsMid('fooalias/bar').should.be.eql("/test/foo/bar");
 	});
 	it (`Embedded loader should ${dojoConfig.noConfigApi ? "not " : ""}have the config API`, function() {
-		debugger; //eslint-disable-line
 		var loaderScope = {};
 		loader.call(loaderScope, {packages:[{name:"dojo", location:"./"}]}, {hasCache:{}, modules:{}}, loaderScope, loaderScope);
 		(!!loaderScope.require.packs).should.be.eql(!dojoConfig.noConfigApi);

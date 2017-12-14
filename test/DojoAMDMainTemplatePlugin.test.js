@@ -18,6 +18,7 @@ class MainTemplate {
 			this.reqExtCallback = callback;
 		}
 	}
+	indent() {}
 }
 
 describe("DojoAMDMainTemplatePlugin tests", function() {
@@ -45,7 +46,7 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 				mainTemplate.reqExtCallback("");
 				done(new Error("Shouldn't get here"));
 			} catch (err) {
-				err.should.match(/Can't locate [^\s]+ in compilation/);
+				err.message.should.match(/Can't locate [^\s]+ in compilation/);
 				done();
 			}
 		});

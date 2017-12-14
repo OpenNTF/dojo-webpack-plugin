@@ -199,7 +199,6 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should gracefully handle missing absMidAliases in data object", function() {
 			const module = {absMid: 'a'};
 			const existing = {};
-			debugger; // eslint-disable-line
 			compilationCb({
 				findModule() { return existing; }
 			});
