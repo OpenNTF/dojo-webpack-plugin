@@ -15,6 +15,7 @@
  */
 
 module.exports = {
+	'foreign-loader': 1, // new in Dojo 1.14
 	'dojo-config-api': 1,
 	'csp-restrictions': 1,
 	'dojo-built': 1,
