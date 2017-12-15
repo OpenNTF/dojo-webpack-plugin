@@ -31,7 +31,7 @@ See the [Release Notes](#release-notes) for important information about upgradin
 
 # The Dojo loader
 
-**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader, as well as the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables), as well as Dojo's `require.toAbsMid()` and `require.toUrl()` functions.
+**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader (~1.5KB after uglify and gzip)<sup>[<a href="#user-content-foot1">1</a>]</sup>, and optionally the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables), as well as Dojo's `require.toAbsMid()` and `require.toUrl()` functions.
 
 This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader).
 
@@ -220,7 +220,7 @@ This property is optional.  If the value is truthy, then console output from bui
 
 # Building the Dojo loader
 
-This plugin embeds a custom build of the Dojo loader (dojo.js) in your packed application.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build profile specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (less than 4KB after uglify and gzip).  The Dojo loader builder requires that the Dojo util directory is a sibling of the `dojo` directory and is named either `util` or `dojo-util`.
+This plugin embeds a custom build of the Dojo loader (dojo.js) in your packed application.  The built loader is packaged as a CommonJS module so that it may be more easily consumed by Webpack.  The loader build profile specifies has.js features which exclude unneeded code (e.g. for loading modules) so that the loader embedded into the client is as small as possible (~1.5KB after uglify and gzip)<sup>[<a href="#user-content-foot1">1</a>]</sup>.  The Dojo loader builder requires that the Dojo util directory is a sibling of the `dojo` directory and is named either `util` or `dojo-util`.
 
 If you do not want to build the Dojo loader every time Webpack is run, then you can build it manually and specify the location of the built loader using the [loader](#loader) option.  You can produce a manual build of the loader by running the build script in the buildDojo directory.
 
@@ -320,6 +320,10 @@ The versions of Dojo listed below require version 2.1.0 of this plugin to work c
 * 1.10.9 and later
 
 In addition, Dojo loaders built with earlier versions of the plugin will not work with 2.1.0 or later, even if you have not changed the version of Dojo you are building with.  If you are using a pre-built loader with the [loader](#loader) config option, then you will need to rebuild it when upgrading to 2.1.
+
+# Footnotes
+
+<a name="foot1">1.</a>&nbsp; Embedded loader sizes are determined using a stand-alone embedded loader that has been uglified and gzipped.  The loader was produced as described in [Building the Dojo loader](#building-the-dojo-loader), with [the Dojo config API excluded](#the-dojo-config-api-feature) and using the 2.2.2 version of this plugin and the 1.14 (not yet released at the time of this writing) Dojo loader, both of which support the new [`foreign-loader`](https://github.com/dojo/dojo/pull/279) has.js feature conditional.  Embedded loader sizes for earlier versions vary depending on the version of this plugin and of Dojo, up to a max of about 4KB when the Dojo config API is included.
 
 [npm]: https://img.shields.io/npm/v/dojo-webpack-plugin.svg
 [npm-url]: https://npmjs.com/package/dojo-webpack-plugin
