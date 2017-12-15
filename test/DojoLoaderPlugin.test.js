@@ -46,7 +46,7 @@ describe("DojoLoaderPlugin tests", function() {
 			tmpStub.dir = function(options__, callback) {
 				callback(error);
 			};
-			DojoLoaderPlugin.getOrCreateEmbeddedLoader("path", {}, {}, err => {
+			plugin.getOrCreateEmbeddedLoader("path", {}, {}, err => {
 				err.should.be.eql(error);
 				done();
 			});
@@ -56,7 +56,7 @@ describe("DojoLoaderPlugin tests", function() {
 			child_processStub.execFile = function(executable__, options__, callback) {
 				callback(error, "", "Error from execFile");
 			};
-			DojoLoaderPlugin.getOrCreateEmbeddedLoader("path", {baseUrl:'.'}, {}, err => {
+			plugin.getOrCreateEmbeddedLoader("path", {baseUrl:'.'}, {}, err => {
 				err.should.be.eql(error);
 				done();
 			});
@@ -65,7 +65,7 @@ describe("DojoLoaderPlugin tests", function() {
 	describe("validateEmbeddedLoader edge cases", function() {
 		it("Should invoke callback with error if nomralModuleFactory.create returns an error", function(done) {
 			var error = new Error("Failed to create module");
-			DojoLoaderPlugin.validateEmbeddedLoader({
+			plugin.validateEmbeddedLoader({
 				normalModuleFactory: {
 					create: function(params__, callback) {
 						callback(error);
@@ -79,13 +79,13 @@ describe("DojoLoaderPlugin tests", function() {
 	});
 	describe("compiler run(0) edge cases", function() {
 		afterEach(function() {
-			plugin.options.loaderConfig = {};
+			delete plugin.getDojoPath;
 		});
 		it("Should call the callback with error if can't find dojo.js", function(done) {
-			// specifying location as an object throws an exception in the getDojoPath function
-			plugin.options.loaderConfig.packages = [{name:"dojo", location:{}}];
+			const error = new Error("test error");
+			plugin.getDojoPath = function() {throw error;};
 			runCallbacks[0].call(plugin, {}, (err, data) => {
-				err.message.should.match(/Path must be a string/);
+				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
@@ -94,13 +94,13 @@ describe("DojoLoaderPlugin tests", function() {
 
 	describe("compiler run(1) edge cases", function() {
 		afterEach(function() {
-			plugin.options.loaderConfig = {};
+			delete plugin.getDojoPath;
 		});
 		it("Should call the callback with error if can't find dojo.js", function(done) {
-			// specifying location as an object throws an exception in the getDojoPath function
-			plugin.options.loaderConfig.packages = [{name:"dojo", location:{}}];
+			const error = new Error("test error");
+			plugin.getDojoPath = function() {throw error;};
 			runCallbacks[1].call(plugin, {}, (err, data) => {
-				err.message.should.match(/Path must be a string/);
+				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
@@ -167,6 +167,7 @@ describe("DojoLoaderPlugin tests", function() {
 			done();
 		});
 	});
+
 	describe("evaluate typeof __embedded_dojo_loader__ edge cases", function() {
 		var params, compilation, parserCallback, evalTypeofCallback;
 		beforeEach(function() {
@@ -182,18 +183,19 @@ describe("DojoLoaderPlugin tests", function() {
 			compilation = {
 				plugin: function() {}
 			};
-			debugger; // eslint-disable-line
 			compilationCallback(compilation, params);
 			parserCallback({
 				plugin: function(event, callback) {
 					if (event === "evaluate typeof __embedded_dojo_loader__") {
 						evalTypeofCallback = callback;
 					}
+				},
+				applyPluginsBailResult() {
+					return {string: ""};
 				}
 			});
 		});
 		it("Should not throw if expr is undefined", function() {
-			debugger; // eslint-disable-line
 			const result = evalTypeofCallback();
 			result.string.should.be.eql('string');
 		});
