@@ -45,6 +45,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		factoryPlugins.forEach(cb => {
 			cb(factory);
 		});
+		plugin.factory = factory;
 	});
 	describe("addAbsMid tests", function() {
 		it("should add the absMid", function() {
@@ -135,14 +136,14 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should parse no-arg requests properly", function() {
 			var data = {};
 			data.request = "foo/bar";
-			plugin.processAbsMidQueryArgs(factory, data);
+			plugin.processAbsMidQueryArgs(data);
 			(typeof data.absMid).should.be.eql('undefined');
 			(typeof data.absMidAliases).should.be.eql('undefined');
 		});
 		it("Should parse request with single absMid properly", function() {
 			var data = {};
 			data.request = "./bar?absMid=foo/bar";
-			plugin.processAbsMidQueryArgs(factory, data);
+			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("./bar");
 			data.absMid.should.be.eql("foo/bar");
 			data.absMidAliases.length.should.be.eql(0);
@@ -150,7 +151,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should parse request with multple absMids and other args properly", function() {
 			var data = {};
 			data.request = "moduleA?q=123&absMid=test/a&id=456&absMid=foo/a";
-			plugin.processAbsMidQueryArgs(factory, data);
+			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA?q=123&id=456");
 			data.absMid.should.be.eql("test/a");
 			data.absMidAliases.length.should.be.eql(1);
@@ -159,7 +160,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should parse requests with no absMid args properly", function() {
 			var data = {};
 			data.request = "moduleA?q=123&s=abc";
-			plugin.processAbsMidQueryArgs(factory, data);
+			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA?q=123&s=abc");
 			(typeof data.absMid).should.be.eql('undefined');
 			(typeof data.absMidAliases).should.be.eql('undefined');
@@ -167,7 +168,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should parse requests with absMid args in multiple plugin segments", function() {
 			var data = {};
 			data.request = "moduleA?absMid=a!moduleB!moduleC?absMid=c!moduleD?q=123";
-			plugin.processAbsMidQueryArgs(factory, data);
+			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA!moduleB!moduleC!moduleD?q=123");
 			data.absMid.should.be.eql("a");
 			data.absMidAliases.length.should.be.eql(1);

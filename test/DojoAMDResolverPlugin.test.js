@@ -23,7 +23,7 @@ describe("DojoAMDResolverPlugin tests", function() {
 				}
 			},
 			plugin: (event, callback) => {
-				if (event === "compilation") {
+				if (event === "normal-module-factory") {
 					callback();
 				}
 			},
