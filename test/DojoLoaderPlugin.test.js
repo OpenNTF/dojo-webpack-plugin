@@ -31,15 +31,16 @@ describe("DojoLoaderPlugin tests", function() {
 			context: "."
 		});
 	});
-	describe("getOrCreateEmbeddedLoader edge cases", function() {
-		beforeEach(function() {
-			Object.keys(tmpStub).forEach(key => {
-				delete tmpStub[key];
-			});
-			Object.keys(child_processStub).forEach(key => {
-				delete child_processStub[key];
-			});
+	afterEach(function() {
+		Object.keys(tmpStub).forEach(key => {
+			delete tmpStub[key];
 		});
+		Object.keys(child_processStub).forEach(key => {
+			delete child_processStub[key];
+		});
+
+	});
+	describe("getOrCreateEmbeddedLoader edge cases", function() {
 
 		it("Should call callback with error returned by tmp.dir", function(done) {
 			var error = new Error("Failed to create temp dir");

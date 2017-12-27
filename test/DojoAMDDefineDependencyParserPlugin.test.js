@@ -11,8 +11,7 @@ const DojoAMDDefineDependencyParserPlugin = require("../lib/DojoAMDDefineDepende
 describe("DojoAMDDefineDependencyParserPlugin tests", function() {
 	var defineArray, defineItem;
 	beforeEach(function() {
-		const plugin = new DojoAMDDefineDependencyParserPlugin({});
-		plugin.apply({
+		const parser = {
 			plugin: function(event, callback) {
 				if (event === "call define:amd:array") {
 					defineArray = callback;
@@ -20,7 +19,9 @@ describe("DojoAMDDefineDependencyParserPlugin tests", function() {
 					defineItem = callback;
 				}
 			}
-		});
+		};
+		const plugin = new DojoAMDDefineDependencyParserPlugin({}, parser);
+		plugin.apply(parser);
 	});
 	describe("Test edge cases", function() {
 		it("'call define:amd:item' with unrecognized param type", function() {
