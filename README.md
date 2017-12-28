@@ -312,7 +312,7 @@ https://openntf.github.io/dojo-webpack-plugin-sample/test.html.
 
 # Release Notes
 
-The versions of Dojo listed below require version 2.1.0 of this plugin to work correctly.  Attempting to use earlier versions of this plugin with the listed versions of Dojo will result in the error "Dojo require not yet initialized" when building.
+The versions of Dojo listed below require version 2.1.0 or later of this plugin to work correctly.  Attempting to use earlier versions of this plugin with the listed versions of Dojo will result in the error "Dojo require not yet initialized" when building.  The newer versions of this plugin should contine to work with older patch releases of the listed versions of Dojo.
 
 * 1.13.0 and later
 * 1.12.3 and later
