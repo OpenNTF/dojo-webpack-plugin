@@ -44,20 +44,14 @@
 	}
 
 	Promise = lang.extend(function PromiseWrapper(executor) {
-		if (executor) {
-			// Create a new dojo/Deferred
-			var dfd = new Deferred();
-			this.promise = dfd.promise;
-			try {
-				executor(
-					function(value) { dfd.resolve(value, false); },
-					function (reason) { dfd.reject(reason, false); }
-				);
-			} catch (err) {
-				dfd.reject(err);
-			}
-			freezeObject(this);
-		}
+		// Create a new dojo/Deferred
+		var dfd = new Deferred();
+		this.promise = dfd.promise;
+		executor(
+			function(value) { dfd.resolve(value, false); },
+			function (reason) { dfd.reject(reason, false); }
+		);
+		freezeObject(this);
 	}, {
 		'catch': function(onRejected) {
 			return wrap(this.promise.otherwise(onRejected));
