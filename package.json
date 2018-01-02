@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.3.3-0",
+  "version": "2.3.3",
   "author": "Chuck Dumont",
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
@@ -16,6 +16,7 @@
     "file-loader": "0.9.0",
     "loader-utils": "1.1.0",
     "node-stringify": "0.2.1",
+    "object.entries": "1.0.4",
     "raw-loader": "0.5.1",
     "tmp": "0.0.30",
     "webpack-sources": "1.1.0"
