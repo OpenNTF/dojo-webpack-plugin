@@ -66,13 +66,15 @@ describe("DojoLoaderPlugin tests", function() {
 	describe("validateEmbeddedLoader edge cases", function() {
 		it("Should invoke callback with error if nomralModuleFactory.create returns an error", function(done) {
 			var error = new Error("Failed to create module");
-			plugin.validateEmbeddedLoader({
+			plugin.params = {
 				normalModuleFactory: {
 					create: function(params__, callback) {
 						callback(error);
 					}
 				}
-			}, "", "", err => {
+			};
+			plugin.embeddedLoader = plugin.filename = "";
+			plugin.validateEmbeddedLoader(null, err => {
 				err.should.be.eql(error);
 				done();
 			});
