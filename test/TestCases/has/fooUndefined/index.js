@@ -1,8 +1,9 @@
-define(["dojo/has", "dojo/has!foo?./a:./b"], function(has, m1) {
+define(["require", "dojo/has", "dojo/has!foo?./a:./b"], function(require, has, m1) {
   it("should load module based on runtime value of foo", function(done) {
     has("webpack").should.be.true;
 		(typeof(has('foo')) === 'undefined').should.be.true;
     m1.should.be.eql("b");
+		require("./b").should.be.eql(m1);
     has.add("foo", true, true);
     require(["dojo/has!foo?./c:./d"], function(m2) {
       // module should have been set at build time and not changed just because foo changed
