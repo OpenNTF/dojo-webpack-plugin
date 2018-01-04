@@ -8,7 +8,7 @@
     "pretest": "npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
     "test": "mocha --harmony",
     "travis:test": "npm run -s test",
-    "cover": "istanbul cover -x **/*.runtime.js node_modules/mocha/bin/_mocha",
+    "cover": "istanbul cover -x index.js -x **/*.runtime.js node_modules/mocha/bin/_mocha",
     "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
