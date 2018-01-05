@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 const path = require("path");
+const i18nEval = require("../i18nEval");
+
 module.exports = function(content) {
 	this.cacheable && this.cacheable();
 
@@ -47,23 +49,7 @@ module.exports = function(content) {
 		return result;
 	}
 
-	var bundle = (function() {
-		var result;
-		function define(arg1, arg2) {
-			if (!arg2) {
-				result = arg1;
-			} else {
-				if (arg1.length !== 0) {
-					throw new Error("define dependencies not supported in langauge files!");
-				}
-				result = arg2(); // call factory function
-			}
-		}
-		define.amd = true;
-		eval(content);
-		return result;
-	})();
-
+	var bundle = i18nEval(content);
 	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
 	var absMid;
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
