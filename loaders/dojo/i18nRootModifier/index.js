@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 const loaderUtils = require("loader-utils");
+const i18nEval = require("../i18nEval");
+
+/*
+ * Modifies the available locales specified in "root" bundles to enable only those locales
+ * specified in the bundleLocales query arg.  All other locales will be unavailable.
+ */
 module.exports = function(content) {
   this.cacheable && this.cacheable();
   const query = this.query ? loaderUtils.parseQuery(this.query) : {};
 
-  var bundle = (function() {
-    var result;
-    function define(arg1, arg2) {
-      if (!arg2) {
-        result = arg1;
-      } else {
-        if (arg1.length !== 0) {
-          throw new Error("define dependencies not supported in langauge files!");
-        }
-        result = arg2(); // call factory function
-      }
-    }
-    define.amd = true;
-    eval(content);
-    return result;
-  })();
+  var bundle = i18nEval(content);
   if (!bundle.root || typeof query.bundledLocales === undefined) {
     return content;
   }
   const bundledLocales = query.bundledLocales.split("|");
   Object.keys(bundle).forEach(availableLocale => {
     if (availableLocale === "root") return;
-    bundle[availableLocale] = bundledLocales.includes(availableLocale);
+    bundle[availableLocale] = bundle[availableLocale] && bundledLocales.includes(availableLocale);
   });
   return `define(${JSON.stringify(bundle,null, 1)})`;
 };
