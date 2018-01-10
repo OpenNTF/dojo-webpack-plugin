@@ -9,31 +9,23 @@
 const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
 
 describe("DojoAMDResolverPlugin tests", function() {
-	const plugin = new DojoAMDResolverPlugin({});
+	const plugin = new DojoAMDResolverPlugin({}, {
+		applyPluginsBailResult(event) {
+			if (event === "get dojo require") {
+				return {
+					toUrl: (request) => {
+						return request.request === "null" ? null : request.request;
+					}
+				};
+			}
+		}
+	});
 	var moduleCallback;
 	beforeEach(function() {
 		plugin.apply({
-			resolvers: {
-				normal: {
-					plugin: (event, callback) => {
-						if (event === "module") {
-							moduleCallback = callback;
-						}
-					}
-				}
-			},
 			plugin: (event, callback) => {
-				if (event === "normal-module-factory") {
-					callback();
-				}
-			},
-			applyPluginsBailResult(event) {
-				if (event === "get dojo require") {
-					return {
-						toUrl: (request) => {
-							return request.request === "null" ? null : request.request;
-						}
-					};
+				if (event === "module") {
+					moduleCallback = callback;
 				}
 			}
 		});
