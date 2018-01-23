@@ -133,7 +133,11 @@ function runTestCases(casesName) {
 									var p = path.join(outputDirectory, bundlePath);
 									content = fs.readFileSync(p, "utf-8");
 									var module = {exports: {}};
-									var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {should.extend('should', Object.prototype);\n" + content + "\n})", context, p);
+									const prologue = `
+should.extend('should', Object.prototype);\n
+Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
+
+									var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
 									fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
 								});
 							}
