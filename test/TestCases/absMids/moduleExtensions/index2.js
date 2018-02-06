@@ -1,4 +1,4 @@
-const should = require("should");
+const should = require("should").default;
 define(['testLoader?addAbsMids=a&filterAbsMids=testLoader!content.txt'], function(content) {
 	define("loader module extension tests - filterAbsMids", function() {
 		it("Should filter the absMids matching the specified regex", function(done) {
