@@ -33,7 +33,8 @@ describe("DojoAMDDefineDependencyParserPlugin tests", function() {
 		});
 		it("'call define:amd:item' with unrecognized param type", function() {
 			const result = defineItem({}, {
-				isString: function() {return false;}
+				isString: function() {return false;},
+				isIdentifier: function() {return false;}
 			});
 			(typeof result).should.be.eql("undefined");
 		});
