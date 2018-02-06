@@ -28,7 +28,7 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 		} catch(e) {
 			exceptionThrown = true;
 		}
-		exceptionThrown.should.be.true;
+		exceptionThrown.should.be.true();
 		require(['require', 'module', 'exports', './asyncDep'], function(require, reqModule, reqExports, asyncDep) {
 			reqModule.id.should.be.eql(module.id);
 			reqExports.should.be.eql(exports);

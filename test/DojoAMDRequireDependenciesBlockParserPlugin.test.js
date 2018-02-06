@@ -23,7 +23,8 @@ describe("DojoAMDRequireDependenciesBlockParserPlugin tests", function() {
 	describe("Test edge cases", function() {
 		it("'call define:amd:item' with unrecognized param type", function() {
 			const result = requireItem({}, {
-				isString: function() {return false;}
+				isString: function() {return false;},
+				isIdentifier: function() {return false;}
 			});
 			(typeof result).should.be.eql("undefined");
 		});
