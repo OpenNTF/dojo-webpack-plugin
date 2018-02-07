@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.4.2-2",
+  "version": "2.4.2-3",
   "author": "Chuck Dumont",
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
