@@ -253,11 +253,11 @@ A modest reduction in the size of the bootstrap code can be realized by excludin
 
 When using an embedded Dojo loader that does not include the config API, post-processed config objects generated at build time are serialized to the application and used to initialize the embedded loader at application run-time. The pre-processed config objects (e.g. `paths`, `packages`, `aliases`, `maps`, etc.) are not serialized to the application because they are not needed by Dojo.  If your application requires access to these config properties at runtime (e.g. from `dojoConfig` or `require.rawConfig`), then don't use this feature.
 
-This plugin detects at application build time whether or not the embedded Dojo loader includes the config API and emits the code for initiailzing the application as appropriate for the type of loader provided.
+This plugin detects at application build time whether or not the embedded Dojo loader includes the config API and emits the code for initiailizing the application as appropriate for the type of loader provided.
 
 There are two ways to use the embedded Dojo loader without the config API.
 
-1. If the plugin is building the loader automatically at application build time (i.e. you are not specifying the [loader](#loader) option), then you can specify the `dojo-config-api` has feature with a value of 0 or false in the Dojo loader config.  Note that the `dojo-config-api` has feature is ignored if the [loaderConfig](#loaderconfig) option specifies a module name.
+1. If the plugin is building the loader automatically at application build time (i.e. you are not specifying the [loader](#loader) option), then you can specify the `dojo-config-api` feature with a value of 0 or false in the Dojo loader config `has` property.  Note that the `dojo-config-api` has feature is ignored if the [loaderConfig](#loaderconfig) option specifies a module name.
 	<!-- eslint-disable no-undef, semi -->
 	```javascript
 	plugins: [
@@ -274,6 +274,10 @@ There are two ways to use the embedded Dojo loader without the config API.
 
 1. If you are specifying a pre-built embedded loader using the [loader](#loader) option, then build the loader without the config API as described in [Overriding profile features](#overriding-profile-features).  Note that a build-time exception will be thrown if the [loaderConfig](#loaderconfig) option specifies a module name and the provided loader does not include the config API.
 
+# The `dojo-undef-api` feature
+
+This plugin supports the `dojo-undef-api` feature.  If this feature is enabled in the Dojo loader config's `has` property at build time, then `require.undef` may be called at runtime to remove a module from the list of defined modules.  This generally works only with AMD modules, not CommonJS modules. `require.undef` is primarily useful for test frameworks that need to load and unload modules without having to reload the entire application.
+
 # ES6 Promise dependency in Webpack 2.x
 
 Webpack 2.x includes code in your packed application that uses ES6 Promise.  If you need to support browsers that lack ES6 Promise support (e.g. IE 11), then you will need to provide this capability in your application.  This plugin provides a tiny wrapper module named [dojoES6Promise](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/amd/dojoES6Promise.js) that implements ES6 Promise using dojo/Deferred.  All you need to do is include this module as an AMD dependency in your application.  See [bootstrap.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/bootstrap.js) in the sample application for an example.
@@ -282,11 +286,25 @@ Webpack 2.x includes code in your packed application that uses ES6 Promise.  If 
 
 When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** converts the module expressions to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before **dojo-webpack-plugin** applies its transformations.
 
-# Client-side Execution of non-transformed Async require
+# Use of run-time identifiers in dependency arrays
 
-Webpack normally transforms async `require()` calls into `__webpack_require__()` calls for the purpose of loading modules at application runtime.  However, if the call references dependencies which cannot be evaluated at build time, then the `require()` call will not be transformed.  Instead, `require()`, as implemented by this plugin, will be called at application runtime on the client and will complete synchronously (callback invoked prior to returning) provided the requested modules are available from chunks that have already been loaded in the client.  If any of the modules requested are not available, then an exception will be thrown.  This restriction is necessary because webpack uses a synchronous model for resolving dependencies at application runtime.  Only the loading of webpack chunks is allowed to complete asynchronously.
+The plugin supports the use of run-time identifiers in require/define dependency arrays with the caveat that the modules referenced by the identifiers must be available in chunks that have already been loaded on the client.  For example:
 
-This can be an issue if your application utilizes the Dojo parser's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) capability for loading modules of declaratively instantiated widgets.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
+<!-- eslint-disable no-unused-vars -->
+```javascript
+var mid = 'foo';
+require([mid, 'bar'], function(foo, bar) {
+	/* ... */
+});
+```
+
+In order for the above code to execute successfully, the module `foo` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the module must have been included in a previously loaded chunk, or it must be a direct or indirect dependency of `bar` so that it is included in the chunk that contains `bar`.  Since values of run-time identifiers cannot, in general, be known at build time, webpack cannot manage the loading of these modules or their dependencies.
+
+Note that you can also specify the dependency array as a run-time identifier, with the same caveat applying to all the modules in the array.
+
+# Use of Dojo's Auto-Require feature
+
+Dojo's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) feature allows the parser to automatically require the modules for widgets that are declared by templates.  This can be problematic with webpack for the reasons discussed [above](#use-of-run-time-identifiers-in-dependency-arrays), if your modules do not explicitly specify dependencies for the widgets that they contain.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
 # Dependency requirements
 
