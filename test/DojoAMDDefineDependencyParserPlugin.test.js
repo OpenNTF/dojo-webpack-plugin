@@ -7,35 +7,31 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDDefineDependencyParserPlugin = require("../lib/DojoAMDDefineDependencyParserPlugin");
+const Tapable = require("tapable");
 
 describe("DojoAMDDefineDependencyParserPlugin tests", function() {
-	var defineArray, defineItem;
+	var parser;
+	const params = {
+		isString: function() {return false;},
+		isIdentifier: function() {return false;},
+		isArray: function() {return false;},
+		isConstArray: function() {return false;}
+	};
 	beforeEach(function() {
-		const parser = {
-			plugin: function(event, callback) {
-				if (event === "call define:amd:array") {
-					defineArray = callback;
-				} else if (event === "call define:amd:item") {
-					defineItem = callback;
-				}
-			}
+		parser = new Tapable();
+		parser.plugin = function() {  // so hasOwnProperty is true
+			return Tapable.prototype.plugin.apply(this, arguments);
 		};
 		const plugin = new DojoAMDDefineDependencyParserPlugin({}, parser);
 		plugin.apply(parser);
 	});
 	describe("Test edge cases", function() {
 		it("'call define:amd:item' with unrecognized param type", function() {
-			const result = defineArray({}, {
-				isArray: function() {return false;},
-				isConstArray: function() {return false;}
-			});
+			const result = parser.applyPluginsBailResult('call define:amd:item', {}, params);
 			(typeof result).should.be.eql("undefined");
 		});
-		it("'call define:amd:item' with unrecognized param type", function() {
-			const result = defineItem({}, {
-				isString: function() {return false;},
-				isIdentifier: function() {return false;}
-			});
+		it("'call define:amd:array' with unrecognized param type", function() {
+			const result = parser.applyPluginsBailResult('call define:amd:array', {}, params);
 			(typeof result).should.be.eql("undefined");
 		});
 	});

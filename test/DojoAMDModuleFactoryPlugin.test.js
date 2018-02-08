@@ -7,44 +7,23 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
+const Tapable = require("tapable");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 
-class Factory {
-	constructor() {
-		this.events = [];
-	}
-	plugin(event, callback) {
-		this.events[event] = callback;
-	}
+class Factory extends Tapable {
 	addAbsMid(data, absMid) {
 		return this.events["add absMid"](data, absMid);
-	}
-	applyPlugins(event) {
-		this.events[event].apply(this, Array.prototype.slice.call(arguments, 1));
-	}
-	applyPluginsBailResult(event) {
-		return this.events[event].apply(this, Array.prototype.slice.call(arguments, 1));
 	}
 }
 
 describe("DojoAMDModuleFactoryPlugin tests", function() {
-	var compilationCb, factory;
+	var factory;
+	var compiler;
 	beforeEach(function() {
-		const factoryPlugins = [];
-		plugin.apply({
-			plugin: function(event, callback) {
-				if (event === "compilation") {
-					compilationCb = callback;
-				}
-				if (event === "normal-module-factory") {
-					factoryPlugins.push(callback);
-				};
-			}
-		});
+		compiler = new Tapable();
+		plugin.apply(compiler);
 		factory = new Factory();
-		factoryPlugins.forEach(cb => {
-			cb(factory);
-		});
+		compiler.applyPlugins("normal-module-factory", factory);
 		plugin.factory = factory;
 	});
 	describe("addAbsMid tests", function() {
@@ -200,7 +179,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should gracefully handle missing absMidAliases in data object", function() {
 			const module = {absMid: 'a'};
 			const existing = {};
-			compilationCb({
+			compiler.applyPlugins("compilation", {
 				findModule() { return existing; }
 			});
 			const result = factory.applyPluginsBailResult("module", module);

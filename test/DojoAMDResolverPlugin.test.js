@@ -7,46 +7,40 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
+const Tapable = require("tapable");
 
 describe("DojoAMDResolverPlugin tests", function() {
-	const plugin = new DojoAMDResolverPlugin({}, {
-		applyPluginsBailResult(event) {
-			if (event === "get dojo require") {
-				return {
-					toUrl: (request) => {
-						return request.request === "null" ? null : request.request;
-					}
-				};
+	const compiler = new Tapable();
+	const plugin = new DojoAMDResolverPlugin({}, compiler);
+	compiler.plugin("get dojo require", function() {
+		return {
+			toUrl: (request) => {
+				return request.request === "null" ? null : request.request;
 			}
-		}
+		};
 	});
-	var moduleCallback;
+	var factory;
 	beforeEach(function() {
-		plugin.apply({
-			plugin: (event, callback) => {
-				if (event === "module") {
-					moduleCallback = callback;
-				}
-			}
-		});
+		factory = new Tapable();
+		plugin.apply(factory);
 	});
 	describe("resolver tests", () => {
 		it("Should invoke callback with no args for directory request", done => {
-			moduleCallback({directory:true}, (err, data) => {
+			factory.applyPlugins("module", {directory:true}, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
 		});
 		it("Should invoke callback with no args for null request", done => {
-			moduleCallback({request: "null", path:"."}, (err, data) => {
+			factory.applyPlugins("module", {request: "null", path:"."}, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
 		});
 		it("Should invoke callback with no args for identity request", done => {
-			moduleCallback({request: "null", path:"."}, (err, data) => {
+			factory.applyPlugins("module", {request: "null", path:"."}, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
