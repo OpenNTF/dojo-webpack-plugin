@@ -8,28 +8,19 @@
  */
 const proxyquire = require("proxyquire");
 const tmpStub = {}, child_processStub = {};
+const Tapable = require("tapable");
 const DojoLoaderPlugin = proxyquire("../lib/DojoLoaderPlugin", {
 	tmp: tmpStub,
 	child_process: child_processStub
 });
 var plugin;
 describe("DojoLoaderPlugin tests", function() {
-	var runCallbacks;
-	var compilationCallback;
+	var compiler;
 	beforeEach(function() {
-		runCallbacks = [];
 		plugin = new DojoLoaderPlugin({loaderConfig:{}, noConsole:true});
-		plugin.apply({
-			plugin: function(event, callback) {
-				if (event === "run" || event[0] === "run") {
-					runCallbacks.push(callback);
-				}
-				if (event === "compilation") {
-					compilationCallback = callback;
-				}
-			},
-			context: "."
-		});
+		compiler = new Tapable();
+		compiler.context = '.';
+		plugin.apply(compiler);
 	});
 	afterEach(function() {
 		Object.keys(tmpStub).forEach(key => {
@@ -87,7 +78,8 @@ describe("DojoLoaderPlugin tests", function() {
 		it("Should call the callback with error if can't find dojo.js", function(done) {
 			const error = new Error("test error");
 			plugin.getDojoPath = function() {throw error;};
-			runCallbacks[0].call(plugin, {}, (err, data) => {
+			compiler._plugins.run.splice(1, 1);	// remove run(1) event
+			compiler.applyPlugins("run", {}, (err, data) => {
 				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
@@ -102,7 +94,8 @@ describe("DojoLoaderPlugin tests", function() {
 		it("Should call the callback with error if can't find dojo.js", function(done) {
 			const error = new Error("test error");
 			plugin.getDojoPath = function() {throw error;};
-			runCallbacks[1].call(plugin, {}, (err, data) => {
+			compiler._plugins.run.splice(0, 1);	// remove run(0) event
+			compiler.applyPlugins("run", {}, (err, data) => {
 				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
@@ -113,7 +106,8 @@ describe("DojoLoaderPlugin tests", function() {
 			tmpStub.dir = function(options__, callback) {
 				callback(error);
 			};
-			runCallbacks[1].call(plugin, {}, (err, data) => {
+			compiler._plugins.run.splice(0, 1);	// remove run(0) event
+			compiler.applyPlugins("run", {}, (err, data) => {
 				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
@@ -141,7 +135,7 @@ describe("DojoLoaderPlugin tests", function() {
 					find() {}
 				}
 			};
-			compilationCallback(compilation, params);
+			compiler.applyPlugins("compilation", compilation, params);
 		});
 		it("Should throw if embedded loader not found in compilation", function(done) {
 			try {
@@ -186,7 +180,7 @@ describe("DojoLoaderPlugin tests", function() {
 			compilation = {
 				plugin: function() {}
 			};
-			compilationCallback(compilation, params);
+			compiler.applyPlugins("compilation", compilation, params);
 			parserCallback({
 				plugin: function(event, callback) {
 					if (event === "evaluate typeof __embedded_dojo_loader__") {

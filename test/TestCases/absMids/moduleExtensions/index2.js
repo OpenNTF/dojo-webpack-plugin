@@ -1,4 +1,3 @@
-const should = require("should").default;
 define(['testLoader?addAbsMids=a&filterAbsMids=testLoader!content.txt'], function(content) {
 	define("loader module extension tests - filterAbsMids", function() {
 		it("Should filter the absMids matching the specified regex", function(done) {
@@ -6,7 +5,7 @@ define(['testLoader?addAbsMids=a&filterAbsMids=testLoader!content.txt'], functio
 			require("a").should.be.eql(content);
 			try {
 				require('testLoader?addAbsMids=a&filterAbsMids=.*!content.txt');
-				should.fail("Shouldn't get here");
+				return done(new Error("Shouldn't get here"));
 			} catch (e) {
 				done();
 			}

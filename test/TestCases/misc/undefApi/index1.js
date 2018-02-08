@@ -1,4 +1,3 @@
-var should = require("should").default;
 define(["require", "./a"], function(require, a) {
 	it("should successfully undefine the module and then load it again", function(done) {
 		a.label.should.be.eql("a");
@@ -6,7 +5,7 @@ define(["require", "./a"], function(require, a) {
 		require.undef("./a");
 		try {
 			require("./a");
-			should.fail("Shouldn't get here");
+			return done(new Error("Shouldn't get here"));
 		} catch (e) {}
 		require(["./a"], function(_a) {
 			a.should.be.eql(_a);
@@ -14,7 +13,7 @@ define(["require", "./a"], function(require, a) {
 			require.undef("./a");
 			try {
 				require("./a");
-				should.fail("Shouldn't get here");
+				return done(new Error("Shouldn't get here"));
 			} catch (e) {}
 			var dep = "./a";
 			require([dep], function(__a) {

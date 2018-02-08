@@ -7,22 +7,18 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDRequireDependenciesBlockParserPlugin = require("../lib/DojoAMDRequireDependenciesBlockParserPlugin");
+const Tapable = require("tapable");
 
 describe("DojoAMDRequireDependenciesBlockParserPlugin tests", function() {
-	var requireItem;
+	var parser;
 	beforeEach(function() {
 		const plugin = new DojoAMDRequireDependenciesBlockParserPlugin({});
-		plugin.apply({
-			plugin: function(event, callback) {
-				if (event === "call require:amd:item") {
-					requireItem = callback;
-				}
-			}
-		});
+		parser = new Tapable();
+		plugin.apply(parser);
 	});
 	describe("Test edge cases", function() {
 		it("'call define:amd:item' with unrecognized param type", function() {
-			const result = requireItem({}, {
+			const result = parser.applyPluginsBailResult('call require:amd:item', {}, {
 				isString: function() {return false;},
 				isIdentifier: function() {return false;}
 			});

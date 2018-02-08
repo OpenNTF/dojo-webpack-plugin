@@ -7,25 +7,18 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDMiscParserPlugin = require("../lib/DojoAMDMiscParserPlugin");
+const Tapable = require("tapable");
 const plugin = new DojoAMDMiscParserPlugin({});
-var moduleCallback;
 
 describe("DojoAMDMiscParserPlugin tests", function() {
+	const parser = new Tapable();
 	beforeEach(function() {
-		plugin.apply({
-			plugin: (event, callback) => { // eslint-disable-line no-shadow
-				if (event === "expression module") {
-					moduleCallback = callback;
-				}
-			},
-			state: {
-				module:{}
-			}
-		});
+		plugin.apply(parser);
+		parser.state = {module:{}};
 	});
 	describe("DojoAMDPlugin tests", function() {
 		it("Should return undefined from parser 'expression module' event", function() {
-			(typeof moduleCallback()).should.be.eql('undefined');
+			(typeof parser.applyPluginsBailResult("expression module")).should.be.eql('undefined');
 		});
 	});
 });

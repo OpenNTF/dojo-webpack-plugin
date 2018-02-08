@@ -7,16 +7,13 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDMainTemplatePlugin = require("../lib/DojoAMDMainTemplatePlugin");
+const Tapable = require("tapable");
 const plugin = new DojoAMDMainTemplatePlugin({});
 
-class MainTemplate {
+class MainTemplate extends Tapable {
 	constructor() {
+		super();
 		this.requireFn = "__webpack_require__";
-	}
-	plugin(event, callback) { // eslint-disable-line no-shadow
-		if (event === 'dojo-require-extensions') {
-			this.reqExtCallback = callback;
-		}
 	}
 	indent() {}
 }
@@ -26,16 +23,12 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 
 	beforeEach(function() {
 		mainTemplate = new MainTemplate();
-		plugin.apply({
-			plugin: function(event, callback) {
-				if (event === "compilation") {
-					callback({	// compilation object
-						mainTemplate: mainTemplate,
-						modules: {
-							find: function() { return null; }
-						}
-					});
-				}
+		const compiler = new Tapable();
+		plugin.apply(compiler);
+		compiler.applyPlugins("compilation", {	// compilation object
+			mainTemplate: mainTemplate,
+			modules: {
+				find: function() { return null; }
 			}
 		});
 	});
@@ -43,7 +36,7 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 	describe("dojo-require-extensions test", function() {
 		it("Should throw if dojo loader is not available", function(done) {
 			try {
-				mainTemplate.reqExtCallback("");
+				mainTemplate.applyPlugins("dojo-require-extensions");
 				done(new Error("Shouldn't get here"));
 			} catch (err) {
 				err.message.should.match(/Can't locate [^\s]+ in compilation/);
