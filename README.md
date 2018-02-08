@@ -290,10 +290,11 @@ When using Webpack's NormalModuleReplacementPlugin, the order of the plugin regi
 
 The plugin supports the use of run-time identifiers in require/define dependency arrays with the caveat that the modules referenced by the identifiers must be available in chunks that have already been loaded on the client.  For example:
 
+<!-- eslint-disable no-unused-vars -->
 ```javascript
 var mid = 'foo';
 require([mid, 'bar'], function(foo, bar) {
-	...
+	/* ... */
 });
 ```
 
