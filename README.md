@@ -298,9 +298,9 @@ require([mid, 'bar'], function(foo, bar) {
 });
 ```
 
-In order for the above code to execute successfully, the module `foo` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the module must have been included in a previously loaded chunk, or it must be a direct or indirect dependency of `bar` so that it is included in the chunk that contains `bar`.  Since values of run-time identifiers cannot, in general, be known at build time, webpack cannot manage the loading of these modules or their dependencies.
+In order for the above code to execute successfully, the module `foo` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the module must have been included in a previously loaded chunk, or it must be a direct or indirect dependency of `bar` so that it is included in the chunk(s) being loaded.  Since values of run-time identifiers cannot, in general, be known at build time, webpack cannot manage the loading of these modules or their dependencies.
 
-Note that you can also specify the dependency array as a run-time identifier, with the same caveat applying to all the modules in the array.
+Note that you can also specify the require dependency array as a run-time identifier, with the same caveat applying to all the modules in the array.
 
 # Use of Dojo's Auto-Require feature
 
