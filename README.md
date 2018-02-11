@@ -17,6 +17,38 @@
   <p>Build Dojo 1.x applications with webpack<p>
 </div>
 
+<!-- TOC START min:1 max:3 link:true update:true -->
+- [Introduction](#introduction)
+- [The Dojo loader](#the-dojo-loader)
+    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+- [The Dojo loader config](#the-dojo-loader-config)
+- [Dojo loader extensions](#dojo-loader-extensions)
+- [The dojo/has loader extension](#the-dojohas-loader-extension)
+- [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
+- [Options](#options)
+    - [loaderConfig](#loaderconfig)
+    - [environment](#environment)
+    - [buildEnvironment](#buildenvironment)
+    - [loader](#loader)
+    - [locales](#locales)
+    - [cjsRequirePatterns](#cjsrequirepatterns)
+    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
+    - [noConsole](#noconsole)
+- [Building the Dojo loader](#building-the-dojo-loader)
+- [The `dojo-config-api` feature](#the-dojo-config-api-feature)
+- [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
+- [ES6 Promise dependency in Webpack 2.x](#es6-promise-dependency-in-webpack-2x)
+- [Order of Plugin Registration](#order-of-plugin-registration)
+- [The global require function](#the-global-require-function)
+- [Use of run-time identifiers in dependency arrays](#use-of-run-time-identifiers-in-dependency-arrays)
+- [Use of Dojo's Auto-Require feature](#use-of-dojos-auto-require-feature)
+- [Dependency requirements](#dependency-requirements)
+- [Related plugins](#related-plugins)
+- [Sample application](#sample-application)
+- [Release Notes](#release-notes)
+- [Footnotes](#footnotes)
+
+<!-- TOC END -->
 
 # Introduction
 
