@@ -286,6 +286,25 @@ Webpack 2.x includes code in your packed application that uses ES6 Promise.  If 
 
 When using Webpack's NormalModuleReplacementPlugin, the order of the plugin registration relative to the **dojo-webpack-plugin** registration is significant.  **dojo-webpack-plugin** converts the module expressions to an absMid (relative paths resolved, maps and aliases applied), so if the NormalModuleReplacementPlugin is registered after **dojo-webpack-plugin**, then `data.request` will contain the absMid for the module and `data.originalRequest` will contain the original module expression before transformation by **dojo-webpack-plugin**.  If the NormalModuleReplacementPlugin is registered before **dojo-webpack-plugin** then the NormalModuleReplacementPlugin will get to modify the request before **dojo-webpack-plugin** applies its transformations.
 
+# The global require function
+
+Like Dojo, this plugin defines `window.require` in global scope.  The global require function implements Dojo's [synchronous require](#commonjs-require-vs-dojo-synchronous-require) capability.  This works great for Dojo applications but it can be a problem in some scenarios involving other (non-webpack) loaders or frameworks.  For those situations where it is not desirable to overwrite `window.require`, you can use the ScopedRequirePlugin plugin.  The ScopedRequirePlugin plugin leaves `window.require` untouched, and instead defines `require` in a scope that encloses each AMD module.  Note that this scoped `require` is similar to the global `require` in that it is not associated with any module's context and cannot be used to load modules with paths relative to the calling module.  For that you still need to use a [context-sensitive require](https://dojotoolkit.org/reference-guide/1.10/loader/amd.html#context-sensitive-require) defined within your module.
+
+To use the `ScopedRequirePlugin` plugin, register the plugin after `dojo-webpack-plugin` in your `webpack.config.js` file.
+
+<!-- eslint-disable no-undef, semi -->
+```javascript
+const DojoWebpackPlugin = require('dojo-webpack-plugin');
+  // ...
+  plugins: [
+    new DojoWebpackPlugin({
+      loaderConfig: {/*...*/},
+      locales: [/*...*/]
+    }),
+    new DojoWebpackPlugin.ScopedRequirePlugin()
+  ]
+```
+
 # Use of run-time identifiers in dependency arrays
 
 The plugin supports the use of run-time identifiers in require/define dependency arrays with the caveat that the modules referenced by the identifiers must be available in chunks that have already been loaded on the client.  For example:

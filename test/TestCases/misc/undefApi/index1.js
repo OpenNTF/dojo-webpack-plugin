@@ -1,5 +1,5 @@
 define(["require", "./a"], function(require, a) {
-	it("should successfully undefine the module and then load it again with " + global.require.rawConfig.testCase, function(done) {
+	it("should successfully undefine the module and then load it again with " + require.rawConfig.testCase, function(done) {
 		a.label.should.be.eql("a");
 		require("./a").should.be.eql(a);
 		require.undef("./a");
