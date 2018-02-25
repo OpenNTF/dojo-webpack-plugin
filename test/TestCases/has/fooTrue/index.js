@@ -1,4 +1,4 @@
-define(["dojo/has", "dojo/has!foo?./a:./b", "dojo/has!foo?:undef"], function(has, m1, undef) {
+define(["require", "dojo/has", "dojo/has!foo?./a:./b", "dojo/has!foo?:undef"], function(require, has, m1, undef) {
   it("should load true module", function(done) {
     has("webpack").should.be.ok();
     m1.should.be.eql("a");

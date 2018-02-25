@@ -2,7 +2,6 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 	it("should compile", function(done) {
 		done();
 	});
-
 	it("require scoping", function(done) {
 		// verify require function hasn't been renamed
 		var name = "req";
@@ -28,13 +27,15 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 			exceptionThrown = true;
 		}
 		exceptionThrown.should.be.true();
-		require(['require', 'module', 'exports', './asyncDep'], function(require, reqModule, reqExports, asyncDep) {
+		/* global require */
+		require(['require', 'module', 'exports', 'asyncDep', 'test/asyncDep'], function(req, reqModule, reqExports, asyncDep) {
 			reqModule.id.should.be.eql(module.id);
 			reqExports.should.be.eql(exports);
 			asyncDep.should.be.eql("asyncDep");
 			// context require
-			require("./asyncDep").should.be.eql(asyncDep);
-			require('test/asyncDep').should.be.eql(asyncDep);
+			require("asyncDep").should.be.eql(asyncDep);
+			require("test/asyncDep").should.be.eql(asyncDep);
+			req('./asyncDep').should.be.eql(asyncDep);
 			done();
 		});
 	});
@@ -96,7 +97,5 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 			});
 		});
 	});
-
 	dep.runTests();
-
 });
