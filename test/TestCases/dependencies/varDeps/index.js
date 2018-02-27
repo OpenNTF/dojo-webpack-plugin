@@ -3,7 +3,6 @@ define(["require", "test/a"], function(require, a) {
 		done();
 	});
 	it("should load the module specified as a variable", function(done) {
-		debugger; // eslint-disable-line
 		a.should.be.eql("a");
 		var avar = "test/a";
 		var count = 2;

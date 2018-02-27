@@ -19,11 +19,14 @@ class Factory extends Tapable {
 describe("DojoAMDModuleFactoryPlugin tests", function() {
 	var factory;
 	var compiler;
+	var compilation;
 	beforeEach(function() {
-		compiler = new Tapable();
-		plugin.apply(compiler);
 		factory = new Factory();
+		compiler = new Tapable();
+		compilation = new Tapable();
+		plugin.apply(compiler);
 		compiler.applyPlugins("normal-module-factory", factory);
+		compiler.applyPlugins("compilation", compilation, {});
 		plugin.factory = factory;
 	});
 	describe("addAbsMid tests", function() {
@@ -179,9 +182,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should gracefully handle missing absMidAliases in data object", function() {
 			const module = {absMid: 'a'};
 			const existing = {};
-			compiler.applyPlugins("compilation", {
-				findModule() { return existing; }
-			});
+			compilation.findModule = function() { return existing; };
 			const result = factory.applyPluginsBailResult("module", module);
 			result.should.be.eql(module);
 			(typeof result.addAbsMid).should.be.eql('function');
