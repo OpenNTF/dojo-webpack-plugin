@@ -1,7 +1,11 @@
 define([], function() {
 	it("should compile", function(done) {
-		require(["dep"], function() {
-			done();
-		});
+		try {
+			require(["dep"], function() {
+				done();
+			});
+		} catch(e) {
+			done(e);
+		}
 	});
 });

@@ -7,21 +7,25 @@ define(["require", "./a"], function(require, a) {
 			require("./a");
 			return done(new Error("Shouldn't get here"));
 		} catch (e) {}
-		require(["./a"], function(_a) {
-			a.should.be.eql(_a);
-			(a === _a).should.be.false;
-			require.undef("./a");
-			try {
-				require("./a");
-				return done(new Error("Shouldn't get here"));
-			} catch (e) {}
-			var dep = "./a";
-			require([dep], function(__a) {
-				a.should.be.eql(__a);
-				(a === __a).should.be.false;
-				(_a === __a).should.be.false;
-				done();
+		try {
+			require(["./a"], function(_a) {
+				a.should.be.eql(_a);
+				(a === _a).should.be.false;
+				require.undef("./a");
+				try {
+					require("./a");
+					return done(new Error("Shouldn't get here"));
+				} catch (e) {}
+				var dep = "./a";
+				require([dep], function(__a) {
+					a.should.be.eql(__a);
+					(a === __a).should.be.false;
+					(_a === __a).should.be.false;
+					done();
+				});
 			});
-		});
+		} catch(e) {
+			done(e);
+		}
 	});
 });
