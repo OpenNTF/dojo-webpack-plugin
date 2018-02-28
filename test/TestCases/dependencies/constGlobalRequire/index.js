@@ -5,7 +5,11 @@ define("require".split(','), function(req) {
 				asyncDep1.should.be.eql("global asyncDep");
 				asyncDep2.should.be.eql("local asyncDep");
 				require("./asyncDep").should.be.eql("global asyncDep");
-				require("../globalContext/asyncDep").should.be.eql("global asyncDep");
+				try {
+					// parent traversal should fail because we don't specify numParents
+					require("../globalContext/asyncDep");
+					return done(new Error("Shouldn't get here"));
+				} catch(e) {}
 				require("asyncDep").should.be.eql("local asyncDep");
 				done();
 			} catch (e) {
