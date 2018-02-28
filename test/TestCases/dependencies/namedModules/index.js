@@ -21,10 +21,14 @@ define(["named1", "named2"], function(named1, named2) {
 	});
 
 	it("should load the named modules in require dependencies", function(done) {
-		require(["named3", "named4"], function (named3, named4) {
-			"named3".should.be.eql(named3);
-			"named4".should.be.eql(named4);
-			done();
-		});
+		try {
+			require(["named3", "named4"], function (named3, named4) {
+				"named3".should.be.eql(named3);
+				"named4".should.be.eql(named4);
+				done();
+			});
+		} catch(e) {
+			done(e);
+		}
 	});
 });

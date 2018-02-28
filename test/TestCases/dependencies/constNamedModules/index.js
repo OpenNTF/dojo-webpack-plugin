@@ -29,11 +29,15 @@ if (versionParts[0] > 3 || versionParts[0] === 3 && versionParts[1] >= 7) {
 		});
 
 		it("should load the named modules in const require dependencies", function(done) {
-			require("named3,named4".split(','), function (named3, named4) {
-				"named3".should.be.eql(named3);
-				"named4".should.be.eql(named4);
-				done();
-			});
+			try {
+				require("named3,named4".split(','), function (named3, named4) {
+					"named3".should.be.eql(named3);
+					"named4".should.be.eql(named4);
+					done();
+				});
+			} catch(e) {
+				done(e);
+			}
 		});
 	});
 } else {
