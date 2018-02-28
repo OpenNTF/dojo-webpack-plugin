@@ -29,6 +29,7 @@
     - [loaderConfig](#loaderconfig)
     - [environment](#environment)
     - [buildEnvironment](#buildenvironment)
+    - [globalContext](#globalcontext)
     - [loader](#loader)
     - [locales](#locales)
     - [cjsRequirePatterns](#cjsrequirepatterns)
@@ -226,6 +227,12 @@ If the loader config evaluates to a function, then this property specifies the o
 
 Simialr to `environment`, but used exclusively at build time.  If both are specified, then `buildEnvironment` will be passed to the `loaderConfig` function when building, and `environment` will be passed to the `loaderConfig` function when the config is evaluated for use in the browser.  This facilitates specifying different `loaderConfig` paths (e.g. `baseUrl`) for build vs. run.  If only `environment` is specified, then it is used for both.
 
+### globalContext
+
+Specifies the path to use for resolving relative module ids passed to the [global require function](#the-global-require-function).  Dojo resolves these against the page URL.  If this option is specified as a relative path, then it is resolved against the webpack compiler context.  If not specified, it defaults to the webpack compiler context.
+
+Note that the `globalContext` option is different than the Dojo loader config's `baseUrl` property in that it is used only for resolving relative path module identifiers (those that begin with a `.`) passed to the global require function.  In contrast, the `baseUrl` property is used for resolving non-relative module ids that don't map to a defined package or path.
+
 ### loader
 
 This property is optional and specifies the module path of the built Dojo loader.  See [Building the Dojo loader](#building-the-dojo-loader) for details.  If not specified, then the loader will be built as part of the Webpack build.
@@ -320,7 +327,7 @@ When using Webpack's NormalModuleReplacementPlugin, the order of the plugin regi
 
 # The global require function
 
-Like Dojo, this plugin differentiates between the global require function and [context-sensitive require](https://dojotoolkit.org/reference-guide/1.10/loader/amd.html#context-sensitive-require).  This distinction affects how module identifiers with relative paths are resolved.  When using context-sensitive require, relative paths are resolved against the path of the containing module.  When using global require, Dojo resolves relative paths against the page URL, while this plugin resolves them against the webpack compiler context path.
+Like Dojo, this plugin differentiates between the global require function and [context-sensitive require](https://dojotoolkit.org/reference-guide/1.10/loader/amd.html#context-sensitive-require).  This distinction affects how module identifiers with relative paths are resolved.  When using context-sensitive require, relative paths are resolved against the path of the containing module.  When using global require, Dojo resolves relative paths against the page URL, while this plugin resolves them against the path specified by the [globalContext](#globalcontext) option, or the webpack compiler context path.
 
 Also like Dojo, this plugin defines `window.require` in global scope on the client.  The global require function implements Dojo's [synchronous require](#commonjs-require-vs-dojo-synchronous-require) capability.  This works great for Dojo applications but it can be a problem in some scenarios involving other (non-webpack) loaders or frameworks.  For those situations where it is not desirable to overwrite `window.require`, you can use the ScopedRequirePlugin plugin.  The ScopedRequirePlugin plugin leaves `window.require` untouched, and instead defines `require` in a scope that encloses each AMD module.  Note that this scoped `require` is similar to the global `require` in that it is not associated with any module's context and cannot be used to load modules with paths relative to the calling module.  For that you need to use a context-sensitive require defined within your module.
 
