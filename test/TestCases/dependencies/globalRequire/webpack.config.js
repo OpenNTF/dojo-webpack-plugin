@@ -9,7 +9,11 @@ module.exports = [contextdir, contextdir+'/'].map(context => {
 			new DojoWebpackPlugin({
 				loaderConfig: {
 					baseUrl: "../",
-					paths:{test: "."}
+					paths:{test: "."},
+					testVarName: "$$root$$"
+				},
+				globalContext: {
+					numParents: 1
 				},
 				loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 			})
@@ -21,10 +25,14 @@ module.exports = [contextdir, contextdir+'/'].map(context => {
 		plugins: [
 			new DojoWebpackPlugin({
 				loaderConfig: {
-					paths:{test: "."}
+					paths:{test: "."},
+					testVarName: "$$root$$"
 				},
 				loader: path.join(__dirname, "../../../js/dojo/dojo.js"),
-				globalContext: context
+				globalContext: {
+					context: context,
+					numParents: 1
+				}
 			})
 		]
 	};
@@ -34,10 +42,15 @@ module.exports = [contextdir, contextdir+'/'].map(context => {
 		plugins: [
 			new DojoWebpackPlugin({
 				loaderConfig: {
-					paths:{test: "."}
+					paths:{test: "."},
+					testVarName: "%%root%%"
 				},
 				loader: path.join(__dirname, "../../../js/dojo/dojo.js"),
-				globalContext: context
+				globalContext: {
+					context: context,
+					numParents: 1,
+					varName: "%%root%%"
+				}
 			})
 		]
 	};

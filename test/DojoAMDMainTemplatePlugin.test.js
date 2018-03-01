@@ -24,13 +24,13 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 	beforeEach(function() {
 		mainTemplate = new MainTemplate();
 		const compiler = new Tapable();
+		const compilation = new Tapable();
 		plugin.apply(compiler);
-		compiler.applyPlugins("compilation", {	// compilation object
-			mainTemplate: mainTemplate,
-			modules: {
-				find: function() { return null; }
-			}
-		});
+		compilation.mainTemplate = mainTemplate;
+		compilation.modules = {
+			find: function() { return null; }
+		};
+		compiler.applyPlugins("compilation", compilation);
 	});
 
 	describe("dojo-require-extensions test", function() {
