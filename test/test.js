@@ -29,6 +29,7 @@ var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
+var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprecated");
 
 
 describe("TestCases", () => {
@@ -75,7 +76,9 @@ function runTestCases(casesName) {
 						if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
 					  options.plugins = options.plugins || [];
-						options.plugins.push(new ScopedRequirePlugin());
+						if (!options.plugins.includes(ScopedRequirePluginDeprecated)) {
+							options.plugins.push(new ScopedRequirePlugin());
+						}
 						options.plugins.push(new MainTemplatePlugin());
 					});
 					webpack(options, function(err, stats) {

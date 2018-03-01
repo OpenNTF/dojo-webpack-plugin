@@ -27,6 +27,7 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 		const compilation = new Tapable();
 		plugin.apply(compiler);
 		compilation.mainTemplate = mainTemplate;
+		compilation.chunkTemplate = new Tapable();
 		compilation.modules = {
 			find: function() { return null; }
 		};
@@ -36,7 +37,7 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 	describe("dojo-require-extensions test", function() {
 		it("Should throw if dojo loader is not available", function(done) {
 			try {
-				mainTemplate.applyPlugins("dojo-require-extensions");
+				mainTemplate.applyPlugins("dojo-require-extensions", "", {chunks:[]});
 				done(new Error("Shouldn't get here"));
 			} catch (err) {
 				err.message.should.match(/Can't locate [^\s]+ in compilation/);
