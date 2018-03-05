@@ -16,7 +16,7 @@
 const loaderUtils = require("loader-utils");
 
 module.exports = function() {
-	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
+	const dojoRequire = this._compiler.hooks.getDojoRequire.call();
 	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
 	function toAbsMid(request) {
 		return dojoRequire.toAbsMid(request, {mid:issuerAbsMid});

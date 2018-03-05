@@ -19,39 +19,43 @@
  */
 
 "use strict";
+const {tap} = require("../../../lib/pluginHelper");
+const Template = require("webpack/lib/Template");
 
 module.exports = class MainTemplatePlugin {
 	apply(compiler) {
-		compiler.plugin("compilation", function(compilation) {
+		tap(compiler, {"compilation" : compilation => {
 
-			compilation.mainTemplate.plugin("require-ensure", function(__, chunk, hash) {
+			tap(compilation.mainTemplate, {"requireEnsure": function(__, chunk, hash) {
+				const indent = this.indent || Template.indent;
+				const asString = this.asString || Template.asString;
 				const chunkFilename = this.outputOptions.chunkFilename;
 				const chunkMaps = chunk.getChunkMaps();
-				return this.asString([
+				return asString([
 					"var installedChunkData = installedChunks[chunkId];",
 					"if(installedChunkData === 0) {",
-					this.indent([
+					indent([
 						"return new Promise(function(resolve) { resolve(); });"
 					]),
 					"}",
 					"",
 					"// a Promise means \"currently loading\".",
 					"if(installedChunkData) {",
-					this.indent([
+					indent([
 						"return installedChunkData[2];"
 					]),
 					"}",
 					"",
 					"// setup Promise in chunk cache",
 					"var promise = new Promise(function(resolve, reject) {",
-					this.indent([
+					indent([
 						"installedChunkData = installedChunks[chunkId] = [resolve, reject];"
 					]),
 					"});",
 					"installedChunkData[2] = promise;",
 					"",
 					"// start chunk loading",
-					"var filename = __dirname + " + this.applyPluginsWaterfall("asset-path", JSON.stringify(`/${chunkFilename}`), {
+					"var filename = __dirname + " + this.hooks.assetPath.call(JSON.stringify(`/${chunkFilename}`), {
 						hash: `" + ${this.renderCurrentHashCode(hash)} + "`,
 						hashWithLength: (length) => `" + ${this.renderCurrentHashCode(hash, length)} + "`,
 						chunk: {
@@ -69,7 +73,7 @@ module.exports = class MainTemplatePlugin {
 						}
 					}) + ";",
 					"require('fs').readFile(filename, 'utf-8',  function(err, content) {",
-					this.indent([
+					indent([
 						"if(err) return reject(err);",
 						"var chunk = {}, i;",
 						"var vm = require('vm');",
@@ -80,7 +84,7 @@ module.exports = class MainTemplatePlugin {
 					"});",
 					"return promise;"
 				]);
-			});
-		});
+			}}, compilation.mainTemplate);
+		}});
 	}
 };

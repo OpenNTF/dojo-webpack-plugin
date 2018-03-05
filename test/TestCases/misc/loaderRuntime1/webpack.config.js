@@ -6,17 +6,17 @@ module.exports = {
 		app: "./index"
 	},
 	output: {
-		filename: "app.js"
+		filename: "[name].js",
+		chunkFilename: "[name].js"
 	},
 	plugins: [
 		new DojoWebpackPlugin({
 			loaderConfig: require("./loaderConfig"),
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		}),
-		new webpack.optimize.CommonsChunkPlugin({
-			name: "vendor",
-			filename: "vendor.js",
-			minChunks: Infinity
-		})
-	]
+		new webpack.optimize.RuntimeChunkPlugin({name:"runtime"})
+	],
+	optimization: {
+		splitChunks: false
+	}
 };

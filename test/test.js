@@ -29,8 +29,6 @@ var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
-var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprecated");
-
 
 describe("TestCases", () => {
 	runTestCases("TestCases");
@@ -76,10 +74,10 @@ function runTestCases(casesName) {
 						if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
 					  options.plugins = options.plugins || [];
-						if (!options.plugins.includes(ScopedRequirePluginDeprecated)) {
-							options.plugins.push(new ScopedRequirePlugin());
-						}
+						options.plugins.push(new ScopedRequirePlugin());
 						options.plugins.push(new MainTemplatePlugin());
+						options.mode = "development";
+						options.devtool = false;
 					});
 					webpack(options, function(err, stats) {
 						if (checkExpectedError(isErrorTest, testDirectory, err, done)) {

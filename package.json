@@ -1,29 +1,30 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.6.0",
+  "version": "3.0.0",
   "author": "Chuck Dumont",
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
     "lint": "eslint . --ext .json --ext .md --ext .js",
     "pretest": "npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
     "test": "mocha --harmony",
+    "qtest": "mocha --harmony",
     "travis:test": "npm run -s test",
     "cover": "istanbul cover -x index.js -x **/*.runtime.js node_modules/mocha/bin/_mocha",
     "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "commondir": "1.0.1",
-    "es6-class-mixin": "1.0.5",
     "file-loader": "0.9.0",
     "loader-utils": "1.1.0",
     "node-stringify": "0.2.1",
     "object.entries": "1.0.4",
     "raw-loader": "0.5.1",
-    "tmp": "0.0.30",
-    "webpack-sources": "1.1.0"
+    "tmp": "0.0.30"
   },
   "peerDependencies": {
-    "webpack": ">= 2.2.0"
+    "webpack": ">= 4.0.0",
+    "tapable": ">= 1.0.0",
+    "webpack-sources": ">=1.0.1"
   },
   "license": "(MIT OR Apache-2.0)",
   "repository": {
@@ -43,7 +44,6 @@
     "mocha-lcov-reporter": "^1.3.0",
     "proxyquire": "^1.8.0",
     "should": "^13.2.1",
-    "tapable": "^0.2.7",
-    "webpack": "3.11.0"
+    "webpack": "4.0.1"
   }
 }

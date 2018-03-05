@@ -50,7 +50,7 @@ module.exports = function(content) {
 	}
 
 	var bundle = i18nEval(content);
-	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
+	const dojoRequire = this._compiler.hooks.getDojoRequire.call();
 	var absMid;
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
 	if (this._module.absMid) {

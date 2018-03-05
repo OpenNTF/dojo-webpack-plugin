@@ -7,10 +7,19 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
-const Tapable = require("tapable");
+const {Tapable, reg, callSync, callSyncWaterfall} = require("../lib/pluginHelper");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 
 class Factory extends Tapable {
+	constructor() {
+		super();
+		reg(this, {
+			"beforeResolve" : ["AsyncSeriesWaterfall", "data"],
+			"resolver"      : ["SyncWaterfall", "resolver"],
+			"createModule"  : ["SyncBail", "data"],
+			"module"        : ["SyncWaterfall", "module", "data"]
+		});
+	}
 	addAbsMid(data, absMid) {
 		return this.events["add absMid"](data, absMid);
 	}
@@ -24,10 +33,14 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		factory = new Factory();
 		compiler = new Tapable();
 		compilation = new Tapable();
+		reg(compiler, {
+			"normalModuleFactory" : ["Sync", "factory"],
+			"compilation"         : ["Sync", "compilation, params"]
+		});
 		plugin.apply(compiler);
-		compiler.applyPlugins("normal-module-factory", factory);
-		compiler.applyPlugins("compilation", compilation, {});
 		plugin.factory = factory;
+		callSync(compiler, "normalModuleFactory", factory);
+		callSync(compiler, "compilation", compilation, {});
 	});
 	describe("addAbsMid tests", function() {
 		it("should add the absMid", function() {
@@ -161,7 +174,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	describe("'add absMids from request event' tests", function() {
 		it("should gracefully handle undefined data object", function(done) {
 			try {
-				factory.applyPlugins("add absMids from request");
+				callSync(factory, "addAbsMidsFromRequest");
 				done();
 			} catch (err) {
 				done(err);
@@ -170,7 +183,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("should gracefully handle undefined data.dependencies object", function(done) {
 			try {
 				const data = {request: ""};
-				factory.applyPlugins("add absMids from request", data);
+				callSync(factory, "addAbsMidsFromRequest", data);
 				done();
 			} catch (err) {
 				done(err);
@@ -183,7 +196,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			const module = {absMid: 'a'};
 			const existing = {};
 			compilation.findModule = function() { return existing; };
-			const result = factory.applyPluginsBailResult("module", module);
+			const result = callSyncWaterfall(factory, "module", module);
 			result.should.be.eql(module);
 			(typeof result.addAbsMid).should.be.eql('function');
 			(typeof result.filterAbsMids).should.be.eql('function');
