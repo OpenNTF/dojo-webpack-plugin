@@ -41,7 +41,7 @@
 - [ES6 Promise dependency in Webpack 2.x](#es6-promise-dependency-in-webpack-2x)
 - [Order of Plugin Registration](#order-of-plugin-registration)
 - [The global require function](#the-global-require-function)
-- [Use of run-time identifiers in dependency arrays](#use-of-run-time-identifiers-in-dependency-arrays)
+- [Use of run-time identifiers and expressions in dependency arrays](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays)
 - [Use of Dojo's Auto-Require feature](#use-of-dojos-auto-require-feature)
 - [Dependency requirements](#dependency-requirements)
 - [Related plugins](#related-plugins)
@@ -346,25 +346,28 @@ const DojoWebpackPlugin = require('dojo-webpack-plugin');
   ]
 ```
 
-# Use of run-time identifiers in dependency arrays
+# Use of run-time identifiers and expressions in dependency arrays
 
-The plugin supports the use of run-time identifiers in require/define dependency arrays with the caveat that the modules referenced by the identifiers must be available in chunks that have already been loaded on the client.  For example:
+The plugin supports the use of run-time identifiers and expressions in require/define dependency arrays with the caveat that the modules referenced by the identifiers or expressions must be available in chunks that have already been loaded on the client.  For example:
 
 <!-- eslint-disable no-unused-vars -->
 ```javascript
-var mid = 'foo';
-require([mid, 'bar'], function(foo, bar) {
+var fooName = 'foo';
+function getBarName() {
+	return 'bar';
+}
+require([fooName, getBarName(), 'baz'], function(foo, bar, baz) {
 	/* ... */
 });
 ```
 
-In order for the above code to execute successfully, the module `foo` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the module must have been included in a previously loaded chunk, or it must be a direct or indirect dependency of `bar` so that it is included in the chunk(s) being loaded.  Since values of run-time identifiers cannot, in general, be known at build time, webpack cannot manage the loading of these modules or their dependencies.
+In order for the above code to execute successfully, the modules `foo` and `bar` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the modules must have been included in a previously loaded chunk, or they must be direct or indirect dependencies of `baz` so that they are included in the chunk(s) being loaded.  Since values of run-time identifiers cannot or expressions, in general, be known at build time, webpack cannot manage the loading of these modules or their dependencies.
 
-Note that you can also specify the require dependency array as a run-time identifier, with the same caveat applying to all the modules in the array.
+Note that you can also specify the require dependency array as a run-time identifier, with the same restrictions applying to all the modules in the array.
 
 # Use of Dojo's Auto-Require feature
 
-Dojo's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) feature allows the parser to automatically require the modules for widgets that are declared by templates.  This can be problematic with webpack for the reasons discussed [above](#use-of-run-time-identifiers-in-dependency-arrays), if your modules do not explicitly specify dependencies for the widgets that they contain.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
+Dojo's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) feature allows the parser to automatically require the modules for widgets that are declared by templates.  This can be problematic with webpack for the reasons discussed [above](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays), if your modules do not explicitly specify dependencies for the widgets that they contain.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
 # Dependency requirements
 

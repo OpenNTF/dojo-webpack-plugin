@@ -26,10 +26,6 @@ describe("DojoAMDDefineDependencyParserPlugin tests", function() {
 		plugin.apply(parser);
 	});
 	describe("Test edge cases", function() {
-		it("'call define:amd:item' with unrecognized param type", function() {
-			const result = parser.applyPluginsBailResult('call define:amd:item', {}, params);
-			(typeof result).should.be.eql("undefined");
-		});
 		it("'call define:amd:array' with unrecognized param type", function() {
 			const result = parser.applyPluginsBailResult('call define:amd:array', {}, params);
 			(typeof result).should.be.eql("undefined");
