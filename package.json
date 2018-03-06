@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "commondir": "1.0.1",
-    "es6-class-mixin": "1.0.5",
     "file-loader": "0.9.0",
     "loader-utils": "1.1.0",
     "node-stringify": "0.2.1",
