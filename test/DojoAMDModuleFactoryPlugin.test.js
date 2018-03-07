@@ -34,12 +34,12 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		compiler = new Tapable();
 		compilation = new Tapable();
 		reg(compiler, {
-			"normalModuleFactory" : ["Sync", "factory"],
+			"normal-module-factory" : ["Sync", "factory"],
 			"compilation"         : ["Sync", "compilation, params"]
 		});
 		plugin.apply(compiler);
 		plugin.factory = factory;
-		callSync(compiler, "normalModuleFactory", factory);
+		callSync(compiler, "normal-module-factory", factory);
 		callSync(compiler, "compilation", compilation, {});
 	});
 	describe("addAbsMid tests", function() {

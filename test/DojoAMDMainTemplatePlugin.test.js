@@ -11,23 +11,21 @@ const {reg, Tapable} = require("../lib/pluginHelper");
 const plugin = new DojoAMDMainTemplatePlugin({});
 
 describe("DojoAMDMainTemplatePlugin tests", function() {
-	var mainTemplate = new Tapable;
 	const compilation = new Tapable();
-	compilation.mainTemplate = mainTemplate;
 	compilation.chunkTemplate = new Tapable();
 	compilation.modules = {
 		find: function() { return null; }
 	};
 	reg(compilation.chunkTemplate, {"renderAbsMids" : ["SyncWaterfall", "source", "chunk"]});
-	compilation.mainTemplate = {
+	compilation.mainTemplate = Object.assign(new Tapable(), {
 		requireFn:  "__webpack_require__",
 		outputOptions: {
 			jsonpFunction: "webpackJsonpFunction",
 			globalObject: "window"
 		}
-	};
+	});
 	reg(compilation.mainTemplate, {
-		"dojoGlobalRequire" : ["SyncWaterfall", "source"]
+		"dojo-global-require" : ["SyncWaterfall", "source"]
 	});
 	const chunk = {
 		groupsIterable: []

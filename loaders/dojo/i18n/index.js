@@ -15,6 +15,7 @@
  */
 const path = require("path");
 const i18nEval = require("../i18nEval");
+const {callSyncBail} = require("../../../lib/pluginHelper");
 
 module.exports = function(content) {
 	this.cacheable && this.cacheable();
@@ -50,7 +51,7 @@ module.exports = function(content) {
 	}
 
 	var bundle = i18nEval(content);
-	const dojoRequire = this._compiler.hooks.getDojoRequire.call();
+	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
 	var absMid;
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
 	if (this._module.absMid) {

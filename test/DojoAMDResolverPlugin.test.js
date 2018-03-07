@@ -6,13 +6,13 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
-const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
+const DojoAMDResolverPluginBase = require("../lib/DojoAMDResolverPluginBase");
 const {Tapable, reg, tap} = require("../lib/pluginHelper");
-const plugin = new DojoAMDResolverPlugin({});
+const plugin = new DojoAMDResolverPluginBase();
 
 const compiler = new Tapable();
-reg(compiler, {"getDojoRequire" : ["SyncBail"]});
-tap(compiler, {"getDojoRequire" : () => {
+reg(compiler, {"get dojo require" : ["SyncBail"]});
+tap(compiler, {"get dojo require" : () => {
 	return {
 		toUrl: (request) => {
 			return request.request === "null" ? null : request.request;

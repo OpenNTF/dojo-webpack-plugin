@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 const loaderUtils = require("loader-utils");
+const {callSyncBail} = require("../../../lib/pluginHelper");
 
 module.exports = function() {
-	const dojoRequire = this._compiler.hooks.getDojoRequire.call();
+	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
 	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
 	function toAbsMid(request) {
 		return dojoRequire.toAbsMid(request, {mid:issuerAbsMid});

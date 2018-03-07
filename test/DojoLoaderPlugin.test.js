@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const proxyquire = require("proxyquire");
-const {reg, tap} = require("../lib/pluginHelper");
+const {reg, tap, Tapable} = require("../lib/pluginHelper");
 
 const tmpStub = {}, child_processStub = {};
 
@@ -20,11 +20,10 @@ describe("DojoLoaderPlugin tests", function() {
 	var compiler;
 	beforeEach(function() {
 		plugin = new DojoLoaderPlugin({loaderConfig:{}, noConsole:true});
-		compiler = {
-			context: '.'
-		};
-		reg(compiler, {"getDojoConfig" : ["SyncBail"]});
-		tap(compiler, {"getDojoConfig" : () => {
+		compiler = new Tapable();
+		compiler.context = '.';
+		reg(compiler, {"get dojo config" : ["SyncBail"]});
+		tap(compiler, {"get dojo config" : () => {
 			return {};
 		}});
 		plugin.compiler = compiler;
