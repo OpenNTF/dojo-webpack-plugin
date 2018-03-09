@@ -76,7 +76,6 @@ function runTestCases(casesName) {
 						if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
 					  options.plugins = options.plugins || [];
-						debugger; //eslint-disable-line
 						if (!options.plugins.some(plugin => {
 							return plugin instanceof ScopedRequirePluginDeprecated;
 						})) {

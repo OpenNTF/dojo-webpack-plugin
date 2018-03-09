@@ -44,5 +44,15 @@ if (parseInt(require("webpack/package.json").version.split(".")[0]) >= 4) {
 				done();
 			}
 		});
+		it("should throw already registered error", function(done) {
+			try {
+				const obj = new Tapable();
+				reg(obj, {"foo" : ["Sync"]});
+				reg(obj, {"foo" : ["SyncBail"]});
+			} catch (e) {
+				e.message.should.containEql("already registered");
+				done();
+			}
+		});
 	});
 }
