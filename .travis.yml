@@ -3,7 +3,14 @@ language: node_js
 node_js:
   - '6'
 
-before_install: if [[ `npm -v` != 3* ]]; then npm i -g npm@3; fi
+matrix:
+  include:
+    - env: WEBPACK_VERSION=V2
+    - env: WEBPACK_VERSION=V3
+
+before_install: 
+  - if [ "$WEBPACK_VERSION" = "V3" ]; then echo Testing webpack v3; fi
+  - if [ "$WEBPACK_VERSION" = "V2" ]; then echo Testing webpack v2; cp -f ./package.webpack2.json ./package.json; fi
 
 cache:
   directories:
