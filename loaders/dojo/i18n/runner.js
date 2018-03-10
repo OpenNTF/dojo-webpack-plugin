@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /*global __webpack_require__: false */
-module.exports = function(name) {
+module.exports = function(name, req) {
 	var result, resultSet;
 	var loader = require("dojo/i18n?absMid=dojo/i18n");
-	var req = __webpack_require__.dj.c();
 	loader.load(name,  req, function(data) {
 		result = data;
 		resultSet = true;

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /*global __webpack_require__: false */
-module.exports = function(loader, name) {
-	var result, resultSet, req = __webpack_require__.dj.c();
+module.exports = function(loader, name, req) {
+	var result, resultSet;
 	loader.load(name,  req, function(data) {
 		result = data;
 		resultSet = true;

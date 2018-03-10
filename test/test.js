@@ -24,6 +24,8 @@ var path = require("path");
 var fs = require("fs");
 var vm = require("vm");
 var Test = require("mocha/lib/test");
+var cloneDeep = require("clone-deep");
+var DojoWebackPlugin = require("../index");
 
 var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
@@ -52,112 +54,121 @@ function runTestCases(casesName) {
 		};
 	});
 	categories.forEach(function(category) {
-		describe(category.name, function() {
-			category.tests.forEach(function(testName) {
-				var suite = describe(testName, function() {});
-				var testDirectory = path.join(casesPath, category.name, testName);
-				const isErrorTest = fs.existsSync(path.join(testDirectory, "expectedError.js"));
-				const isCompilerErrors = fs.existsSync(path.join(testDirectory, "errors.js"));
-				const isCompilerWarnings = fs.existsSync(path.join(testDirectory, "warnings.js"));
-				it(testName + (isErrorTest ? " should fail" : " should compile") + (isCompilerErrors ? " with errors" : isCompilerWarnings ? " with warnings" : ""), function(done) {
-					this.timeout(60000);
-					var outputDirectory = path.join(__dirname, "js", casesName, category.name, testName);
-					var options = require(path.join(testDirectory, "webpack.config.js"));
-					var optionsArr = [].concat(options);
-					optionsArr.forEach(function(options, idx) {
-						if(!options.context) options.context = testDirectory;
-						if(!options.entry) options.entry = "./index.js";
-						if(!options.target) options.target = "web";
-						if(!options.output) options.output = {};
-						if(!options.output.path) options.output.path = outputDirectory;
-						if(typeof options.output.pathinfo === "undefined") options.output.pathinfo = true;
-						if(!options.output.filename) options.output.filename = "bundle" + idx + ".js";
-						if(!options.output.chunkFilename) options.output.chunkFilename = "[id].bundle" + idx + ".js";
-						if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
+		["", "djPropRenamed"].forEach(djProp => {
+			describe(category.name + (djProp ? (' - ' + djProp) : ''), function() {
+				category.tests.forEach(function(testName) {
+					var suite = describe(testName, function() {});
+					var testDirectory = path.join(casesPath, category.name, testName);
+					const isErrorTest = fs.existsSync(path.join(testDirectory, "expectedError.js"));
+					const isCompilerErrors = fs.existsSync(path.join(testDirectory, "errors.js"));
+					const isCompilerWarnings = fs.existsSync(path.join(testDirectory, "warnings.js"));
+					it(testName + (isErrorTest ? " should fail" : " should compile") + (isCompilerErrors ? " with errors" : isCompilerWarnings ? " with warnings" : ""), function(done) {
+						this.timeout(60000);
+						var outputDirectory = path.join(__dirname, "js", casesName, category.name, testName + (djProp ? ('_' + djProp) : ''));
+						var options = cloneDeep(require(path.join(testDirectory, "webpack.config.js")));
+						var optionsArr = [].concat(options);
+						optionsArr.forEach(function(options, idx) {
+							if(!options.context) options.context = testDirectory;
+							if(!options.entry) options.entry = "./index.js";
+							if(!options.target) options.target = "web";
+							if(!options.output) options.output = {};
+							if(typeof options.output.pathinfo === "undefined") options.output.pathinfo = true;
+							if(!options.output.filename) options.output.filename = "bundle" + idx + ".js";
+							if(!options.output.chunkFilename) options.output.chunkFilename = "[id].bundle" + idx + ".js";
+							if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
-					  options.plugins = options.plugins || [];
-						if (!options.plugins.some(plugin => {
-							return plugin instanceof ScopedRequirePluginDeprecated;
-						})) {
-							options.plugins.push(new ScopedRequirePlugin());
-						}
-						options.plugins.push(new MainTemplatePlugin());
-						if (parseInt(require("webpack/package.json").version.split(".")[0]) >= 4) {
-							options.mode = "development";
-							options.devtool = false;
-						}
-					});
-					webpack(options, function(err, stats) {
-						if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
-							return;
-						}
-						var statOptions = Stats.presetToOptions("verbose");
-						statOptions.colors = false;
-						fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
-						var jsonStats = stats.toJson({
-							errorDetails: true
-						});
-						if(checkArrayExpectation(testDirectory, jsonStats, "error", "Error", done)) return;
-						if(checkArrayExpectation(testDirectory, jsonStats, "warning", "Warning", done)) return;
-						var exportedTests = 0;
-
-						function _it(title, fn) {
-							var test = new Test(title, fn);
-							suite.addTest(test);
-							exportedTests++;
-							return test;
-						}
-
-						var filesCount = 0;
-						var testConfig = {};
-						try {
-							// try to load a test file
-							testConfig = require(path.join(testDirectory, "test.config.js"));
-						} catch(e) {}
-						if (testConfig.noTests) return process.nextTick(done);
-						if (!testConfig.findBundle) {
-							testConfig.findBundle = function(i, options) {
-								if(fs.existsSync(path.join(options.output.path, "bundle" + i + ".js"))) {
-									return "./bundle" + i + ".js";
-								}
-							};
-						}
-						for(var i = 0; i < optionsArr.length; i++) {
-							var bundlePath = testConfig.findBundle(i, optionsArr[i]);
-							if(bundlePath) {
-								filesCount++;
-								var context = vm.createContext({
-									console: console,
-									process: process
+							options.output.path = outputDirectory;
+						  options.plugins = options.plugins || [];
+							if (!options.plugins.some(plugin => {
+								return plugin instanceof ScopedRequirePluginDeprecated;
+							})) {
+								options.plugins.push(new ScopedRequirePlugin());
+							}
+							if (djProp) {
+								options.plugins.forEach(plugin => {
+									if (plugin instanceof DojoWebackPlugin) {
+										plugin.options.requireFnPropName = djProp;
+									}
 								});
-								context.global = context;
-								context.it = _it;
-								Object.defineProperty(context, "should", {
-							    set: function() {},
-							    get: function() {
-							      return should.valueOf();
-							    },
-							    configurable: true
-							  });
-								const bundlePaths = Array.isArray(bundlePath) ? bundlePath : [bundlePath];
-								bundlePaths.forEach(bundlePath => {
-									var content;
-									var p = path.join(outputDirectory, bundlePath);
-									content = fs.readFileSync(p, "utf-8");
-									var module = {exports: {}};
-									const prologue = `
+							}
+							options.plugins.push(new MainTemplatePlugin());
+							if (parseInt(require("webpack/package.json").version.split(".")[0]) >= 4) {
+								options.mode = "development";
+								options.devtool = false;
+							}
+						});
+						webpack(options, function(err, stats) {
+							if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
+								return;
+							}
+							var statOptions = Stats.presetToOptions("verbose");
+							statOptions.colors = false;
+							fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
+							var jsonStats = stats.toJson({
+								errorDetails: true
+							});
+							if(checkArrayExpectation(testDirectory, jsonStats, "error", "Error", done)) return;
+							if(checkArrayExpectation(testDirectory, jsonStats, "warning", "Warning", done)) return;
+							var exportedTests = 0;
+
+							function _it(title, fn) {
+								var test = new Test(title, fn);
+								suite.addTest(test);
+								exportedTests++;
+								return test;
+							}
+
+							var filesCount = 0;
+							var testConfig = {};
+							try {
+								// try to load a test file
+								testConfig = require(path.join(testDirectory, "test.config.js"));
+							} catch(e) {}
+							if (testConfig.noTests) return process.nextTick(done);
+							if (!testConfig.findBundle) {
+								testConfig.findBundle = function(i, options) {
+									if(fs.existsSync(path.join(options.output.path, "bundle" + i + ".js"))) {
+										return "./bundle" + i + ".js";
+									}
+								};
+							}
+							for(var i = 0; i < optionsArr.length; i++) {
+								var bundlePath = testConfig.findBundle(i, optionsArr[i]);
+								if(bundlePath) {
+									filesCount++;
+									var context = vm.createContext({
+										console: console,
+										process: process
+									});
+									context.global = context;
+									context.it = _it;
+									Object.defineProperty(context, "should", {
+								    set: function() {},
+								    get: function() {
+								      return should.valueOf();
+								    },
+								    configurable: true
+								  });
+									const bundlePaths = Array.isArray(bundlePath) ? bundlePath : [bundlePath];
+									bundlePaths.forEach(bundlePath => {
+										var content;
+										var p = path.join(outputDirectory, bundlePath);
+										content = fs.readFileSync(p, "utf-8");
+										var module = {exports: {}};
+										const prologue = `
 should.extend('should', Object.prototype);\n
 Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
 
-									var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
-									fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
-								});
+										var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
+										fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
+									});
+								}
 							}
-						}
-						// give a free pass to compilation that generated an error
-						if(!jsonStats.errors.length && filesCount !== optionsArr.length) return done(new Error("Should have found at least one bundle file per webpack config"));
-						if(exportedTests < filesCount) return done(new Error("No tests exported by test case"));
-						process.nextTick(done);
+							// give a free pass to compilation that generated an error
+							if(!jsonStats.errors.length && filesCount !== optionsArr.length) return done(new Error("Should have found at least one bundle file per webpack config"));
+							if(exportedTests < filesCount) return done(new Error("No tests exported by test case"));
+							process.nextTick(done);
+						});
 					});
 				});
 			});

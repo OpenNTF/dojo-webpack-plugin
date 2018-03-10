@@ -112,7 +112,8 @@ module.exports = function(content) {
 	} else {
 		buf.push(`require("${res}?absMid=${absMid}");`);
 	}
-	buf.push(`module.exports = require("${runner}")("${absMid}");`);
+	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
+	buf.push(`module.exports = require("${runner}")("${absMid}", req);`);
 	return buf.join("\n");
 };
 

@@ -32,8 +32,10 @@ module.exports = function() {
 	const deps = query.deps ? query.deps.split(",") : [];
 	const buf = [];
 	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
+	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	buf.push("var runner = require(\"" + runner + "\");");
 	buf.push("var loader = require(\"" + loader + "?absMid=" + toAbsMid(loader)  + "\");");
+	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
 	deps.forEach((dep) => {
 		dep = decodeURIComponent(dep);
 		dep = dep.split("!").map((segment) => {
@@ -41,7 +43,7 @@ module.exports = function() {
 		}).join("!");
 		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");");
 	});
-	buf.push("module.exports = runner(loader,\"" + name + "\");");
+	buf.push(`module.exports = runner(loader, "${name}", req)`);
 
 	this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
 		return !/loaderProxy/.test(absMid);
