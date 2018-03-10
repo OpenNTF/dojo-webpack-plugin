@@ -75,7 +75,8 @@ module.exports = function(content) {
 	// Determine if this is the default bundle or a locale specific bundle
 	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
 	const resMatch = regex.exec(res);
-	const requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales;
+	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
+	const requestedLocales = pluginOptions.locales;
 	const bundledLocales = [];
 
 	if (!resMatch) {
