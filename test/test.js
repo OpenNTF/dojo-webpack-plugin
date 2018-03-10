@@ -109,18 +109,19 @@ function runTestCases(casesName) {
 						}
 
 						var filesCount = 0;
-						var testConfig = {
-							findBundle: function(i, options) {
-								if(fs.existsSync(path.join(options.output.path, "bundle" + i + ".js"))) {
-									return "./bundle" + i + ".js";
-								}
-							}
-						};
+						var testConfig = {};
 						try {
 							// try to load a test file
 							testConfig = require(path.join(testDirectory, "test.config.js"));
 						} catch(e) {}
-						if(testConfig.noTests) return process.nextTick(done);
+						if (testConfig.noTests) return process.nextTick(done);
+						if (!testConfig.findBundle) {
+							testConfig.findBundle = function(i, options) {
+								if(fs.existsSync(path.join(options.output.path, "bundle" + i + ".js"))) {
+									return "./bundle" + i + ".js";
+								}
+							};
+						}
 						for(var i = 0; i < optionsArr.length; i++) {
 							var bundlePath = testConfig.findBundle(i, optionsArr[i]);
 							if(bundlePath) {
