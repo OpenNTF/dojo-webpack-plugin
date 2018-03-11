@@ -32,6 +32,7 @@
     "url": "git+https://github.com/OpenNTF/dojo-webpack-plugin.git"
   },
   "devDependencies": {
+    "clone-deep": "^3.0.1",
     "coveralls": "^3.0.0",
     "dojo": "1.13.0",
     "dojo-util": "1.13.0",
