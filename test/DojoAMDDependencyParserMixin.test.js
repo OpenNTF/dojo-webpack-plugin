@@ -28,7 +28,7 @@ describe("DojoAMDDependencyParserMixin tests", function() {
 		const test = new Test(() => {
 			processItemCalled = true;
 		});
-		test.processItem({}, {
+		test.processItem({}, {}, {
 			isString: function() {return false;},
 			isConditional: function() {return true;}
 		});
@@ -40,7 +40,7 @@ describe("DojoAMDDependencyParserMixin tests", function() {
 		const test = new Test(null, () => {
 			processArrayCalled = true;
 		});
-		test.processArray({}, {
+		test.processArray({}, {}, {
 			isArray: function() {return false;},
 			isConstArray: function() {return false;}
 		});

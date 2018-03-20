@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
-const {Tapable, reg, callSync, callSyncWaterfall} = require("../lib/pluginHelper");
+const {Tapable, reg, callSync, callSyncWaterfall} = require("../lib/pluginCompat");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 
 class Factory extends Tapable {

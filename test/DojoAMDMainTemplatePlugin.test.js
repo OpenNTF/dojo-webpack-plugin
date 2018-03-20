@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDMainTemplatePlugin = require("../lib/DojoAMDMainTemplatePlugin");
-const {reg, Tapable} = require("../lib/pluginHelper");
+const {reg, Tapable} = require("../lib/pluginCompat");
 const plugin = new DojoAMDMainTemplatePlugin({});
 
 describe("DojoAMDMainTemplatePlugin tests", function() {

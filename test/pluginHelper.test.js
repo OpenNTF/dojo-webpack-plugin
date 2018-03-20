@@ -1,5 +1,5 @@
 if (parseInt(require("webpack/package.json").version.split(".")[0]) >= 4) {
-	const {Tapable, reg, tap, callSync, callSyncBail} = require("../lib/pluginHelper");
+	const {Tapable, reg, tap, callSync, callSyncBail} = require("../lib/pluginCompat").for("pluginHelper.test");
 	describe("pluginHelper tests", function() {
 		it("tap should throw error for missing hook", function(done) {
 			try {

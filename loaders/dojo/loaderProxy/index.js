@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 const loaderUtils = require("loader-utils");
-const {callSyncBail} = require("../../../lib/pluginHelper");
+const {callSyncBail} = require("../../../lib/pluginCompat");
 
 module.exports = function() {
 	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
