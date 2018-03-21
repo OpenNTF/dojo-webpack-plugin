@@ -3,14 +3,14 @@ language: node_js
 node_js:
   - '6'
 
-matrix:
-  include:
-    - env: WEBPACK_VERSION=V2
-    - env: WEBPACK_VERSION=V3
+env: 
+  - WEBPACK_VERSION=V4
+  - WEBPACK_VERSION=V3
+  - WEBPACK_VERSION=V2
 
 before_install: 
-  - if [ "$WEBPACK_VERSION" = "V3" ]; then echo Testing webpack v3; fi
-  - if [ "$WEBPACK_VERSION" = "V2" ]; then echo Testing webpack v2; cp -f ./package.webpack2.json ./package.json; fi
+  - if [ "$WEBPACK_VERSION" = "V3" ]; then  rm -f package-lock.json; cp -f ./package.webpack3.json ./package.json; fi
+  - if [ "$WEBPACK_VERSION" = "V2" ]; then  rm -f package-lock.json; cp -f ./package.webpack2.json ./package.json; fi
 
 cache:
   directories:

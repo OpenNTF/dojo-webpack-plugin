@@ -7,8 +7,10 @@
  * changes are not related to the paths being tested.
  */
 const proxyquire = require("proxyquire");
+const {reg, tap, Tapable} = require("../lib/pluginCompat").for("DojoLoaderPlugin.test");
+
 const tmpStub = {}, child_processStub = {};
-const Tapable = require("tapable");
+
 const DojoLoaderPlugin = proxyquire("../lib/DojoLoaderPlugin", {
 	tmp: tmpStub,
 	child_process: child_processStub
@@ -20,7 +22,11 @@ describe("DojoLoaderPlugin tests", function() {
 		plugin = new DojoLoaderPlugin({loaderConfig:{}, noConsole:true});
 		compiler = new Tapable();
 		compiler.context = '.';
-		plugin.apply(compiler);
+		reg(compiler, {"get dojo config" : ["SyncBail"]});
+		tap(compiler, {"get dojo config" : () => {
+			return {};
+		}});
+		plugin.compiler = compiler;
 	});
 	afterEach(function() {
 		Object.keys(tmpStub).forEach(key => {
@@ -71,15 +77,14 @@ describe("DojoLoaderPlugin tests", function() {
 			});
 		});
 	});
-	describe("compiler run(0) edge cases", function() {
+	describe("compiler run1 edge cases", function() {
 		afterEach(function() {
 			delete plugin.getDojoPath;
 		});
 		it("Should call the callback with error if can't find dojo.js", function(done) {
 			const error = new Error("test error");
 			plugin.getDojoPath = function() {throw error;};
-			compiler._plugins.run.splice(1, 1);	// remove run(1) event
-			compiler.applyPlugins("run", {}, (err, data) => {
+			plugin.run1({}, (err, data) => {
 				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
@@ -87,15 +92,14 @@ describe("DojoLoaderPlugin tests", function() {
 		});
 	});
 
-	describe("compiler run(1) edge cases", function() {
+	describe("compiler run2 edge cases", function() {
 		afterEach(function() {
 			delete plugin.getDojoPath;
 		});
 		it("Should call the callback with error if can't find dojo.js", function(done) {
 			const error = new Error("test error");
 			plugin.getDojoPath = function() {throw error;};
-			compiler._plugins.run.splice(0, 1);	// remove run(0) event
-			compiler.applyPlugins("run", {}, (err, data) => {
+			plugin.run2({}, (err, data) => {
 				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
@@ -106,8 +110,7 @@ describe("DojoLoaderPlugin tests", function() {
 			tmpStub.dir = function(options__, callback) {
 				callback(error);
 			};
-			compiler._plugins.run.splice(0, 1);	// remove run(0) event
-			compiler.applyPlugins("run", {}, (err, data) => {
+			plugin.run2({}, (err, data) => {
 				err.should.be.eql(error);
 				(typeof data).should.be.eql('undefined');
 				done();
@@ -116,30 +119,18 @@ describe("DojoLoaderPlugin tests", function() {
 	});
 
 	describe("after-optimize-chunks edge cases", function() {
-		var afterOptimizeChunksCallback, params, compilation;
 		beforeEach(function() {
 			plugin.options.loader = "loader";
 			plugin.options.loaderConfig = "loaderConfig";
-			params = {
-				normalModuleFactory: {
-					plugin: function() {}
-				}
-			},
-			compilation = {
-				plugin: function(event, callback) {
-					if (event === 'after-optimize-chunks') {
-						afterOptimizeChunksCallback = callback;
-					}
-				},
+			plugin.compilation =  {
 				modules: {
 					find() {}
 				}
 			};
-			compiler.applyPlugins("compilation", compilation, params);
 		});
 		it("Should throw if embedded loader not found in compilation", function(done) {
 			try {
-				afterOptimizeChunksCallback([{hasRuntime:function(){return true;}}]);
+				plugin.afterOptimizeChunks([{hasRuntime:function(){return true;}}]);
 				done(new Error("Exception not thrown"));
 			} catch (err) {
 				err.message.should.match(/Can't locate loader in compilation/);
@@ -149,10 +140,10 @@ describe("DojoLoaderPlugin tests", function() {
 		it("Should throw if config module not found in compilation", function(done) {
 			try {
 				var count = 0;
-				compilation.modules.find = function() {
+				plugin.compilation.modules.find = function() {
 					return count++ === 0 ? {} : null;
 				};
-				afterOptimizeChunksCallback([{hasRuntime:function(){return true;}}]);
+				plugin.afterOptimizeChunks([{hasRuntime:function(){return true;}}]);
 				done(new Error("Exception not thrown"));
 			} catch (err) {
 				err.message.should.match(/Can't locate loaderConfig in compilation/);
@@ -160,41 +151,12 @@ describe("DojoLoaderPlugin tests", function() {
 			}
 		});
 		it("Should not throw if chunk doesn't have runtime", function(done) {
-			afterOptimizeChunksCallback([{hasRuntime:function(){return false;}}]);
+			plugin.afterOptimizeChunks([{hasRuntime:function(){return false;}}]);
 			done();
 		});
-	});
-
-	describe("evaluate typeof __embedded_dojo_loader__ edge cases", function() {
-		var params, compilation, parserCallback, evalTypeofCallback;
-		beforeEach(function() {
-			params = {
-				normalModuleFactory: {
-					plugin: function(event, callback) {
-						if (event === "parser") {
-							parserCallback = callback;
-						}
-					}
-				}
-			},
-			compilation = {
-				plugin: function() {}
-			};
-			compiler.applyPlugins("compilation", compilation, params);
-			parserCallback({
-				plugin: function(event, callback) {
-					if (event === "evaluate typeof __embedded_dojo_loader__") {
-						evalTypeofCallback = callback;
-					}
-				},
-				applyPluginsBailResult() {
-					return {string: ""};
-				}
-			});
-		});
-		it("Should not throw if expr is undefined", function() {
-			const result = evalTypeofCallback();
-			result.string.should.be.eql('string');
+		it("should return typeof string for loader expression when no expression object is passed", function() {
+			const result = plugin.evaluateTypeofLoader();
+			result.string.should.be.eql("string");
 		});
 	});
 });

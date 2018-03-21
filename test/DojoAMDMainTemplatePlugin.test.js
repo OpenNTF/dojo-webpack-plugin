@@ -7,37 +7,36 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDMainTemplatePlugin = require("../lib/DojoAMDMainTemplatePlugin");
-const Tapable = require("tapable");
+const {reg, Tapable} = require("../lib/pluginCompat");
 const plugin = new DojoAMDMainTemplatePlugin({});
 
-class MainTemplate extends Tapable {
-	constructor() {
-		super();
-		this.requireFn = "__webpack_require__";
-	}
-	indent() {}
-}
-
 describe("DojoAMDMainTemplatePlugin tests", function() {
-	var mainTemplate;
-
-	beforeEach(function() {
-		mainTemplate = new MainTemplate();
-		const compiler = new Tapable();
-		const compilation = new Tapable();
-		plugin.apply(compiler);
-		compilation.mainTemplate = mainTemplate;
-		compilation.chunkTemplate = new Tapable();
-		compilation.modules = {
-			find: function() { return null; }
-		};
-		compiler.applyPlugins("compilation", compilation);
+	const compilation = new Tapable();
+	compilation.chunkTemplate = new Tapable();
+	compilation.modules = {
+		find: function() { return null; }
+	};
+	reg(compilation.chunkTemplate, {"renderAbsMids" : ["SyncWaterfall", "source", "chunk"]});
+	compilation.mainTemplate = Object.assign(new Tapable(), {
+		requireFn:  "__webpack_require__",
+		outputOptions: {
+			jsonpFunction: "webpackJsonpFunction",
+			globalObject: "window"
+		}
 	});
+	reg(compilation.mainTemplate, {
+		"dojo-global-require" : ["SyncWaterfall", "source"]
+	});
+	const chunk = {
+		groupsIterable: []
+	};
+	plugin.indent = (string) => string,
 
+	plugin.compilation = compilation;
 	describe("dojo-require-extensions test", function() {
 		it("Should throw if dojo loader is not available", function(done) {
 			try {
-				mainTemplate.applyPlugins("dojo-require-extensions", "", {chunks:[]});
+				plugin.dojoRequireExtensions("", chunk);
 				done(new Error("Shouldn't get here"));
 			} catch (err) {
 				err.message.should.match(/Can't locate [^\s]+ in compilation/);

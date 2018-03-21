@@ -6,41 +6,38 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
-const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
-const Tapable = require("tapable");
+const DojoAMDResolverPluginBase = require("../lib/DojoAMDResolverPluginBase");
+const {Tapable, reg, tap} = require("../lib/pluginCompat").for("DojoAMDResolverPlugin.test");
+const plugin = new DojoAMDResolverPluginBase();
 
 describe("DojoAMDResolverPlugin tests", function() {
 	const compiler = new Tapable();
-	const plugin = new DojoAMDResolverPlugin({}, compiler);
-	compiler.plugin("get dojo require", function() {
+	reg(compiler, {"get dojo require" : ["SyncBail"]});
+	tap(compiler, {"get dojo require" : () => {
 		return {
 			toUrl: (request) => {
 				return request.request === "null" ? null : request.request;
 			}
 		};
-	});
-	var factory;
-	beforeEach(function() {
-		factory = new Tapable();
-		plugin.apply(factory);
-	});
+	}});
+	plugin.compiler = compiler;
 	describe("resolver tests", () => {
 		it("Should invoke callback with no args for directory request", done => {
-			factory.applyPlugins("module", {directory:true}, (err, data) => {
+			plugin.module({directory:true}, null, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
 		});
 		it("Should invoke callback with no args for null request", done => {
-			factory.applyPlugins("module", {request: "null", path:"."}, (err, data) => {
+			plugin.module({request: "null", path:"."}, null, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
 		});
 		it("Should invoke callback with no args for identity request", done => {
-			factory.applyPlugins("module", {request: "null", path:"."}, (err, data) => {
+			plugin.module({request: "null", path:"."}, null, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();

@@ -15,6 +15,7 @@
  */
 const path = require("path");
 const i18nEval = require("../i18nEval");
+const {callSyncBail} = require("../../../lib/pluginCompat");
 
 module.exports = function(content) {
 	this.cacheable && this.cacheable();
@@ -50,7 +51,7 @@ module.exports = function(content) {
 	}
 
 	var bundle = i18nEval(content);
-	const dojoRequire = this._compiler.applyPluginsBailResult("get dojo require");
+	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
 	var absMid;
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
 	if (this._module.absMid) {
@@ -74,7 +75,8 @@ module.exports = function(content) {
 	// Determine if this is the default bundle or a locale specific bundle
 	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
 	const resMatch = regex.exec(res);
-	const requestedLocales = this._compilation.options.DojoAMDPlugin && this._compilation.options.DojoAMDPlugin.locales;
+	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
+	const requestedLocales = pluginOptions.locales;
 	const bundledLocales = [];
 
 	if (!resMatch) {
@@ -110,7 +112,8 @@ module.exports = function(content) {
 	} else {
 		buf.push(`require("${res}?absMid=${absMid}");`);
 	}
-	buf.push(`module.exports = require("${runner}")("${absMid}");`);
+	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
+	buf.push(`module.exports = require("${runner}")("${absMid}", req);`);
 	return buf.join("\n");
 };
 

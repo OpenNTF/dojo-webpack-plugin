@@ -19,13 +19,17 @@
  */
 
 "use strict";
+const {tap, callSyncWaterfall} = require("../../../lib/pluginCompat").for("MainTemplatePlugin - tests");
+const Template = require("webpack/lib/Template");
 
 module.exports = class MainTemplatePlugin {
 	apply(compiler) {
-		compiler.plugin("compilation", function(compilation) {
+		tap(compiler, {"compilation" : compilation => {
 
-			compilation.mainTemplate.plugin("require-ensure", function(__, chunk, hash) {
-				const chunkFilename = this.outputOptions.chunkFilename;
+			tap(compilation.mainTemplate, {"require-ensure": (__, chunk, hash) => {
+				this.indent = compilation.mainTemplate.indent || Template.indent;
+				this.asString = compilation.mainTemplate.asString || Template.asString;
+				const chunkFilename = compilation.mainTemplate.outputOptions.chunkFilename;
 				const chunkMaps = chunk.getChunkMaps();
 				return this.asString([
 					"var installedChunkData = installedChunks[chunkId];",
@@ -51,9 +55,9 @@ module.exports = class MainTemplatePlugin {
 					"installedChunkData[2] = promise;",
 					"",
 					"// start chunk loading",
-					"var filename = __dirname + " + this.applyPluginsWaterfall("asset-path", JSON.stringify(`/${chunkFilename}`), {
-						hash: `" + ${this.renderCurrentHashCode(hash)} + "`,
-						hashWithLength: (length) => `" + ${this.renderCurrentHashCode(hash, length)} + "`,
+					"var filename = __dirname + " + callSyncWaterfall(compilation.mainTemplate, "asset-path", JSON.stringify(`/${chunkFilename}`), {
+						hash: `" + ${compilation.mainTemplate.renderCurrentHashCode(hash)} + "`,
+						hashWithLength: (length) => `" + ${compilation.mainTemplate.renderCurrentHashCode(hash, length)} + "`,
 						chunk: {
 							id: "\" + chunkId + \"",
 							hash: `" + ${JSON.stringify(chunkMaps.hash)}[chunkId] + "`,
@@ -80,7 +84,7 @@ module.exports = class MainTemplatePlugin {
 					"});",
 					"return promise;"
 				]);
-			});
-		});
+			}});
+		}});
 	}
 };

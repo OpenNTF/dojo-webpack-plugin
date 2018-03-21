@@ -6,7 +6,10 @@ define(["require", "test/a"], function(require, a) {
 		try {
 			a.should.be.eql("a");
 			var avar = "test/a";
-			var count = 2;
+			var count = 3;
+			function getVar() {
+				return "test/a";
+			}
 			require([avar, "test/b"], function(_a, b) {
 				(a === _a).should.be.true();
 				b.b.should.be.eql("b");
@@ -15,6 +18,12 @@ define(["require", "test/a"], function(require, a) {
 			});
 			avar = "./a";
 			require([avar, "./b"], function(_a, b) {
+				(a === _a).should.be.true();
+				b.b.should.be.eql("b");
+				b.a.should.be.eql("a");
+				if (--count === 0) done();
+			});
+			require([getVar(), "./b"], function(_a, b) {
 				(a === _a).should.be.true();
 				b.b.should.be.eql("b");
 				b.a.should.be.eql("a");
