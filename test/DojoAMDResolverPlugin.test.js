@@ -10,17 +10,17 @@ const DojoAMDResolverPluginBase = require("../lib/DojoAMDResolverPluginBase");
 const {Tapable, reg, tap} = require("../lib/pluginCompat").for("DojoAMDResolverPlugin.test");
 const plugin = new DojoAMDResolverPluginBase();
 
-const compiler = new Tapable();
-reg(compiler, {"get dojo require" : ["SyncBail"]});
-tap(compiler, {"get dojo require" : () => {
-	return {
-		toUrl: (request) => {
-			return request.request === "null" ? null : request.request;
-		}
-	};
-}});
-plugin.compiler = compiler;
 describe("DojoAMDResolverPlugin tests", function() {
+	const compiler = new Tapable();
+	reg(compiler, {"get dojo require" : ["SyncBail"]});
+	tap(compiler, {"get dojo require" : () => {
+		return {
+			toUrl: (request) => {
+				return request.request === "null" ? null : request.request;
+			}
+		};
+	}});
+	plugin.compiler = compiler;
 	describe("resolver tests", () => {
 		it("Should invoke callback with no args for directory request", done => {
 			plugin.module({directory:true}, null, (err, data) => {
