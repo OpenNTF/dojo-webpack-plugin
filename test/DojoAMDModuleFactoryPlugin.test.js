@@ -64,13 +64,13 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			data.absMidAliases.length.should.be.eql(1);
 			data.absMidAliases[0].should.be.eql("/foo/bar");
 		});
-		it("Should throw if absMid is relative", function(done) {
-			var data = {};
+		it("Should throw with empty absMid", function(done) {
 			try {
-				plugin.addAbsMid(data, "./foo");
-				done(new Error("Error not thrown"));
+				var data = {};
+				plugin.addAbsMid(data, "");
+				return done(new Error("Should have thrown"));
 			} catch (e) {
-				e.message.startsWith("Illegal absMid").should.be.true;
+				e.message.should.containEql("Illegal absMid:");
 				done();
 			}
 		});

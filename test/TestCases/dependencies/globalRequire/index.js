@@ -6,7 +6,6 @@ define(["require"], function(req) {
 				asyncDep2.should.be.eql("local asyncDep");
 				asyncDep3.should.be.eql("local asyncDep");
 				require("./asyncDep").should.be.eql("global asyncDep");
-				require("../globalContext/asyncDep").should.be.eql("global asyncDep");
 				require("asyncDep").should.be.eql("local asyncDep");
 				require("../asyncDep").should.be.eql("local asyncDep");
 				done();
@@ -29,13 +28,13 @@ define(["require"], function(req) {
 			}
 		});
 	});
-	it("should use " + require.rawConfig.testVarName + " for root relative module absMids", function() {
+	it("should fail to load missing module", function() {
 		var error;
 		try {
 			require("./missing");
 		} catch(e) {
 			error = e;
 		}
-		error.message.should.containEql("not found: " + require.rawConfig.testVarName + "/");
+		error.message.should.containEql("not found: ./missing");
 	});
 });
