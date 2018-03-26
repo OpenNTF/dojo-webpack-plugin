@@ -64,6 +64,16 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			data.absMidAliases.length.should.be.eql(1);
 			data.absMidAliases[0].should.be.eql("/foo/bar");
 		});
+		it("Should throw with empty absMid", function(done) {
+			try {
+				var data = {};
+				plugin.addAbsMid(data, "");
+				return done(new Error("Should have thrown"));
+			} catch (e) {
+				e.message.should.containEql("Illegal absMid:");
+				done();
+			}
+		});
 	});
 
 	describe("filterAbsMids tests", function() {
