@@ -42,6 +42,24 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 		}
 	});
 
+	it("require sans callback", function(done) {
+		var resolver;
+		global.asyncDep3Promise = new Promise((resolve) => {
+			resolver = resolve;
+		});
+		global.asyncDep3Promise.resolve = resolver;
+		require(["asyncDep3"]);
+		global.asyncDep3Promise.then(() => {
+			try {
+				var dep3 = ['asyncDep3'];
+				require(dep3);
+			} catch (err) {
+				return done(err);
+			}
+			done();
+		});
+	});
+
 	it("runtime require failures", function(done) {
 		var notTrue;
 		if (notTrue) {
