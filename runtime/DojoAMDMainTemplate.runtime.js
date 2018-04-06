@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /* globals loaderScope __webpack_require__ installedModules globalRequireContext */
+ /* globals module loaderScope __webpack_require__ installedModules globalRequireContext */
 
 module.exports = {
 	main: function() {
