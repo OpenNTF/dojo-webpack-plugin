@@ -8,6 +8,7 @@
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
 const {Tapable, reg, callSync, callSyncWaterfall} = require("../lib/pluginCompat");
+const Module = require("webpack/lib/Module");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 
 class Factory extends Tapable {
@@ -202,6 +203,19 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			(typeof result.filterAbsMids).should.be.eql('function');
 			existing.absMid.should.eql('a');
 			existing.absMidAliases.length.should.eql(0);
+		});
+
+		it("Should copy absMids from original request of delgated modules", function() {
+			const originalModule = new Module("test");
+			const delegated = {originalRequest: originalModule};
+			callSync(factory, "add absMid", originalModule, "a");
+			compilation.findModule = function() { return null; };
+			debugger; // eslint-disable-line
+			const result = callSyncWaterfall(factory, "module", delegated);
+			result.should.be.eql(delegated);
+			result.absMid.should.eql('a');
+			result.absMidAliases.length.should.eql(0);
+			originalModule.absMid.should.eql('a');
 		});
 	});
 
