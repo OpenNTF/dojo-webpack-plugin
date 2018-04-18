@@ -132,8 +132,10 @@ module.exports = {
 						errors.push({mid: mid, error: e});
 					}
 				});
-				if (callback && errors.length === 0) {
-					callback.apply(this, modules);
+				if (errors.length === 0) {
+					if (callback) {
+						callback.apply(this, modules);
+					}
 				} else {
 					var error = new Error("findModules");
 					error.src = "dojo-webpack-plugin";
