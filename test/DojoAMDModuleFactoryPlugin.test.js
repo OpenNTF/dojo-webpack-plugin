@@ -41,7 +41,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		plugin.apply(compiler);
 		plugin.factory = factory;
 		callSync(compiler, "normal-module-factory", factory);
-		callSync(compiler, "compilation", compilation, {});
+		callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
 	});
 	describe("addAbsMid tests", function() {
 		it("should add the absMid", function() {
@@ -210,7 +210,6 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			const delegated = {originalRequest: originalModule};
 			callSync(factory, "add absMid", originalModule, "a");
 			compilation.findModule = function() { return null; };
-			debugger; // eslint-disable-line
 			const result = callSyncWaterfall(factory, "module", delegated);
 			result.should.be.eql(delegated);
 			result.absMid.should.eql('a');

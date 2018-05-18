@@ -60,23 +60,6 @@ describe("DojoLoaderPlugin tests", function() {
 			});
 		});
 	});
-	describe("validateEmbeddedLoader edge cases", function() {
-		it("Should invoke callback with error if nomralModuleFactory.create returns an error", function(done) {
-			var error = new Error("Failed to create module");
-			plugin.params = {
-				normalModuleFactory: {
-					create: function(params__, callback) {
-						callback(error);
-					}
-				}
-			};
-			plugin.embeddedLoader = plugin.filename = "";
-			plugin.validateEmbeddedLoader(null, err => {
-				err.should.be.eql(error);
-				done();
-			});
-		});
-	});
 	describe("compiler run1 edge cases", function() {
 		afterEach(function() {
 			delete plugin.getDojoPath;
