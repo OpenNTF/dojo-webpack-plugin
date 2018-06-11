@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
-const {Tapable, reg, callSync, callSyncWaterfall} = require("../lib/pluginCompat");
+const {Tapable, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat");
 const Module = require("webpack/lib/Module");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 

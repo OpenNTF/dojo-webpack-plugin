@@ -19,7 +19,7 @@
  */
 
 "use strict";
-const {tap, callSyncWaterfall} = require("../../../lib/pluginCompat").for("MainTemplatePlugin - tests");
+const {tap, callSyncWaterfall} = require("webpack-plugin-compat").for("MainTemplatePlugin - tests");
 const Template = require("webpack/lib/Template");
 
 module.exports = class MainTemplatePlugin {

@@ -6,7 +6,7 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
-const {Tapable} = require("../lib/pluginCompat").for("DojoLoaderPlugin.test");
+const {Tapable} = require("webpack-plugin-compat").for("DojoLoaderPlugin.test");
 
 const DojoLoaderValidatorPlugin = require("../lib/DojoLoaderValidatorPlugin");
 var plugin;

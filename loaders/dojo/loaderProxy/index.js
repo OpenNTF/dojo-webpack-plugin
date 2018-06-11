@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 const loaderUtils = require("loader-utils");
-const {callSyncBail} = require("../../../lib/pluginCompat");
+const {callSyncBail} = require("webpack-plugin-compat");
 
 module.exports = function() {
 	const dojoRequire = callSyncBail(this._compiler, "get dojo require");

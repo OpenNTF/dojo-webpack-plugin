@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDMainTemplatePlugin = require("../lib/DojoAMDMainTemplatePlugin");
-const {reg, Tapable} = require("../lib/pluginCompat");
+const {reg, Tapable} = require("webpack-plugin-compat");
 const plugin = new DojoAMDMainTemplatePlugin({});
 
 describe("DojoAMDMainTemplatePlugin tests", function() {

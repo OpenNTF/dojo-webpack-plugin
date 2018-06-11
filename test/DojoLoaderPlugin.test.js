@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const proxyquire = require("proxyquire");
-const {reg, tap, Tapable} = require("../lib/pluginCompat").for("DojoLoaderPlugin.test");
+const {reg, tap, Tapable} = require("webpack-plugin-compat").for("DojoLoaderPlugin.test");
 
 const tmpStub = {}, child_processStub = {};
 
