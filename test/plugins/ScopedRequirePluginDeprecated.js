@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- const {tap} = require("../../lib/pluginCompat").for("ScopedRequirePluginDeprecated");
+ const {tap} = require("webpack-plugin-compat").for("ScopedRequirePluginDeprecated");
 const ConcatSource = require("webpack-sources").ConcatSource;
 
 module.exports = class ScopedRequirePluginDeprecated {

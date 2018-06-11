@@ -15,7 +15,7 @@
  */
 const path = require("path");
 const i18nEval = require("../i18nEval");
-const {callSyncBail} = require("../../../lib/pluginCompat");
+const {callSyncBail} = require("webpack-plugin-compat");
 
 module.exports = function(content) {
 	this.cacheable && this.cacheable();

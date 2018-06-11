@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDResolverPluginBase = require("../lib/DojoAMDResolverPluginBase");
-const {Tapable, reg, tap} = require("../lib/pluginCompat").for("DojoAMDResolverPlugin.test");
+const {Tapable, reg, tap} = require("webpack-plugin-compat").for("DojoAMDResolverPlugin.test");
 const plugin = new DojoAMDResolverPluginBase();
 
 describe("DojoAMDResolverPlugin tests", function() {
