@@ -138,7 +138,11 @@ function runTestCases(casesName) {
 									filesCount++;
 									var context = vm.createContext({
 										console: console,
-										process: process
+										process: process,
+										setTimeout: setTimeout,
+										setInterval: setInterval,
+										clearTimeout: clearTimeout,
+										clearInterval: clearInterval
 									});
 									context.global = context;
 									context.it = _it;
