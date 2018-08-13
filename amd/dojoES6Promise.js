@@ -21,12 +21,14 @@
  */
  define([
 	"dojo/Deferred",
+	"dojo/promise/Promise",
 	"dojo/promise/all",
 	"dojo/promise/first",
 	"dojo/_base/lang",
 	"dojo/_base/array"
 ], function(
 	Deferred,
+	DojoPromise,
 	all,
 	first,
 	lang,
@@ -37,20 +39,22 @@
 	var Promise, freezeObject = Object.freeze || function(){};
 
 	function wrap(dojoPromise) {
-		var result = new Promise();
-		result.promise = dojoPromise;
-		freezeObject(result);
-		return result;
+		return new Promise(dojoPromise);
 	}
 
 	Promise = lang.extend(function PromiseWrapper(executor) {
-		// Create a new dojo/Deferred
-		var dfd = new Deferred();
-		this.promise = dfd.promise;
-		executor(
-			function(value) { dfd.resolve(value, false); },
-			function (reason) { dfd.reject(reason, false); }
-		);
+		if (executor instanceof DojoPromise) {
+			// wrapping an existing Dojo promise
+			this.promise = executor;
+		} else {
+			// Create a new dojo/Deferred
+			var dfd = new Deferred();
+			this.promise = dfd.promise;
+			executor(
+				function(value) { dfd.resolve(value, false); },
+				function (reason) { dfd.reject(reason, false); }
+			);
+		}
 		freezeObject(this);
 	}, {
 		'catch': function(onRejected) {
