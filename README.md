@@ -404,7 +404,7 @@ In addition, Dojo loaders built with earlier versions of the plugin will not wor
 
 # Footnotes
 
-<a name="foot1">1.</a>&nbsp; Embedded loader sizes are determined using a stand-alone embedded loader that has been uglified and gzipped.  The loader was produced as described in [Building the Dojo loader](#building-the-dojo-loader), with [the Dojo config API excluded](#the-dojo-config-api-feature) and using the 2.2.2 version of this plugin and the 1.14 (not yet released at the time of this writing) Dojo loader, both of which support the new [`foreign-loader`](https://github.com/dojo/dojo/pull/279) has.js feature conditional.  Embedded loader sizes for earlier versions vary depending on the version of this plugin and of Dojo, up to a max of about 4KB when the Dojo config API is included.
+<a name="foot1">1.</a>&nbsp; Embedded loader sizes are determined using a stand-alone embedded loader that has been uglified and gzipped.  The loader was produced as described in [Building the Dojo loader](#building-the-dojo-loader), with [the Dojo config API excluded](#the-dojo-config-api-feature) and using the 2.2.2 version of this plugin and the 1.14 Dojo loader, both of which support the new [`foreign-loader`](https://github.com/dojo/dojo/pull/279) has.js feature conditional.  Embedded loader sizes for earlier versions vary depending on the version of this plugin and of Dojo, up to a max of about 4KB when the Dojo config API is included.
 
 [npm]: https://img.shields.io/npm/v/dojo-webpack-plugin.svg
 [npm-url]: https://npmjs.com/package/dojo-webpack-plugin
