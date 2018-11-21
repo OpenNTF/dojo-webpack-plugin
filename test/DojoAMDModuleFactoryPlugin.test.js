@@ -51,19 +51,9 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			data.absMidAliases.length.should.be.eql(0);
 
 			plugin.addAbsMid(data, "b");
-			data.absMid.should.be.eql("a");
+			data.absMid.should.be.eql("b");
 			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("b");
-		});
-		it("Should prioritize the non-absolute absMid", function() {
-			var data = {};
-			plugin.addAbsMid(data, "/foo/bar");
-			data.absMid.should.be.eql("/foo/bar");
-			data.absMidAliases.length.should.be.eql(0);
-			plugin.addAbsMid(data, "foo/bar");
-			data.absMid.should.be.eql("foo/bar");
-			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("/foo/bar");
+			data.absMidAliases[0].should.be.eql("a");
 		});
 		it("Should throw with empty absMid", function(done) {
 			try {
@@ -149,9 +139,9 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			data.request = "moduleA?q=123&absMid=test/a&id=456&absMid=foo/a";
 			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA?q=123&id=456");
-			data.absMid.should.be.eql("test/a");
+			data.absMid.should.be.eql("foo/a");
 			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("foo/a");
+			data.absMidAliases[0].should.be.eql("test/a");
 		});
 		it("Should parse requests with no absMid args properly", function() {
 			var data = {};
@@ -166,9 +156,9 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			data.request = "moduleA?absMid=a!moduleB!moduleC?absMid=c!moduleD?q=123";
 			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA!moduleB!moduleC!moduleD?q=123");
-			data.absMid.should.be.eql("a");
+			data.absMid.should.be.eql("c");
 			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("c");
+			data.absMidAliases[0].should.be.eql("a");
 		});
 	});
 
