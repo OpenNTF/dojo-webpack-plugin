@@ -10,7 +10,6 @@ const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
 const {Tapable, tap, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat").for("DojoAMDModuleFactoryPlugin.tests");
 const Module = require("webpack/lib/Module");
 const plugin = new DojoAMDModuleFactoryPlugin({});
-const path = require("path");
 
 class Factory extends Tapable {
 	constructor() {
@@ -63,15 +62,6 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 				return done(new Error("Should have thrown"));
 			} catch (e) {
 				e.message.should.containEql("Illegal absMid:");
-				done();
-			}
-		});
-		it("Should throw for absolute path", function(done) {
-			try {
-				plugin.addAbsMid({}, path.sep === '/' ? "/foo/bar" : "c:/foo/bar.js");
-				done(new Error("Exception not thrown"));
-			} catch (err) {
-				err.message.should.containEql("must not be absolute");
 				done();
 			}
 		});
