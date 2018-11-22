@@ -67,7 +67,7 @@ module.exports = function(content) {
 		if (!path.isAbsolute(rawRequest) && !rawRequest.startsWith('.')) {
 			absMid = rawRequest;
 		} else {
-			absMid = res;
+			absMid = path.relative(this._compiler.context, res).replace(/[\\]/g, '/');
 		}
 	}
 	this._module.absMid = this._module.absMid || "dojo/i18n!" + absMid;
@@ -90,15 +90,15 @@ module.exports = function(content) {
 		// this is the default bundle.  Add any locale specific bundles that match the
 		// requested locale.  Default bundles specify available locales
 		let absMidMatch = regex.exec(absMid);
-		(requestedLocales || ["*"]).forEach(function(requestedLocale) {
+		(requestedLocales || ["*"]).forEach(requestedLocale => {
 			const availableLocales = getAvailableLocales(requestedLocale, bundle);
-			availableLocales.forEach((loc) => {
+			availableLocales.forEach(loc => {
 				const localeRes = `${resMatch[1]}/nls/${loc}/${resMatch[2]}`;
 				if (absMidMatch) {
 					var localeAbsMid = `${absMidMatch[1]}/nls/${loc}/${absMidMatch[2]}`;
 				}
 				bundledLocales.push(loc);
-				buf.push(`require("${localeRes}?absMid=${(localeAbsMid || localeRes)}");`);
+				buf.push(`require("${localeRes}?absMid=${localeAbsMid || path.relative(this._compiler.context, localeRes).replace(/[\\]/g, '/')}");`);
 			});
 		});
 
