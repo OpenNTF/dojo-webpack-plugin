@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
-const {Tapable, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat");
+const {Tapable, tap, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat").for("DojoAMDModuleFactoryPlugin.tests");
 const Module = require("webpack/lib/Module");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 
@@ -62,6 +62,15 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 				return done(new Error("Should have thrown"));
 			} catch (e) {
 				e.message.should.containEql("Illegal absMid:");
+				done();
+			}
+		});
+		it("Should throw for absolute path", function(done) {
+			try {
+				plugin.addAbsMid({}, "c:/foo/bar.js");
+				done(new Error("Exception not thrown"));
+			} catch (err) {
+				err.message.should.containEql("must not be absolute");
 				done();
 			}
 		});
@@ -165,16 +174,22 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	describe("'add absMids from request event' tests", function() {
 		it("should gracefully handle undefined data object", function(done) {
 			try {
-				callSync(factory, "addAbsMidsFromRequest");
+				callSync(factory, "add absMids from request", null);
 				done();
 			} catch (err) {
 				done(err);
 			}
 		});
+
 		it("should gracefully handle undefined data.dependencies object", function(done) {
+			reg(compiler, {"get dojo require" : ["SyncBail"]});
+			tap(compiler, {"get dojo require" : function() {
+				return {toAbsMid: function(a) {return a;}};
+			}});
 			try {
-				const data = {request: ""};
-				callSync(factory, "addAbsMidsFromRequest", data);
+				const data = {request: "foo/bar"};
+				callSync(factory, "add absMids from request", data);
+				data.absMid.should.be.eql(data.request);
 				done();
 			} catch (err) {
 				done(err);
