@@ -93,7 +93,7 @@ function runTestCases(casesName) {
 							}
 							options.plugins.push(new MainTemplatePlugin());
 							if (parseInt(require("webpack/package.json").version.split(".")[0]) >= 4) {
-								options.mode = "development";
+								options.mode = options.mode || "development";
 								options.devtool = false;
 							}
 						});

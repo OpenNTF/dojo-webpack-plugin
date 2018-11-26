@@ -104,12 +104,11 @@ module.exports = {
 		}
 
 		function dojoModuleFromWebpackModule(webpackModule) { // eslint-disable-line no-unused-vars
-			var result = {exports: webpackModule.exports};
-			var id = webpackModule.i;
-			if (req.absMidsById[id]) {
-				id = req.absMidsById[id];
+			var result = {exports: webpackModule.exports, i: webpackModule.i};
+			var id = req.absMidsById[webpackModule.i];
+			if (id) {
+				result.id = id;
 			}
-			result.i = result.id = id;
 			return result;
 		}
 
