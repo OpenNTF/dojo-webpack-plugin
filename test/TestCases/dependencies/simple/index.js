@@ -14,6 +14,7 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 	it("defined vars" , function() {
 		module.exports.should.be.eql(exports);
 		module.id.should.be.eql('test/index');
+		module.i.should.not.be.eql(module.id);
 	});
 
 	it("require", function(done) {
