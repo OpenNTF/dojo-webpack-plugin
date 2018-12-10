@@ -108,10 +108,11 @@ If you want the config to specify different properties at build time vs. run tim
 
 This plugin does not support the dojoConfig `deps` and `callback` properties.  The same functionality can be provided by requiring your dependencies in the webpack entry module.  For example:
 
+<!-- eslint-disable no-unused-vars -->
 ```javascript
 // entry.js
 require(/* dojoConfig.deps */ ['dep1', 'dep2'], function(dep1, dep2) {
-	// dojoConfig.callback code here 
+	// dojoConfig.callback code here
 });
 ```
 
