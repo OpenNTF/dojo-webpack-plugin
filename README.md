@@ -20,21 +20,21 @@
 <!-- TOC START min:1 max:3 link:true update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-    - [loaderConfig](#loaderconfig)
-    - [environment](#environment)
-    - [buildEnvironment](#buildenvironment)
-    - [globalContext](#globalcontext)
-    - [loader](#loader)
-    - [locales](#locales)
-    - [cjsRequirePatterns](#cjsrequirepatterns)
-    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
-    - [noConsole](#noconsole)
+		- [loaderConfig](#loaderconfig)
+		- [environment](#environment)
+		- [buildEnvironment](#buildenvironment)
+		- [globalContext](#globalcontext)
+		- [loader](#loader)
+		- [locales](#locales)
+		- [cjsRequirePatterns](#cjsrequirepatterns)
+		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+		- [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -105,6 +105,15 @@ The loader config may be specified as an object, a function that returns the con
 If the config is specified as a module name, then the config module will be evaluated both at build time (for the purpose of resolving modules for webpack), and then again at application run time when the config module is loaded on the client.  Note that if you want webpack to process the config module (i.e. perform build time variable substitution, etc.) then you must specify the config as a module name.   
 
 If you want the config to specify different properties at build time vs. run time, then specify the config as a function that returns the config object and use the [environment](#environment) and [buildEnvironment](#buildenvironment) options to set the properties who's values change depending on the target environment.  This works both when the config is evaluated at build time (specified as a function) and when the config is evaluated at build time and runtime (specified as the name of a CommonJS module that exports a function).
+
+This plugin does not support the dojoConfig `deps` and `callback` properties.  The same functionality can be provided by requiring your dependencies in the webpack entry module.  For example:
+
+```javascript
+// entry.js
+require(/* dojoConfig.deps */ ['dep1', 'dep2'], function(dep1, dep2) {
+	// dojoConfig.callback code here 
+});
+```
 
 See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that uses the [environment](#environment) and [buildEnvironment](#buildenvironment) options to specify different config paths for build time vs run time.  The config also supports running the sample app as a non-packed application with Dojo loaded from a CDN.
 
