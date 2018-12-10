@@ -106,6 +106,16 @@ If the config is specified as a module name, then the config module will be eval
 
 If you want the config to specify different properties at build time vs. run time, then specify the config as a function that returns the config object and use the [environment](#environment) and [buildEnvironment](#buildenvironment) options to set the properties who's values change depending on the target environment.  This works both when the config is evaluated at build time (specified as a function) and when the config is evaluated at build time and runtime (specified as the name of a CommonJS module that exports a function).
 
+This plugin does not support the dojoConfig `deps` and `callback` properties.  The same functionality can be provided by requiring your dependencies in the webpack entry module.  For example:
+
+<!-- eslint-disable no-unused-vars -->
+```javascript
+// entry.js
+require(/* dojoConfig.deps */ ['dep1', 'dep2'], function(dep1, dep2) {
+	// dojoConfig.callback code here
+});
+```
+
 See [js/loaderConfig.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/loaderConfig.js) in the sample project for an example of a Dojo loader config that uses the [environment](#environment) and [buildEnvironment](#buildenvironment) options to specify different config paths for build time vs run time.  The config also supports running the sample app as a non-packed application with Dojo loaded from a CDN.
 
 # Dojo loader extensions
