@@ -1,4 +1,5 @@
 /*
+ * (C) Copyright HCL Technologies Ltd. 2018
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,7 +104,7 @@ module.exports = function(content) {
 		});
 
 	}
-	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
+	const runner = require.resolve(pluginOptions.async ? "./asyncRunner" : "./runner.js").replace(/\\/g, "/");
 	const rootLocales = getAvailableLocales("*", bundle);
 
 	if (rootLocales.length !== bundledLocales.length) {
@@ -113,7 +114,11 @@ module.exports = function(content) {
 		buf.push(`require("${res}?absMid=${absMid}");`);
 	}
 	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
-	buf.push(`module.exports = require("${runner}")("${absMid}", req);`);
+	if (pluginOptions.async) {
+		buf.push(`module.exports = Promise.resolve(require("${runner}")("${absMid}", req)).then(function(m){return module.exports=m});`);
+	} else {
+		buf.push(`module.exports = require("${runner}")("${absMid}", req);`);
+	}
 	return buf.join("\n");
 };
 

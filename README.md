@@ -20,21 +20,22 @@
 <!-- TOC START min:1 max:3 link:true update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-    - [loaderConfig](#loaderconfig)
-    - [environment](#environment)
-    - [buildEnvironment](#buildenvironment)
-    - [globalContext](#globalcontext)
-    - [loader](#loader)
-    - [locales](#locales)
-    - [cjsRequirePatterns](#cjsrequirepatterns)
-    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
-    - [noConsole](#noconsole)
+		- [async](#async)
+		- [loaderConfig](#loaderconfig)
+		- [environment](#environment)
+		- [buildEnvironment](#buildenvironment)
+		- [globalContext](#globalcontext)
+		- [loader](#loader)
+		- [locales](#locales)
+		- [cjsRequirePatterns](#cjsrequirepatterns)
+		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+		- [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -221,9 +222,26 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 
 The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`.
 
+**Update** - Version 2.8 of this plugin introduced the [`async`](#async) option.  When this option is specified, the requirement that the Dojo loader extension invoke its `load` callback synchronously is removed.
+
 # Options
 
 The plugin is instantiated with a properties map specifying the following options:
+
+### async
+
+This property specifies that AMD modules should be defined asynchronously.  The default (false) is to define AMD modules synchronously.  This option is supported in version 2.8 or greater and requires webpack version 4.28 or greater.
+
+Using async mode allows the [`dojo/loaderProxy`](#the-dojoloaderproxy-loader-extension) plugin to support Dojo loader extensions that resolve asynchronously.
+
+One major caveat to using async mode is that if CommonJS `require` is used to load an AMD module, the returned value can be an un-resolved promise.  For this reason, you should always load AMD modules asynchronously from CommonJS modules unless you can be certain that the module is already defined.  For example:
+
+```javascript
+// From within a CommonJS module
+Promise.resolve(require('myAmdModule')).then(function(myAmdModule) {
+	myAmdModule.doSomething();
+});
+```
 
 ### loaderConfig
 

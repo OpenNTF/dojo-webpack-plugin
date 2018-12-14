@@ -1,4 +1,5 @@
 /*
+ * (C) Copyright HCL Technologies Ltd. 2018
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,8 +32,8 @@ module.exports = function() {
 	const name = query.name || this._module.absMid.split("!").pop();
 	const deps = query.deps ? query.deps.split(",") : [];
 	const buf = [];
-	const runner = require.resolve("./runner.js").replace(/\\/g, "/");
 	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
+	const runner = require.resolve(pluginOptions.async ? "./asyncRunner.js" : "./runner.js").replace(/\\/g, "/");
 	buf.push("var runner = require(\"" + runner + "\");");
 	buf.push("var loader = require(\"" + loader + "?absMid=" + toAbsMid(loader)  + "\");");
 	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
@@ -43,7 +44,11 @@ module.exports = function() {
 		}).join("!");
 		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");");
 	});
-	buf.push(`module.exports = runner(loader, "${name}", req)`);
+	if (pluginOptions.async) {
+		buf.push(`module.exports = Promise.resolve(runner(loader, "${name}", req)).then(function(m){return module.exports=m});`);
+	} else {
+		buf.push(`module.exports = runner(loader, "${name}", req);`);
+	}
 
 	this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
 		return !/loaderProxy/.test(absMid);
