@@ -29,11 +29,14 @@ module.exports = function() {
 	if (!loader) {
 		throw new Error("No loader specified");
 	}
-	const name = query.name || this._module.absMid.split("!").pop();
+	const name = query.name ||
+	             this._module.absMid && this._module.absMid.split("!").pop() ||
+							 this._module.request.split("!").pop();
+	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const deps = query.deps ? query.deps.split(",") : [];
 	const buf = [];
-	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const runner = require.resolve(pluginOptions.async ? "./asyncRunner.js" : "./runner.js").replace(/\\/g, "/");
+	this._module.addAbsMid(`${toAbsMid(loader)}!${toAbsMid(name)}`);
 	buf.push("var runner = require(\"" + runner + "\");");
 	buf.push("var loader = require(\"" + loader + "?absMid=" + toAbsMid(loader)  + "\");");
 	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);

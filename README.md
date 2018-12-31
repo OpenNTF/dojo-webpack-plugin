@@ -20,22 +20,22 @@
 <!-- TOC START min:1 max:3 link:true update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-		- [async](#async)
-		- [loaderConfig](#loaderconfig)
-		- [environment](#environment)
-		- [buildEnvironment](#buildenvironment)
-		- [globalContext](#globalcontext)
-		- [loader](#loader)
-		- [locales](#locales)
-		- [cjsRequirePatterns](#cjsrequirepatterns)
-		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
-		- [noConsole](#noconsole)
+    - [async](#async)
+    - [loaderConfig](#loaderconfig)
+    - [environment](#environment)
+    - [buildEnvironment](#buildenvironment)
+    - [globalContext](#globalcontext)
+    - [loader](#loader)
+    - [locales](#locales)
+    - [cjsRequirePatterns](#cjsrequirepatterns)
+    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
+    - [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -220,9 +220,9 @@ The general syntax for the `dojo/loaderProxy` loader extension is `dojo/loaderPr
 
 Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is required by the `svg` loader extension's load method on the client, then the dependency will be resolved in-line and the `load` method's callback will be invoked in-line as required.
 
-The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent a module.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources.  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`.
+The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent the name of a module that can be resolved at build time.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources or resources that are not available at build time (see notes on the [`async`](#async) option below).  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`.
 
-**Update** - Version 2.8 of this plugin introduced the [`async`](#async) option.  When this option is specified, the requirement that the Dojo loader extension invoke its `load` callback synchronously is removed.
+**Update** - Version 2.8 of this plugin introduces the [`async`](#async) option.  When this option is specified, the requirement that the Dojo loader extension invoke its `load` callback synchronously is lifted.  Loader extensions can use `XMLHttpRequest`, `dojo/request`, `dojo/script`, etc. to asynchronously load resources from web sites at runtime.  Note, though, that `require` (the global instance as well as the function passed to the loader extension's load method) may **not** be used to asynchronously load external resources as it maps to webpack's implementation which can only be used to load packed resources.
 
 # Options
 

@@ -16,7 +16,7 @@
 module.exports = function(ldr, name, req) {
 	return Promise.resolve(ldr).then(function(loader) {
 		return new Promise(function(resolve) {
-			loader.load(name,  req, function(data) {
+			loader.load(req.toAbsMid(name),  req, function(data) {
 				resolve(data);
 			}, {isBuild:true});
 		});

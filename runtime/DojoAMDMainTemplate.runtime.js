@@ -92,7 +92,7 @@ module.exports = {
 			mid = mid.split("!").map(function(segment) {
 				var isRelative = segment.charAt(0) === '.';
 				if(isRelative && !referenceModule){
-					return mid;
+					return segment;
 				}
 				return toAbsMid(segment, referenceModule ? {mid: referenceModule} : null);
 			}).join("!");
