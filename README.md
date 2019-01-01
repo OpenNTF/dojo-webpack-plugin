@@ -20,22 +20,22 @@
 <!-- TOC START min:1 max:3 link:true update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-    - [async](#async)
-    - [loaderConfig](#loaderconfig)
-    - [environment](#environment)
-    - [buildEnvironment](#buildenvironment)
-    - [globalContext](#globalcontext)
-    - [loader](#loader)
-    - [locales](#locales)
-    - [cjsRequirePatterns](#cjsrequirepatterns)
-    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
-    - [noConsole](#noconsole)
+		- [async](#async)
+		- [loaderConfig](#loaderconfig)
+		- [environment](#environment)
+		- [buildEnvironment](#buildenvironment)
+		- [globalContext](#globalcontext)
+		- [loader](#loader)
+		- [locales](#locales)
+		- [cjsRequirePatterns](#cjsrequirepatterns)
+		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+		- [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -230,7 +230,7 @@ The plugin is instantiated with a properties map specifying the following option
 
 ### async
 
-This property specifies that AMD modules should be defined asynchronously.  The default (false) is to define AMD modules synchronously.  This option is supported in version 2.8 or greater and requires webpack version 4.28 or greater.
+This property specifies that AMD modules should be defined asynchronously.  The default (false) is to define AMD modules synchronously.  This option is supported in version 2.8 or greater and requires webpack version 4 or greater.
 
 Using async mode allows the [`dojo/loaderProxy`](#the-dojoloaderproxy-loader-extension) plugin to support Dojo loader extensions that resolve asynchronously.
 
