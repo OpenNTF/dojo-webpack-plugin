@@ -32,6 +32,15 @@ var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
 var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprecated");
+var webpackMajorVersion = parseInt(require("webpack/package.json").version.split(".")[0]);
+
+var testGroups = {
+	default: {},
+	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}}
+};
+if (webpackMajorVersion >= 4) {
+	testGroups.async = {pluginOptions: {async:true}};
+}
 
 
 describe("TestCases", () => {
@@ -54,8 +63,8 @@ function runTestCases(casesName) {
 		};
 	});
 	categories.forEach(function(category) {
-		["", "djPropRenamed"].forEach(djProp => {
-			describe(category.name + (djProp ? (' - ' + djProp) : ''), function() {
+		Object.keys(testGroups).forEach(testGroup => {
+			describe(category.name + (testGroup ? (' - ' + testGroup) : ''), function() {
 				category.tests.forEach(function(testName) {
 					var suite = describe(testName, function() {});
 					var testDirectory = path.join(casesPath, category.name, testName);
@@ -64,7 +73,17 @@ function runTestCases(casesName) {
 					const isCompilerWarnings = fs.existsSync(path.join(testDirectory, "warnings.js"));
 					it(testName + (isErrorTest ? " should fail" : " should compile") + (isCompilerErrors ? " with errors" : isCompilerWarnings ? " with warnings" : ""), function(done) {
 						this.timeout(60000);
-						var outputDirectory = path.join(__dirname, "js", casesName, category.name, testName + (djProp ? ('_' + djProp) : ''));
+						var outputDirectory = path.join(__dirname, "js", casesName, category.name, testName + (testGroup ? ('_' + testGroup) : ''));
+						var testConfig = {};
+						try {
+							// try to load a test file
+							testConfig = require(path.join(testDirectory, "test.config.js"));
+						} catch(e) {}
+						if (testConfig.noTests) return process.nextTick(done);
+						if (testConfig.mode && testConfig.mode !== testGroup) {
+							return process.nextTick(done);
+						}
+
 						var options = cloneDeep(require(path.join(testDirectory, "webpack.config.js")));
 						var optionsArr = [].concat(options);
 						optionsArr.forEach(function(options, idx) {
@@ -84,95 +103,105 @@ function runTestCases(casesName) {
 							})) {
 								options.plugins.push(new ScopedRequirePlugin());
 							}
-							if (djProp) {
-								options.plugins.forEach(plugin => {
-									if (plugin instanceof DojoWebackPlugin) {
-										plugin.options.requireFnPropName = djProp;
-									}
-								});
-							}
+							options.plugins.forEach(plugin => {
+								if (plugin instanceof DojoWebackPlugin) {
+									Object.assign(plugin.options, testGroups[testGroup].pluginOptions);
+								}
+							});
 							options.plugins.push(new MainTemplatePlugin());
-							if (parseInt(require("webpack/package.json").version.split(".")[0]) >= 4) {
+							if (webpackMajorVersion >= 4) {
 								options.mode = options.mode || "development";
 								options.devtool = false;
 							}
 						});
-						webpack(options, function(err, stats) {
-							if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
-								return;
-							}
-							var statOptions = Stats.presetToOptions("verbose");
-							statOptions.colors = false;
-							fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
-							var jsonStats = stats.toJson({
-								errorDetails: true
-							});
-							if(checkArrayExpectation(testDirectory, jsonStats, "error", "Error", done)) return;
-							if(checkArrayExpectation(testDirectory, jsonStats, "warning", "Warning", done)) return;
-							var exportedTests = 0;
-
-							function _it(title, fn) {
-								var test = new Test(title, fn);
-								suite.addTest(test);
-								exportedTests++;
-								return test;
-							}
-
-							var filesCount = 0;
-							var testConfig = {};
-							try {
-								// try to load a test file
-								testConfig = require(path.join(testDirectory, "test.config.js"));
-							} catch(e) {}
-							if (testConfig.noTests) return process.nextTick(done);
-							if (!testConfig.findBundle) {
-								testConfig.findBundle = function(i, options) {
-									if(fs.existsSync(path.join(options.output.path, "bundle" + i + ".js"))) {
-										return "./bundle" + i + ".js";
-									}
-								};
-							}
-							for(var i = 0; i < optionsArr.length; i++) {
-								var bundlePath = testConfig.findBundle(i, optionsArr[i]);
-								if(bundlePath) {
-									filesCount++;
-									var context = vm.createContext({
-										console: console,
-										process: process,
-										setTimeout: setTimeout,
-										setInterval: setInterval,
-										clearTimeout: clearTimeout,
-										clearInterval: clearInterval
-									});
-									context.global = context;
-									context.it = _it;
-									Object.defineProperty(context, "should", {
-								    set: function() {},
-								    get: function() {
-								      return should.valueOf();
-								    },
-								    configurable: true
-								  });
-									const bundlePaths = Array.isArray(bundlePath) ? bundlePath : [bundlePath];
-									bundlePaths.forEach(bundlePath => {
-										var content;
-										var p = path.join(outputDirectory, bundlePath);
-										content = fs.readFileSync(p, "utf-8");
-										var module = {exports: {}};
-										const prologue = `
-should.extend('should', Object.prototype);\n
-Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
-
-										var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
-										fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
-									});
+						try {
+							webpack(options, function(err, stats) {
+								if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
+									console.error(err);
+									return;
 								}
+								var statOptions = Stats.presetToOptions("verbose");
+								statOptions.colors = false;
+								fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
+								var jsonStats = stats.toJson({
+									errorDetails: true
+								});
+								if(checkArrayExpectation(testDirectory, jsonStats, "error", "Error", done)) return;
+								if(checkArrayExpectation(testDirectory, jsonStats, "warning", "Warning", done)) return;
+								var exportedTests = 0;
+
+								function _it(title, fn) {
+									var test = new Test(title, fn);
+									suite.addTest(test);
+									exportedTests++;
+									return test;
+								}
+
+								var filesCount = 0;
+								if (!testConfig.findBundle) {
+									testConfig.findBundle = function(i, options) {
+										if(fs.existsSync(path.join(options.output.path, "bundle" + i + ".js"))) {
+											return "./bundle" + i + ".js";
+										}
+									};
+								}
+								for(var i = 0; i < optionsArr.length; i++) {
+									var bundlePath = testConfig.findBundle(i, optionsArr[i]);
+									if(bundlePath) {
+										filesCount++;
+										var context = vm.createContext({
+											console: console,
+											process: process,
+											setTimeout: setTimeout,
+											setInterval: setInterval,
+											clearTimeout: clearTimeout,
+											clearInterval: clearInterval
+										});
+										context.global = context;
+										context.it = _it;
+										Object.defineProperty(context, "should", {
+									    set: function() {},
+									    get: function() {
+									      return should.valueOf();
+									    },
+									    configurable: true
+									  });
+										const bundlePaths = Array.isArray(bundlePath) ? bundlePath : [bundlePath];
+										bundlePaths.forEach(bundlePath => {
+											var content;
+											var p = path.join(outputDirectory, bundlePath);
+											content = fs.readFileSync(p, "utf-8");
+											var module = {exports: {}};
+											const prologue = `
+	should.extend('should', Object.prototype);\n
+	Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
+
+											var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
+											fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
+										});
+									}
+								}
+								// give a free pass to compilation that generated an error
+								if(!jsonStats.errors.length && filesCount !== optionsArr.length) return done(new Error("Should have found at least one bundle file per webpack config"));
+								// Wait up to 5 seconds for all tests to be defined
+								var startTime = Date.now();
+								(function() {
+									if (exportedTests < filesCount) {
+										if (Date.now() - startTime >= 5000) {
+											done(new Error("No tests exported by test case"));
+										} else {
+											setTimeout(arguments.callee, 100);
+										}
+									} else {
+										process.nextTick(done);
+									}
+								})();
+							});
+						} catch(err) {
+							if (checkExpectedError(isErrorTest, testDirectory, err, done)) {
+								console.error(err);
 							}
-							// give a free pass to compilation that generated an error
-							if(!jsonStats.errors.length && filesCount !== optionsArr.length) return done(new Error("Should have found at least one bundle file per webpack config"));
-							if(exportedTests < filesCount) return done(new Error("No tests exported by test case"));
-							process.nextTick(done);
-						});
+						}
 					});
 				});
 			});
@@ -182,15 +211,18 @@ Object.assign = function() { throw new Error(\"Don't use Object.assign (not supp
 
 function checkExpectedError(isErrorTest, testDirectory, error, done) {
 	if (isErrorTest) {
+		const expectedError = require(path.join(testDirectory, "expectedError"));
 		if (error) {
-			const expectedError = require(path.join(testDirectory, "expectedError"));
 			if (expectedError.test(error)) {
 				done();
 			} else {
 				done(new Error("Unexpected error message: " + error));
 			}
-		} else {
+		} else if (expectedError.test) {
 			done(new Error("Expected error but test passed."));
+		} else {
+			// no test function, so test is really expected to pass
+			done();
 		}
 		return true;
 	} else if (error) {

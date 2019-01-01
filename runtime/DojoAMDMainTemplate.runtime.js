@@ -1,4 +1,5 @@
 /*
+ * (C) Copyright HCL Technologies Ltd. 2018
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /* globals module loaderScope __webpack_require__ installedModules globalRequireContext */
+ /* globals module loaderScope __webpack_require__ __async__ installedModules globalRequireContext Promise */
 
 module.exports = {
 	main: function() {
@@ -75,16 +76,23 @@ module.exports = {
 			// integers corresponding to webpack module ids.  Returns a module reference if evaluation of the expression
 			// using the currently defined features returns a module id, or else undefined.
 
-			var has = req("dojo/has");
-			var id = has.normalize(expr, function(arg){return arg;});
-			return id && __webpack_require__(id) || undefined;
+			function resolve(has) {
+				var id = has.normalize(expr, function(arg){return arg;});
+				return id && __webpack_require__(id) || undefined;
+			}
+			var has = findModule("dojo/has", null, true);
+			if (has instanceof Promise) {
+				return has.then(function(has) { return resolve(has); }); // eslint-disable-line no-shadow
+			} else {
+				return resolve(has);
+			}
 		}
 
 		function findModule(mid, referenceModule, noInstall, asModuleObj) {
 			mid = mid.split("!").map(function(segment) {
 				var isRelative = segment.charAt(0) === '.';
 				if(isRelative && !referenceModule){
-					return mid;
+					return segment;
 				}
 				return toAbsMid(segment, referenceModule ? {mid: referenceModule} : null);
 			}).join("!");
@@ -118,7 +126,11 @@ module.exports = {
 				// a3 is passed by require calls injected into dependency arrays for dependencies specified
 				// as identifiers (vs. string literals).
 				var noInstall = !(a3 === false);
-				return findModule(a1, referenceModule, noInstall);
+				var m = findModule(a1, referenceModule, noInstall);
+				if (a3 !== false && m instanceof Promise) {
+					throw new Error('Module not found: ' + a1);
+				}
+				return m;
 			} else if (type === '[object Object]') {
 				throw new Error('Require config is not supported by WebPack');
 			}
@@ -133,7 +145,13 @@ module.exports = {
 				});
 				if (errors.length === 0) {
 					if (callback) {
-						callback.apply(this, modules);
+						if (__async__) {
+							Promise.all(modules).then(function(deps) {
+								callback.apply(this, deps);
+							}.bind(this)).catch(function(err){console.error(err);});
+						} else {
+							callback.apply(this, modules);
+						}
 					}
 				} else {
 					var error = new Error("findModules");

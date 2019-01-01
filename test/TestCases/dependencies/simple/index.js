@@ -112,8 +112,10 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 						return done(new Error("rutime require callback should not be called"));
 					});
 					waitForError.then(function() {
-						require("test/asyncDep2").should.be.eql("asyncDep2");
-						done();
+						setTimeout(function() {
+							require("test/asyncDep2").should.be.eql("asyncDep2");
+							done();
+						}, 0);
 					});
 				});
 			});
