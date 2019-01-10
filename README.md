@@ -189,7 +189,7 @@ You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-p
 
 # The dojo/loaderProxy loader extension
 
-`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to ensure that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
+`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method (see update below on use of the [`async`](#async) option to relax this requirement).  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to ensure that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
 
 Consider a simple svg loader extension that loads the specified svg file and fixes up the contents by removing the xml header in the content.  The implementation of the load method might look like this:
 
@@ -230,7 +230,7 @@ The plugin is instantiated with a properties map specifying the following option
 
 ### async
 
-This property specifies that AMD modules should be defined asynchronously.  The default (false) is to define AMD modules synchronously.  This option is supported in version 2.8 or greater and requires webpack version 4 or greater.
+This property specifies that AMD modules should be defined asynchronously.  The default (false) is to define AMD modules synchronously.  This option is supported in version 2.8 or greater and requires webpack version 4.28.4 or greater.
 
 Using async mode allows the [`dojo/loaderProxy`](#the-dojoloaderproxy-loader-extension) plugin to support Dojo loader extensions that resolve asynchronously.
 
