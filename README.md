@@ -389,7 +389,7 @@ require([fooName, getBarName(), 'baz'], function(foo, bar, baz) {
 });
 ```
 
-In order for the above code to execute successfully, the modules `foo` and `bar` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the modules must have been included in a previously loaded chunk, or they must be direct or indirect dependencies of `baz` so that they are included in the chunk(s) being loaded.  Since values of run-time identifiers cannot or expressions, in general, be known at build time, webpack cannot manage the loading of these modules or their dependencies.
+In order for the above code to execute successfully, the modules `foo` and `bar` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the modules must have been included in a previously loaded chunk, or they must be direct or indirect dependencies of `baz` so that they are included in the chunk(s) being loaded.  Since values of run-time identifiers or expressions, in general, cannot be known at build time, webpack cannot manage the loading of these modules or their dependencies.
 
 Note that you can also specify the require dependency array as a run-time identifier, with the same restrictions applying to all the modules in the array.
 
