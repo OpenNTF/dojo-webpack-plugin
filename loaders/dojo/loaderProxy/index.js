@@ -1,5 +1,5 @@
 /*
- * (C) Copyright HCL Technologies Ltd. 2018
+ * (C) Copyright HCL Technologies Ltd. 2018, 2019
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,7 @@ module.exports = function() {
 	});
 	if (pluginOptions.async) {
 		buf.push(`module.exports = Promise.resolve(runner(loader, "${name}", req)).then(function(m){return module.exports=m});`);
+		buf.push('module.exports.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;');
 	} else {
 		buf.push(`module.exports = runner(loader, "${name}", req);`);
 	}

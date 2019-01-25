@@ -1,4 +1,5 @@
 /*
+ * (C) Copyright HCL Technologies Ltd. 2019
  * (C) Copyright IBM Corp. 2017 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +37,7 @@
 ) {
 	"use strict";
 
-	var Promise, freezeObject = Object.freeze || function(){};
+	var Promise;
 
 	function wrap(dojoPromise) {
 		return new Promise(dojoPromise);
@@ -55,7 +56,6 @@
 				function (reason) { dfd.reject(reason, false); }
 			);
 		}
-		freezeObject(this);
 	}, {
 		'catch': function(onRejected) {
 			return wrap(this.promise.otherwise(onRejected));

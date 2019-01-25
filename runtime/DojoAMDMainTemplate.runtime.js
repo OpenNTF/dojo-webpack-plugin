@@ -1,5 +1,5 @@
 /*
- * (C) Copyright HCL Technologies Ltd. 2018
+ * (C) Copyright HCL Technologies Ltd. 2018, 2019
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -82,7 +82,9 @@ module.exports = {
 			}
 			var has = findModule("dojo/has", null, true);
 			if (has instanceof Promise) {
-				return has.then(function(has) { return resolve(has); }); // eslint-disable-line no-shadow
+				var newPromise = has.then(function(has) { return resolve(has); }); // eslint-disable-line no-shadow
+				newPromise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
+				return newPromise;
 			} else {
 				return resolve(has);
 			}
@@ -133,7 +135,7 @@ module.exports = {
 				// as identifiers (vs. string literals).
 				var noInstall = !(a3 === false);
 				var m = findModule(a1, referenceModule, noInstall);
-				if (a3 !== false && m instanceof Promise) {
+				if (a3 !== false && m && m.__DOJO_WEBPACK_DEFINE_PROMISE__) {
 					throw new Error('Module not found: ' + a1);
 				}
 				return m;
@@ -152,8 +154,8 @@ module.exports = {
 				if (errors.length === 0) {
 					if (callback) {
 						if (__async__) {
-							Promise.all(modules).then(function(deps) {
-								callback.apply(this, deps);
+							Promise.all(asyncWrapDependencies(modules)).then(function(deps) { // eslint-disable-line no-undef
+								callback.apply(this, asyncUnwrapDependencies(deps)); // eslint-disable-line no-undef
 							}.bind(this)).catch(function(err){console.error(err);});
 						} else {
 							callback.apply(this, modules);
@@ -175,6 +177,48 @@ module.exports = {
 		req.absMids = {};
 		req.absMidsById = [];
 		req.async = 1;
+	},
+
+	async: function() {
+		function asyncWrapDependencies(deps) {
+			return deps.map(function(m) {
+				return (m && typeof m.then === 'function' && !m.__DOJO_WEBPACK_DEFINE_PROMISE__) ? {__DOJO_WEBPACK_PROMISE_VALUE__: m} : m;
+			});
+		}
+
+		function asyncUnwrapDependencies(deps) {
+			return deps.map(function(m) {
+				return m && m.__DOJO_WEBPACK_PROMISE_VALUE__ || m;
+			});
+		}
+
+		function	asyncDefineModule(defArray, defFactory, module, exports) { // eslint-disable-line no-unused-vars
+			// Wrap native promise modules (modules who's value is a promise) in a wrapper object so we don't
+			// resolve them.
+			defArray = asyncWrapDependencies(defArray);
+			var promise = Promise.all(defArray).then(function(deps) {
+				// Unwrap wrapped promises
+				deps = asyncUnwrapDependencies(deps);
+				module && (module.exports = exports);
+				var result =  defFactory.apply(exports, deps);
+				if (typeof module === 'function') {
+					// module is actually a callback function
+					module(result);
+				} else {
+					if (result !== undefined) {
+						module.exports = result;
+					} else {
+						result = module.exports;
+					}
+				}
+				if (result && typeof result.then === 'function') {
+					result = {__DOJO_WEBPACK_PROMISE_VALUE__: result};
+				}
+				return result;
+			});
+			promise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
+			return promise;
+		}
 	},
 
 	makeDeprecatedReq: function() {
