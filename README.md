@@ -258,7 +258,7 @@ Promise.resolve(require("amdModuleThatReturnsAPromiseValue"))
   .then(resolved => {
 		resolved.doSomething();
 	});
-});
+
 ```
 
 Note that it is safe to call `unwrap` for non-wrapped modules, and to call it with the value returned by previous calls to unwrap.  If the input module is not a wrapped promise, then the input value is returned.
