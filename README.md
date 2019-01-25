@@ -20,22 +20,22 @@
 <!-- TOC START min:1 max:3 link:true update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-		- [async](#async)
-		- [loaderConfig](#loaderconfig)
-		- [environment](#environment)
-		- [buildEnvironment](#buildenvironment)
-		- [globalContext](#globalcontext)
-		- [loader](#loader)
-		- [locales](#locales)
-		- [cjsRequirePatterns](#cjsrequirepatterns)
-		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
-		- [noConsole](#noconsole)
+    - [async](#async)
+    - [loaderConfig](#loaderconfig)
+    - [environment](#environment)
+    - [buildEnvironment](#buildenvironment)
+    - [globalContext](#globalcontext)
+    - [loader](#loader)
+    - [locales](#locales)
+    - [cjsRequirePatterns](#cjsrequirepatterns)
+    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
+    - [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -243,7 +243,7 @@ Promise.resolve(require('myAmdModule')).then(function(myAmdModule) {
 });
 ```
 
-###### Wrapped promises
+##### Wrapped promises
 
 This section is for the special (and hopefully rare) case of requiring, from CommonJS code, an AMD module that itself returns a promise as the module value.  If you're not doing this in your code, then you can ignore this section.
 
