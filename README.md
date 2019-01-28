@@ -20,22 +20,22 @@
 <!-- TOC START min:1 max:3 link:true update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+	- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-    - [async](#async)
-    - [loaderConfig](#loaderconfig)
-    - [environment](#environment)
-    - [buildEnvironment](#buildenvironment)
-    - [globalContext](#globalcontext)
-    - [loader](#loader)
-    - [locales](#locales)
-    - [cjsRequirePatterns](#cjsrequirepatterns)
-    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
-    - [noConsole](#noconsole)
+	- [async](#async)
+	- [loaderConfig](#loaderconfig)
+	- [environment](#environment)
+	- [buildEnvironment](#buildenvironment)
+	- [globalContext](#globalcontext)
+	- [loader](#loader)
+	- [locales](#locales)
+	- [cjsRequirePatterns](#cjsrequirepatterns)
+	- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+	- [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -247,13 +247,13 @@ Promise.resolve(require('myAmdModule')).then(function(myAmdModule) {
 
 This section is for the special (and hopefully rare) case of requiring, from CommonJS code, an AMD module that itself returns a promise as the module value.  If you're not doing this in your code, then you can ignore this section.
 
-dojo-webpack-plugin wraps module value promises in a non-promise object.  This is done in order to prevent promise chaining from replacing the promise with the resolved value before it is provided to the caller.  Promise wrapping and unwrapping happens transparently within AMD modules, so you don't need to be concerned with it.  When an AMD module is required from CommonJS code, however, then the promise wrapper can be exposed and you need to take steps to deal with it, as shown in the following example:
+dojo-webpack-plugin wraps module value promises (actually, any thenable) in a non-promise object.  This is done in order to prevent promise chaining from replacing the promise with the resolved value before it is provided to the caller.  Promise wrapping and unwrapping happens transparently within AMD modules, so you don't need to be concerned with it.  When an AMD module is required from CommonJS code, however, then the promise wrapper can be exposed and you need to take steps to deal with it, as shown in the following example:
 
 ```javascript
 // From within a CommonJS module
 const unwrap = require('dojo-webpack-plugin/cjs/unwrapPromiseValue');
 
-Promise.resolve(require("amdModuleThatReturnsAPromiseValue"))
+Promise.resolve(require("amdModuleThatHasPromiseValue"))
   .then(wrapped => unwrap(wrapped))
   .then(resolved => {
 		resolved.doSomething();
