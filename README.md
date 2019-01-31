@@ -187,6 +187,16 @@ The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause
 
 You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-plugin) if you want to perform has.js filtering of source code at build time using statically defined features.  
 
+#### namedModules
+
+By default, webpack uses the resource path of the module as the module id in development builds.  In production builds, integer modules ids are used.  Using named module ids helps with debugging, but can trip up the parsing of dojo/has loader expressions when the module ids contains `?` and `:` characters.  For this reason, it is recommended to disable the use of named module ids with the following option in your webpack config:
+
+```javascript
+optimization: {
+	namedModules: false
+}
+```
+
 # The dojo/loaderProxy loader extension
 
 `dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method (see update below on use of the [`async`](#async) option to relax this requirement).  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to ensure that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
