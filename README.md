@@ -191,6 +191,7 @@ You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-p
 
 By default, webpack uses the resource path of the module as the module id in development builds.  In production builds, integer modules ids are used.  Using named module ids helps with debugging, but can trip up the parsing of dojo/has loader expressions when the module ids contains `?` and `:` characters.  For this reason, it is recommended to disable the use of named module ids with the following option in your webpack config:
 
+<!-- eslint-disable semi-->
 ```javascript
 optimization: {
 	namedModules: false
