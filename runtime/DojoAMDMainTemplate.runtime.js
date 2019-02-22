@@ -20,7 +20,7 @@ module.exports = {
 	main: function() {
 		function mix(dest, src) { // eslint-disable-line no-unused-vars
 			for(var n in src) dest[n] = src[n];
-			return src;
+			return dest;
 		}
 
 		function toUrl(name, referenceModule) {
