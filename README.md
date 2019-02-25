@@ -48,6 +48,7 @@
 - [Related plugins](#related-plugins)
 - [Sample application](#sample-application)
 - [Release Notes](#release-notes)
+- [Known Issues](#known-issues)
 - [Footnotes](#footnotes)
 
 <!-- TOC END -->
@@ -460,6 +461,10 @@ The versions of Dojo listed below require version 2.1.0 or later of this plugin 
 * 1.10.9 and later
 
 In addition, Dojo loaders built with earlier versions of the plugin will not work with 2.1.0 or later, even if you have not changed the version of Dojo you are building with.  If you are using a pre-built loader with the [loader](#loader) config option, then you will need to rebuild it when upgrading to 2.1.
+
+# Known Issues
+
+There is a known issue with incrementally upgrading some versions of webpack to newer versions when using this plugin.  If, after upgrading webpack, you encounter the error "No hook for resolver normal in object ResolverFactory", try deletig your `node_modules` directory **and** your `package-lock.json` file and running `npm install` again to resolve the issue.
 
 # Footnotes
 
