@@ -200,7 +200,7 @@ module.exports = {
 				// Unwrap wrapped promises
 				deps = asyncUnwrapDependencies(deps);
 				module && (module.exports = exports);
-				var result =  defFactory.apply(exports, deps);
+				var result =  defFactory.apply(null, deps);
 				if (typeof module === 'function') {
 					// module is actually a callback function
 					module(result);
