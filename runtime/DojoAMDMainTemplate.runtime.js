@@ -67,9 +67,7 @@ module.exports = {
 		function registerAbsMids(absMids) { // eslint-disable-line no-unused-vars
 			for (var s in absMids) {
 				req.absMids[s] = absMids[s];
-				if (!req.absMidsById[absMids[s]]) {
-					req.absMidsById[absMids[s]] = s;
-				}
+				req.absMidsById[absMids[s]] = s;
 			}
 		}
 
