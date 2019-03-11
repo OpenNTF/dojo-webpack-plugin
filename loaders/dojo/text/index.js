@@ -15,6 +15,11 @@
  */
 const rawLoader = require("raw-loader");
 module.exports = function(source) {
+	// The following has the side-effect of exporting the absMid.  This is needed
+  // so the module can be resolved by name at runtime.  The default absMid
+	// will sufice.
+	this._module.addAbsMid();
+
 	this.cacheable && this.cacheable();
 	return rawLoader(source);
 };
