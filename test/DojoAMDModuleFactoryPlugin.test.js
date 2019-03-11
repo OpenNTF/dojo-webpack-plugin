@@ -38,6 +38,9 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			"normal-module-factory" : ["Sync", "factory"],
 			"compilation"         : ["Sync", "compilation, params"]
 		});
+		reg(compilation, {
+			"before-chunk-assets" : ["Sync"]
+		});
 		plugin.apply(compiler);
 		plugin.factory = factory;
 		callSync(compiler, "normal-module-factory", factory);
@@ -48,12 +51,17 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			var data = {};
 			plugin.addAbsMid(data, "a");
 			data.absMid.should.be.eql("a");
-			data.absMidAliases.length.should.be.eql(0);
+			var absMids = [];
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(1);
 
 			plugin.addAbsMid(data, "b");
+			absMids = [];
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
 			data.absMid.should.be.eql("b");
-			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("a");
+			absMids.length.should.be.eql(2);
+			absMids[0].should.be.eql("b");
+			absMids[1].should.be.eql("a");
 		});
 		it("Should throw with empty absMid", function(done) {
 			try {
@@ -70,51 +78,64 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	describe("filterAbsMids tests", function() {
 		it("Should remove the specified aliases", function() {
 			var data = {};
-			data.absMid = "a";
-			data.absMidAliases = ["b", "c"];
+			var absMids = [];
+			plugin.addAbsMid(data, 'c');
+			plugin.addAbsMid(data, 'b');
+			plugin.addAbsMid(data, 'a');
 			plugin.filterAbsMids(data, absMid => {
 				return absMid === "b";
 			});
 			data.absMid.should.be.eql("b");
-			data.absMidAliases.length.should.be.eql(0);
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(1);
 
 			data = {};
-			data.absMid = "a";
-			data.absMidAliases = ["b", "c"];
+			plugin.addAbsMid(data, 'c');
+			plugin.addAbsMid(data, 'b');
+			plugin.addAbsMid(data, 'a');
 			plugin.filterAbsMids(data, absMid => {
 				return absMid !== "b";
 			});
 			data.absMid.should.be.eql("a");
-			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("c");
+			absMids = [];
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(2);
+			absMids[0].should.be.eql("a");
+			absMids[1].should.be.eql("c");
 
 			data = {};
-			data.absMid = "a";
-			data.absMidAliases = ["b", "c"];
+			plugin.addAbsMid(data, 'c');
+			plugin.addAbsMid(data, 'b');
+			plugin.addAbsMid(data, 'a');
 			plugin.filterAbsMids(data, absMid => {
 				return absMid !== "c";
 			});
 			data.absMid.should.be.eql("a");
-			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("b");
+			absMids = [];
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(2);
+			absMids[0].should.be.eql("a");
+			absMids[1].should.be.eql("b");
 
 			data = {};
-			data.absMid = "a";
-			data.absMidAliases = ["b", "c"];
+			plugin.addAbsMid(data, 'c');
+			plugin.addAbsMid(data, 'b');
+			plugin.addAbsMid(data, 'a');
 			plugin.filterAbsMids(data, () => {
 				return false;
 			});
 			(typeof data.absMid).should.be.eql('undefined');
-			(typeof data.absMidAliases).should.be.eql('undefined');
 
 			// shouldn't blow up if absMidAliaes is missing
 			data = {};
-			data.absMid = "a";
+			plugin.addAbsMid(data, 'a');
 			plugin.filterAbsMids(data, () => {
 				return true;
 			});
 			data.absMid.should.be.eql("a");
-			data.absMidAliases.length.should.be.eql(0);
+			absMids = [];
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(1);
 		});
 	});
 
@@ -124,7 +145,6 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			data.request = "foo/bar";
 			plugin.processAbsMidQueryArgs(data);
 			(typeof data.absMid).should.be.eql('undefined');
-			(typeof data.absMidAliases).should.be.eql('undefined');
 		});
 		it("Should parse request with single absMid properly", function() {
 			var data = {};
@@ -132,16 +152,18 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("./bar");
 			data.absMid.should.be.eql("foo/bar");
-			data.absMidAliases.length.should.be.eql(0);
 		});
 		it("Should parse request with multple absMids and other args properly", function() {
 			var data = {};
+			var absMids = [];
 			data.request = "moduleA?q=123&absMid=test/a&id=456&absMid=foo/a";
 			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA?q=123&id=456");
 			data.absMid.should.be.eql("foo/a");
-			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("test/a");
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(2);
+			absMids[0].should.be.eql("foo/a");
+			absMids[1].should.be.eql("test/a");
 		});
 		it("Should parse requests with no absMid args properly", function() {
 			var data = {};
@@ -149,16 +171,18 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA?q=123&s=abc");
 			(typeof data.absMid).should.be.eql('undefined');
-			(typeof data.absMidAliases).should.be.eql('undefined');
 		});
 		it("Should parse requests with absMid args in multiple plugin segments", function() {
 			var data = {};
+			var absMids = [];
 			data.request = "moduleA?absMid=a!moduleB!moduleC?absMid=c!moduleD?q=123";
 			plugin.processAbsMidQueryArgs(data);
 			data.request.should.be.eql("moduleA!moduleB!moduleC!moduleD?q=123");
 			data.absMid.should.be.eql("c");
-			data.absMidAliases.length.should.be.eql(1);
-			data.absMidAliases[0].should.be.eql("a");
+			plugin.filterAbsMids(data, absMid => absMids.push(absMid));
+			absMids.length.should.be.eql(2);
+			absMids[0].should.be.eql("c");
+			absMids[1].should.be.eql("a");
 		});
 	});
 
@@ -192,24 +216,28 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("Should gracefully handle missing absMidAliases in data object", function() {
 			const module = {absMid: 'a'};
 			const existing = {};
+			var absMids = [];
 			compilation.findModule = function() { return existing; };
 			const result = callSyncWaterfall(factory, "module", module);
 			result.should.be.eql(module);
 			(typeof result.addAbsMid).should.be.eql('function');
 			(typeof result.filterAbsMids).should.be.eql('function');
 			existing.absMid.should.eql('a');
-			existing.absMidAliases.length.should.eql(0);
+			plugin.filterAbsMids(existing, absMid => absMids.push(absMid));
+			absMids.length.should.eql(1);
 		});
 
 		it("Should copy absMids from original request of delgated modules", function() {
 			const originalModule = new Module("test");
 			const delegated = {originalRequest: originalModule};
+			var absMids = [];
 			callSync(factory, "add absMid", originalModule, "a");
 			compilation.findModule = function() { return null; };
 			const result = callSyncWaterfall(factory, "module", delegated);
 			result.should.be.eql(delegated);
 			result.absMid.should.eql('a');
-			result.absMidAliases.length.should.eql(0);
+			plugin.filterAbsMids(originalModule, absMid => absMids.push(absMid));
+			absMids.length.should.eql(1);
 			originalModule.absMid.should.eql('a');
 		});
 	});

@@ -14,7 +14,7 @@ module.exports = {
 			/fooLoader!/, "foo"
 		),
 		new webpack.NormalModuleReplacementPlugin(
-			/barLoader!bar/, "raw-loader!bar.txt"
+			/barLoader!bar/, "dojo/text!bar.txt"
 		)
 	]
 };

@@ -51,30 +51,13 @@ module.exports = function(content) {
 		return result;
 	}
 
+	this._module.addAbsMid();	// add default absMid
 	var bundle = i18nEval(content);
-	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
-	var absMid;
+	var absMid = this._module.absMid.split("!").pop();
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
-	if (this._module.absMid) {
-		// Fix up absMid to remove loader
-		absMid = this._module.absMid.split("!").pop();
-	}
-	if (!absMid && this._module.issuer.absMid) {
-		// Fix up absMid to remove loader
-		absMid = dojoRequire.toAbsMid(this._module.rawRequest.split("!").pop(), {mid:this._module.issuer.absMid});
-	}
-	if (!absMid) {
-		const rawRequest = this._module.rawRequest.split("!").pop();
-		if (!path.isAbsolute(rawRequest) && !rawRequest.startsWith('.')) {
-			absMid = rawRequest;
-		} else {
-			absMid = path.relative(this._compiler.context, res).replace(/[\\]/g, '/');
-		}
-	}
-	this._module.absMid = this._module.absMid || "dojo/i18n!" + absMid;
 
 	// Determine if this is the default bundle or a locale specific bundle
-	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*)$/;
+	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*?)$/;
 	const resMatch = regex.exec(res);
 	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const requestedLocales = pluginOptions.locales;
@@ -95,11 +78,17 @@ module.exports = function(content) {
 			const availableLocales = getAvailableLocales(requestedLocale, bundle);
 			availableLocales.forEach(loc => {
 				const localeRes = `${resMatch[1]}/nls/${loc}/${resMatch[2]}`;
+				var localeAbsMid;
 				if (absMidMatch) {
-					var localeAbsMid = `${absMidMatch[1]}/nls/${loc}/${absMidMatch[2]}`;
+					localeAbsMid = `${absMidMatch[1]}/nls/${loc}/${absMidMatch[2]}`;
+				} else {
+					localeAbsMid = path.relative(this._compiler.context, localeRes).replace(/[\\]/g, '/');
+				}
+				if (localeAbsMid.endsWith('.js')) {
+					localeAbsMid = localeAbsMid.substring(0, localeAbsMid.length-3);
 				}
 				bundledLocales.push(loc);
-				buf.push(`require("${localeRes}?absMid=${localeAbsMid || path.relative(this._compiler.context, localeRes).replace(/[\\]/g, '/')}");`);
+				buf.push(`require("${localeRes}?absMid=${localeAbsMid}");`);
 			});
 		});
 
