@@ -15,9 +15,10 @@
  */
 const rawLoader = require("raw-loader");
 module.exports = function(source) {
-	// The following has the side-effect of exporting the absMid.  This is needed
-	// so the module can be resolved by name at runtime.  The default absMid
-	// will sufice.
+	// Webpack loader replacements for Dojo loader plugins should provide
+	// an absMid for the module.  For this loader, the default absMid(s) will do,
+	// but the default absMids are provisional and won't be exported to the client
+	// unless we make them non-provisional.  This is done with following call.
 	this._module.addAbsMid();
 
 	this.cacheable && this.cacheable();

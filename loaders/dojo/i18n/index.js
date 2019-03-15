@@ -51,7 +51,17 @@ module.exports = function(content) {
 		return result;
 	}
 
-	this._module.addAbsMid();	// add default absMid
+	// Webpack loader replacements for Dojo loader plugins should provide
+	// an absMid for the module.  For this loader, the default absMid(s) will do,
+	// but the default absMids are provisional and won't be exported to the client
+	// unless we make them non-provisional.  This is done with following call.
+	this._module.addAbsMid();
+	if (!this._module.absMid) {
+		throw new Error(`Dojo i18n loader error: No absMid for module ${this._module.request}
+ requested with ${this._module.rawRequest}.  Try using a non-relative or non-absolute module
+ itentifier (e.g. myPackage/nls/strings.js) for the module or any of it's including modules.`);
+	}
+
 	var bundle = i18nEval(content);
 	var absMid = this._module.absMid.split("!").pop();
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();

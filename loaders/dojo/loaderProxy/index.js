@@ -29,9 +29,13 @@ module.exports = function() {
 	if (!loader) {
 		throw new Error("No loader specified");
 	}
-	const name = query.name ||
-	             this._module.absMid && this._module.absMid.split("!").pop() ||
-							 this._module.request.split("!").pop();
+	const name = query.name || this._module.absMid && this._module.absMid.split("!").pop();
+	if (!name) {
+		throw new Error(`Dojo Loader Proxy error: No absMid for module ${this._module.request}
+ requested with ${this._module.rawRequest}.  Try using a non-relative or non-absolute module
+ itentifier (e.g. myPackage/nls/strings.js) for the module or any of it's including modules,
+ or else use the 'name' query arg.`);
+	}
 	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const deps = query.deps ? query.deps.split(",") : [];
 	const buf = [];
