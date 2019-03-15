@@ -8,7 +8,6 @@
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
 const {Tapable, tap, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat").for("DojoAMDModuleFactoryPlugin.tests");
-const Module = require("webpack/lib/Module");
 const plugin = new DojoAMDModuleFactoryPlugin({});
 
 class Factory extends Tapable {
