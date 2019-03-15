@@ -266,7 +266,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			const existing = {};
 			var absMids = [];
 			compilation.findModule = function() { return existing; };
-			const result = callSyncWaterfall(factory, "module", module);
+			const result = callSyncWaterfall(factory, "module", module, {});
 			result.should.be.eql(module);
 			(typeof result.addAbsMid).should.be.eql('function');
 			(typeof result.filterAbsMids).should.be.eql('function');
@@ -281,7 +281,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			var absMids = [];
 			callSync(factory, "add absMid", originalModule, "a");
 			compilation.findModule = function() { return null; };
-			const result = callSyncWaterfall(factory, "module", delegated);
+			const result = callSyncWaterfall(factory, "module", delegated, {});
 			result.should.be.eql(delegated);
 			result.absMid.should.eql('a');
 			plugin.filterAbsMids(originalModule, absMid => absMids.push(absMid));
