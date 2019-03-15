@@ -274,20 +274,6 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			plugin.filterAbsMids(existing, absMid => absMids.push(absMid));
 			absMids.length.should.eql(1);
 		});
-
-		it("Should copy absMids from original request of delgated modules", function() {
-			const originalModule = new Module("test");
-			const delegated = {originalRequest: originalModule};
-			var absMids = [];
-			callSync(factory, "add absMid", originalModule, "a");
-			compilation.findModule = function() { return null; };
-			const result = callSyncWaterfall(factory, "module", delegated, {});
-			result.should.be.eql(delegated);
-			result.absMid.should.eql('a');
-			plugin.filterAbsMids(originalModule, absMid => absMids.push(absMid));
-			absMids.length.should.eql(1);
-			originalModule.absMid.should.eql('a');
-		});
 	});
 
 	describe("toAbsMid tests", function() {
