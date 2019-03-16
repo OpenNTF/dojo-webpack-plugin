@@ -38,7 +38,11 @@ if (!dojoPath) {
 }
 
 function getLoaderDefaultFeatures() {
-	const version = nodeRequire(path.resolve(dojoPath, "../", "./package.json")).version;
+	const pkg = nodeRequire(path.resolve(dojoPath, "../", "./package.json"));
+	if (pkg.name !== "dojo") {
+		throw new Error(`Expected package.json for 'dojo' but found '${pkg.name}' instead.`);
+	}
+	const version = pkg.version;
 	const versionParts = version.split(".");
 	const majorVersion = parseInt(versionParts[0]), minorVersion = parseInt(versionParts[1]), patchVersion = parseInt(versionParts[2]);
 	if (majorVersion !== 1) {

@@ -11,10 +11,6 @@ module.exports = {
 			loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 		}),
 		new webpack.NormalModuleReplacementPlugin(
-			/fooLoader!/, "foo"
-		),
-		new webpack.NormalModuleReplacementPlugin(
-			/barLoader!bar/, "dojo/text!bar.txt"
-		)
-	]
+			/^test\/fooLoader!/, "dojo/loaderProxy?loader=test/fooLoader!"
+		)	]
 };
