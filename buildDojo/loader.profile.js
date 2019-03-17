@@ -38,10 +38,9 @@ if (!dojoPath) {
 }
 
 function getLoaderDefaultFeatures() {
-	const loaderPath = path.resolve(dojoPath, "../", "./package.json");
-	const pkg = nodeRequire(loaderPath);
+	const pkg = nodeRequire(path.resolve(dojoPath, "../", "./package.json"));
 	if (pkg.name !== "dojo") {
-		throw new Error(`Expected package.json for 'dojo' at '${loaderPath}' but found '${pkg.name}' instead.`);
+		throw new Error(`Expected package.json for 'dojo' but found '${pkg.name}' instead.`);
 	}
 	const version = pkg.version;
 	const versionParts = version.split(".");
