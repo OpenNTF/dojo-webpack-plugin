@@ -22,18 +22,33 @@ const i18nEval = require("../i18nEval");
  */
 module.exports = function(content) {
   this.cacheable && this.cacheable();
+	const banner = `/*
+ * This module was modified by dojo-webpack-plugin to disable some locales
+ * that were excluded by the plugin's 'locales' option
+ */
+`;
   const query = this.query ? loaderUtils.parseQuery(this.query) : {};
-
-  var bundle = i18nEval(content);
-  if (!bundle.root || typeof query.bundledLocales === undefined) {
+  if (typeof query.bundledLocales === 'undefined') {
     return content;
   }
+
+  var bundle = i18nEval(content);
+  if (!bundle.root) {
+    return content;
+  }
+
   const bundledLocales = query.bundledLocales.split("|");
+	let modified = false;
   Object.keys(bundle).forEach(availableLocale => {
     if (availableLocale === "root") return;
-    bundle[availableLocale] = bundle[availableLocale] && bundledLocales.includes(availableLocale);
+		if (bundle[availableLocale]) {
+			if (!bundledLocales.includes(availableLocale)) {
+				bundle[availableLocale] = false;
+				modified = true;
+			}
+		}
   });
-  return `define(${JSON.stringify(bundle,null, 1)})`;
+  return !modified ? content : `${banner}define(${JSON.stringify(bundle,null, 1)})`;
 };
 
 module.exports.seperable = true;
