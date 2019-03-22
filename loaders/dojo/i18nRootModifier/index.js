@@ -28,7 +28,7 @@ module.exports = function(content) {
  */
 `;
   const query = this.query ? loaderUtils.parseQuery(this.query) : {};
-  if (typeof query.bundledLocales === undefined) {
+  if (typeof query.bundledLocales === 'undefined') {
     return content;
   }
 
