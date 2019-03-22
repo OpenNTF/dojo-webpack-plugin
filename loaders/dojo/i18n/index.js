@@ -104,14 +104,7 @@ module.exports = function(content) {
 
 	}
 	const runner = require.resolve(pluginOptions.async ? "./asyncRunner" : "./runner.js").replace(/\\/g, "/");
-	const rootLocales = getAvailableLocales("*", bundle);
-
-	if (rootLocales.length !== bundledLocales.length) {
-		const locs = bundledLocales.toString().replace(/,/g,"|");
-		buf.push(`require("dojo/i18nRootModifier?absMid=${absMid}&bundledLocales=${locs}!${absMid}");`);
-	} else {
-		buf.push(`require("${res}?absMid=${absMid}");`);
-	}
+	buf.push(`require("${res}?absMid=${absMid}");`);
 	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
 	if (pluginOptions.async) {
 		buf.push(`module.exports = Promise.resolve(require("${runner}")("${absMid}", req)).then(function(m){return module.exports=m});`);
