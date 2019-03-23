@@ -6,5 +6,6 @@ define({
 	"fr":true,
 	"fr-fr": false,
 	"es":true,
+	"es-us":true,
 	"de":false
 });

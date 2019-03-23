@@ -1,4 +1,5 @@
 /*
+ * (C) Copyright HCL Technologies Ltd. 2019
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,18 +33,21 @@ module.exports = function(content) {
     return content;
   }
 
-  var bundle = i18nEval(content);
-  if (!bundle.root) {
+	var bundle;
+	try {
+		bundle = i18nEval(content);
+	} catch(ignore__) {}
+  if (!bundle || !bundle.root) {
     return content;
   }
 
-  const bundledLocales = query.bundledLocales.split("|");
+  const requestedLocales = query.bundledLocales.split("|");
 	let modified = false;
-  Object.keys(bundle).forEach(availableLocale => {
-    if (availableLocale === "root") return;
-		if (bundle[availableLocale]) {
-			if (!bundledLocales.includes(availableLocale)) {
-				bundle[availableLocale] = false;
+  Object.keys(bundle).forEach(bundleLocale => {
+    if (bundleLocale === "root") return;
+		if (bundle[bundleLocale]) {
+			if (!requestedLocales.find(loc => loc === bundleLocale || bundleLocale.startsWith(loc + '-'))) {
+				bundle[bundleLocale] = false;
 				modified = true;
 			}
 		}
