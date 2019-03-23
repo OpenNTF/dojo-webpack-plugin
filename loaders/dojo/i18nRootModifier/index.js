@@ -1,4 +1,5 @@
 /*
+ * (C) Copyright HCL Technologies Ltd. 2019
  * (C) Copyright IBM Corp. 2012, 2016 All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,40 +16,45 @@
  */
 const loaderUtils = require("loader-utils");
 const i18nEval = require("../i18nEval");
+const stringify = require("node-stringify");
 
+const localeRegexp = /^[a-z]{2,4}(-([A-Z][a-z]{3}|[0-9]{3}))?(-([A-Z]{2}|[0-9]{3}))?$/;
 /*
  * Modifies the available locales specified in "root" bundles to enable only those locales
  * specified in the bundleLocales query arg.  All other locales will be unavailable.
  */
 module.exports = function(content) {
-  this.cacheable && this.cacheable();
+	this.cacheable && this.cacheable();
 	const banner = `/*
  * This module was modified by dojo-webpack-plugin to disable some locales
  * that were excluded by the plugin's 'locales' option
  */
 `;
-  const query = this.query ? loaderUtils.parseQuery(this.query) : {};
-  if (typeof query.bundledLocales === 'undefined') {
-    return content;
-  }
+	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
+	if (typeof query.bundledLocales === 'undefined') {
+		return content;
+	}
 
-  var bundle = i18nEval(content);
-  if (!bundle.root) {
-    return content;
-  }
+	var bundle;
+	try {
+		bundle = i18nEval(content);
+	} catch(ignore__) {}
+	if (!bundle || !bundle.root) {
+		return content;
+	}
 
-  const bundledLocales = query.bundledLocales.split("|");
+	const requestedLocales = query.bundledLocales.split("|");
 	let modified = false;
-  Object.keys(bundle).forEach(availableLocale => {
-    if (availableLocale === "root") return;
-		if (bundle[availableLocale]) {
-			if (!bundledLocales.includes(availableLocale)) {
-				bundle[availableLocale] = false;
+	Object.keys(bundle).forEach(bundleLocale => {
+		if (bundleLocale === "root" || !localeRegexp.test(bundleLocale)) return;
+		if (bundle[bundleLocale]) {
+			if (!requestedLocales.find(loc => loc === bundleLocale || bundleLocale.startsWith(loc + '-'))) {
+				bundle[bundleLocale] = false;
 				modified = true;
 			}
 		}
-  });
-  return !modified ? content : `${banner}define(${JSON.stringify(bundle,null, 1)})`;
+	});
+	return !modified ? content : `${banner}define(${stringify(bundle,null, 1)})`;
 };
 
 module.exports.seperable = true;
