@@ -22,37 +22,37 @@ const i18nEval = require("../i18nEval");
  * specified in the bundleLocales query arg.  All other locales will be unavailable.
  */
 module.exports = function(content) {
-  this.cacheable && this.cacheable();
+	this.cacheable && this.cacheable();
 	const banner = `/*
  * This module was modified by dojo-webpack-plugin to disable some locales
  * that were excluded by the plugin's 'locales' option
  */
 `;
-  const query = this.query ? loaderUtils.parseQuery(this.query) : {};
-  if (typeof query.bundledLocales === 'undefined') {
-    return content;
-  }
+	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
+	if (typeof query.bundledLocales === 'undefined') {
+		return content;
+	}
 
 	var bundle;
 	try {
 		bundle = i18nEval(content);
 	} catch(ignore__) {}
-  if (!bundle || !bundle.root) {
-    return content;
-  }
+	if (!bundle || !bundle.root) {
+		return content;
+	}
 
-  const requestedLocales = query.bundledLocales.split("|");
+	const requestedLocales = query.bundledLocales.split("|");
 	let modified = false;
-  Object.keys(bundle).forEach(bundleLocale => {
-    if (bundleLocale === "root") return;
+	Object.keys(bundle).forEach(bundleLocale => {
+		if (bundleLocale === "root") return;
 		if (bundle[bundleLocale]) {
 			if (!requestedLocales.find(loc => loc === bundleLocale || bundleLocale.startsWith(loc + '-'))) {
 				bundle[bundleLocale] = false;
 				modified = true;
 			}
 		}
-  });
-  return !modified ? content : `${banner}define(${JSON.stringify(bundle,null, 1)})`;
+	});
+	return !modified ? content : `${banner}define(${JSON.stringify(bundle,null, 1)})`;
 };
 
 module.exports.seperable = true;
