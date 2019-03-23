@@ -16,7 +16,9 @@
  */
 const loaderUtils = require("loader-utils");
 const i18nEval = require("../i18nEval");
+const stringify = require("node-stringify");
 
+const localeRegexp = /^[a-z]{2,4}(-([A-Z][a-z]{3}|[0-9]{3}))?(-([A-Z]{2}|[0-9]{3}))?$/;
 /*
  * Modifies the available locales specified in "root" bundles to enable only those locales
  * specified in the bundleLocales query arg.  All other locales will be unavailable.
@@ -44,7 +46,7 @@ module.exports = function(content) {
 	const requestedLocales = query.bundledLocales.split("|");
 	let modified = false;
 	Object.keys(bundle).forEach(bundleLocale => {
-		if (bundleLocale === "root") return;
+		if (bundleLocale === "root" || !localeRegexp.test(bundleLocale)) return;
 		if (bundle[bundleLocale]) {
 			if (!requestedLocales.find(loc => loc === bundleLocale || bundleLocale.startsWith(loc + '-'))) {
 				bundle[bundleLocale] = false;
@@ -52,7 +54,7 @@ module.exports = function(content) {
 			}
 		}
 	});
-	return !modified ? content : `${banner}define(${JSON.stringify(bundle,null, 1)})`;
+	return !modified ? content : `${banner}define(${stringify(bundle,null, 1)})`;
 };
 
 module.exports.seperable = true;
