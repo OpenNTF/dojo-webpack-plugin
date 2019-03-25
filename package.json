@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.8.4-2",
+  "version": "2.8.4-3",
   "author": "Chuck Dumont",
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
@@ -46,7 +46,9 @@
     "webpack": "4.28.4"
   },
   "nyc": {
-    "reporter": ["text-summary"],
+    "reporter": [
+      "text-summary"
+    ],
     "exclude": [
       "index.js",
       "lib/compat.js",
