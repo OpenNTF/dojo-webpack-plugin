@@ -45,6 +45,12 @@ define([
 				should.fail("Callback should not be called");
 			} catch (e) {}
 		});
+		it("should disable all locales in raw bundle", function() {
+			Object.keys(rawStrings1).forEach(function(key) {
+				if (key === "root") return;
+				("" + key + ":" + rawStrings1[key]).should.be.eql("" + key + (key === "not-a-locale" ? ":0" : ":false"));
+			});
+		});
 	}
 	it("should load language specific nls bundle", function() {
 		frStrings1.hello.should.be.eql(has("empty-locales") ? "Hello" : "Bonjoure");

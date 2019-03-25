@@ -18,7 +18,7 @@ const loaderUtils = require("loader-utils");
 const i18nEval = require("../i18nEval");
 const stringify = require("node-stringify");
 
-const localeRegexp = /^[a-z]{2,4}(-([A-Z][a-z]{3}|[0-9]{3}))?(-([A-Z][a-z]{2}|[0-9]{3}))?$/;
+const localeRegexp = /^[a-z]{2}([_-]([A-Za-z]{2,4}|[0-9]{3}))?([_-]([A-Za-z]{2,4}|[0-9]{3}))?$/;
 /*
  * Modifies the available locales specified in "root" bundles to enable only those locales
  * specified in the bundleLocales query arg.  All other locales will be unavailable.
