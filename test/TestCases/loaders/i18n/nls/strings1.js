@@ -8,5 +8,5 @@ define({
 	"es":true,
 	"es-us":true,
 	"de":false,
-	"not-a-locale": false
+	"not-a-locale": 0
 });

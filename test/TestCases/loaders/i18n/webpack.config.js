@@ -27,7 +27,7 @@ module.exports = (
 				loaderConfig: {
 					paths:{test: "."},
 					has: {"host-browser": 0, "dojo-config-api": 1},
-					locale: locale
+					locale: locale === 'es' ? "es-us" : locale
 				},
 				loader: path.join(__dirname, "../../../js/dojo/dojo.js")
 			})
