@@ -43,6 +43,22 @@
 		return new Promise(dojoPromise);
 	}
 
+	function newAsyncCallback(dojoPromise, cb) {
+		if (typeof cb !== 'function') return cb;
+		if (!dojoPromise.isFulfilled()) return cb;
+		return function() {
+			var args = arguments;
+			var dfd = new Deferred();
+			setTimeout(function() {
+				try {
+					dfd.resolve(cb.apply(null, args));
+				} catch (err) {
+					dfd.reject(err);
+				}
+			}, 0);
+			return dfd.promise;
+		};
+	}
 	Promise = lang.extend(function PromiseWrapper(executor) {
 		if (executor instanceof DojoPromise) {
 			// wrapping an existing Dojo promise
@@ -58,10 +74,20 @@
 		}
 	}, {
 		'catch': function(onRejected) {
-			return wrap(this.promise.otherwise(onRejected));
+			return wrap(this.promise.otherwise(
+				newAsyncCallback(this.promise, onRejected)
+			));
 		},
 		then: function(onFullfilled, onRejected) {
-			return wrap(this.promise.then(onFullfilled, onRejected));
+			return wrap(this.promise.then(
+				newAsyncCallback(this.promise, onFullfilled),
+				newAsyncCallback(this.promise, onRejected)
+			));
+		},
+		finally: function(onSettled) {
+			return wrap(this.promise.always(
+				newAsyncCallback(this.promise, onSettled)
+			));
 		}
 	});
 	Promise.all = function(iterable) {
