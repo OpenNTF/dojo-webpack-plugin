@@ -17,25 +17,25 @@
   <p>Build Dojo 1.x applications with webpack<p>
 </div>
 
-<!-- TOC START min:1 max:3 link:true update:true -->
+<!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-	- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-	- [async](#async)
-	- [loaderConfig](#loaderconfig)
-	- [environment](#environment)
-	- [buildEnvironment](#buildenvironment)
-	- [globalContext](#globalcontext)
-	- [loader](#loader)
-	- [locales](#locales)
-	- [cjsRequirePatterns](#cjsrequirepatterns)
-	- [coerceUndefinedToFalse](#coerceundefinedtofalse)
-	- [noConsole](#noconsole)
+    - [async](#async)
+    - [loaderConfig](#loaderconfig)
+    - [environment](#environment)
+    - [buildEnvironment](#buildenvironment)
+    - [globalContext](#globalcontext)
+    - [loader](#loader)
+    - [locales](#locales)
+    - [cjsRequirePatterns](#cjsrequirepatterns)
+    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
+    - [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -50,7 +50,6 @@
 - [Release Notes](#release-notes)
 - [Known Issues](#known-issues)
 - [Footnotes](#footnotes)
-
 <!-- TOC END -->
 
 # Introduction
