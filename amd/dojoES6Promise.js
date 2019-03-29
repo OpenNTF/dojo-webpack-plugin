@@ -43,9 +43,14 @@
 		return new Promise(dojoPromise);
 	}
 
-	function newAsyncCallback(dojoPromise, cb) {
+	/*
+	 * Dojo promises can resolve synchronously but ES6 promises
+	 * always resolve asynchronously.  Wrapping the callbacks
+	 * with this function ensures that the ES6 behavior is
+	 * adhered to.
+	 */
+	function newAsyncCallback(cb) {
 		if (typeof cb !== 'function') return cb;
-		if (!dojoPromise.isFulfilled()) return cb;
 		return function() {
 			var args = arguments;
 			var dfd = new Deferred();
@@ -75,18 +80,18 @@
 	}, {
 		'catch': function(onRejected) {
 			return wrap(this.promise.otherwise(
-				newAsyncCallback(this.promise, onRejected)
+				newAsyncCallback(onRejected)
 			));
 		},
 		then: function(onFullfilled, onRejected) {
 			return wrap(this.promise.then(
-				newAsyncCallback(this.promise, onFullfilled),
-				newAsyncCallback(this.promise, onRejected)
+				newAsyncCallback(onFullfilled),
+				newAsyncCallback(onRejected)
 			));
 		},
 		finally: function(onSettled) {
 			return wrap(this.promise.always(
-				newAsyncCallback(this.promise, onSettled)
+				newAsyncCallback(onSettled)
 			));
 		}
 	});
