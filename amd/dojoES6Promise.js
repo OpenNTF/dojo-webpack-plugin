@@ -43,6 +43,12 @@
 		return new Promise(dojoPromise);
 	}
 
+	/*
+	 * Dojo promises can resolve synchronously but ES6 promises
+	 * always resolve asynchronously.  Wrapping the callbacks
+	 * with this function ensures that the ES6 behavior is
+	 * adhered to.
+	 */
 	function newAsyncCallback(cb) {
 		if (typeof cb !== 'function') return cb;
 		return function() {
