@@ -17,7 +17,7 @@
   <p>Build Dojo 1.x applications with webpack<p>
 </div>
 
-<!-- TOC START min:1 max:3 link:true update:true -->
+<!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
 	- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
@@ -50,7 +50,6 @@
 - [Release Notes](#release-notes)
 - [Known Issues](#known-issues)
 - [Footnotes](#footnotes)
-
 <!-- TOC END -->
 
 # Introduction
@@ -254,6 +253,8 @@ Promise.resolve(require('myAmdModule')).then(function(myAmdModule) {
 	myAmdModule.doSomething();
 });
 ```
+
+Because async mode depends on ES6 Promise, you need to provide a polyfill on platforms that don't support Promise natively (e.g. IE9).  Note that the amd/dojoES6Promise polyfill provided by this package cannot be used for this purpose because the AMD modules that implement the polyfill (dojo/Deferred, etc.) cannot be loaded without the Promise support.
 
 ##### Wrapped promises
 

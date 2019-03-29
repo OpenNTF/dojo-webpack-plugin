@@ -83,7 +83,7 @@ module.exports = {
 				return id && __webpack_require__(id) || undefined;
 			}
 			var has = findModule("dojo/has", null, true);
-			if (has instanceof Promise) {
+			if (typeof has.then === 'function') {
 				var newPromise = has.then(function(has) { return resolve(has); }); // eslint-disable-line no-shadow
 				newPromise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
 				return newPromise;
