@@ -155,7 +155,8 @@ function runTestCases(casesName) {
 											setTimeout: setTimeout,
 											setInterval: setInterval,
 											clearTimeout: clearTimeout,
-											clearInterval: clearInterval
+											clearInterval: clearInterval,
+											Promise: Promise
 										});
 										context.global = context;
 										context.it = _it;
