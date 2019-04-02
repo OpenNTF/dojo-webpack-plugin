@@ -146,7 +146,7 @@ module.exports = {
 				});
 				if (errors.length === 0) {
 					if (callback) {
-						if (__async__) {
+						if (__async__ && isDefinePromise(modules)) { // eslint-disable-line no-undef
 							Promise.all(wrapPromises(modules)).then(function(deps) { // eslint-disable-line no-undef
 								callback.apply(this, unwrapPromises(deps)); // eslint-disable-line no-undef
 							}.bind(this)).catch(function(err){console.error(err);});
@@ -187,13 +187,13 @@ module.exports = {
 			return Array.isArray(deps) ? result : result[0];
 		}
 
-		function	asyncDefineModule(defArray, defFactory, module, exports) { // eslint-disable-line no-unused-vars
+		function isDefinePromise(values) {
+			return (Array.isArray(values) ? values : [values]).some(function(dep) {
+				return typeof dep === 'object' && dep.__DOJO_WEBPACK_DEFINE_PROMISE__;
+			});
+		}
 
-			function isDefinePromise(values) {
-				return (Array.isArray(values) ? values : [values]).some(function(dep) {
-					return typeof dep === 'object' && dep.__DOJO_WEBPACK_DEFINE_PROMISE__;
-				});
-			}
+		function asyncDefineModule(defArray, defFactory, module, exports) { // eslint-disable-line no-unused-vars
 
 			function setDefinePromise(promise) {
 				promise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
