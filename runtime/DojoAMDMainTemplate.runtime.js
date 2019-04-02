@@ -78,18 +78,9 @@ module.exports = {
 			// integers corresponding to webpack module ids.  Returns a module reference if evaluation of the expression
 			// using the currently defined features returns a module id, or else undefined.
 
-			function resolve(has) {
-				var id = has.normalize(expr, function(arg){return arg;});
-				return id && __webpack_require__(id) || undefined;
-			}
-			var has = findModule("dojo/has", null, true);
-			if (typeof has.then === 'function') {
-				var newPromise = has.then(function(has) { return resolve(has); }); // eslint-disable-line no-shadow
-				newPromise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
-				return newPromise;
-			} else {
-				return resolve(has);
-			}
+			var has = findModule("dojo/has", null, false);
+			var id = has.normalize(expr, function(arg){return arg;});
+			return id && __webpack_require__(id) || undefined;
 		}
 
 		function findModule(mid, referenceModule, noInstall, asModuleObj) {
@@ -137,7 +128,7 @@ module.exports = {
 				// as identifiers (vs. string literals).
 				var noInstall = !(a3 === false);
 				var m = findModule(a1, referenceModule, noInstall);
-				if (a3 !== false && m && m.__DOJO_WEBPACK_DEFINE_PROMISE__) {
+				if (typeof m === 'object' && m.__DOJO_WEBPACK_DEFINE_PROMISE__) {
 					throw new Error('Module not found: ' + a1);
 				}
 				return m;
@@ -156,8 +147,8 @@ module.exports = {
 				if (errors.length === 0) {
 					if (callback) {
 						if (__async__) {
-							Promise.all(asyncWrapDependencies(modules)).then(function(deps) { // eslint-disable-line no-undef
-								callback.apply(this, asyncUnwrapDependencies(deps)); // eslint-disable-line no-undef
+							Promise.all(wrapPromises(modules)).then(function(deps) { // eslint-disable-line no-undef
+								callback.apply(this, unwrapPromises(deps)); // eslint-disable-line no-undef
 							}.bind(this)).catch(function(err){console.error(err);});
 						} else {
 							callback.apply(this, modules);
@@ -182,25 +173,34 @@ module.exports = {
 	},
 
 	async: function() {
-		function asyncWrapDependencies(deps) {
-			return deps.map(function(m) {
+		function wrapPromises(deps) {
+			var result = (Array.isArray(deps) ? deps : [deps]).map(function(m) {
 				return (m && typeof m.then === 'function' && !m.__DOJO_WEBPACK_DEFINE_PROMISE__) ? {__DOJO_WEBPACK_PROMISE_VALUE__: m} : m;
 			});
+			return Array.isArray(deps) ? result : result[0];
 		}
 
-		function asyncUnwrapDependencies(deps) {
-			return deps.map(function(m) {
+		function unwrapPromises(deps) {
+			var result = (Array.isArray(deps) ? deps : [deps]).map(function(m) {
 				return m && m.__DOJO_WEBPACK_PROMISE_VALUE__ || m;
 			});
+			return Array.isArray(deps) ? result : result[0];
 		}
 
 		function	asyncDefineModule(defArray, defFactory, module, exports) { // eslint-disable-line no-unused-vars
-			// Wrap native promise modules (modules who's value is a promise) in a wrapper object so we don't
-			// resolve them.
-			defArray = asyncWrapDependencies(defArray);
-			var promise = Promise.all(defArray).then(function(deps) {
-				// Unwrap wrapped promises
-				deps = asyncUnwrapDependencies(deps);
+
+			function isDefinePromise(values) {
+				return (Array.isArray(values) ? values : [values]).some(function(dep) {
+					return typeof dep === 'object' && dep.__DOJO_WEBPACK_DEFINE_PROMISE__;
+				});
+			}
+
+			function setDefinePromise(promise) {
+				promise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
+				return promise;
+			}
+
+			function defModule(deps) {
 				module && (module.exports = exports);
 				var result =  defFactory.apply(null, deps);
 				if (typeof module === 'function') {
@@ -213,13 +213,16 @@ module.exports = {
 						result = module.exports;
 					}
 				}
-				if (result && typeof result.then === 'function') {
-					result = {__DOJO_WEBPACK_PROMISE_VALUE__: result};
-				}
 				return result;
-			});
-			promise.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
-			return promise;
+			}
+
+			if (!isDefinePromise(defArray)) {
+				return defModule(defArray);
+			} else {
+				return setDefinePromise(Promise.all(wrapPromises(defArray)).then(function(deps) {
+					return unwrapPromises(defModule(unwrapPromises(deps)));
+				}));
+			}
 		}
 	},
 
