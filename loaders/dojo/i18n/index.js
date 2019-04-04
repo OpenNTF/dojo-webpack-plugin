@@ -107,7 +107,9 @@ module.exports = function(content) {
 	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
 	deps.push(`${res}?absMid=${absMid}`);
 	const req = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
-	buf.push(`define(["dojo/i18n", "${runner}","${deps.join("\",\"")}"], function(loader, runner) {`);
+	buf.push(`define(["dojo/i18n", "${runner}"`);
+	deps.forEach(dep => buf.push(`,"${dep}"`));
+	buf.push('], function(loader, runner) {');
 	buf.push(`   return runner(loader, "${absMid}", ${req}, ${(!!pluginOptions.async).toString()});`);
 	buf.push('});');
 	return buf.join("\n");
