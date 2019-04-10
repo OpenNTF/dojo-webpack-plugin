@@ -39,7 +39,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 			"get dojo require"		: ["SyncBail"]
 		});
 		reg(compilation, {
-			"before-chunk-assets" : ["Sync"],
+			"seal" : ["Sync"],
 			"build-module"  : ["SyncBail", "module"]
 		});
 		plugin.apply(compiler);
