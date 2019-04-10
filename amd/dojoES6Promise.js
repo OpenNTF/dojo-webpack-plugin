@@ -96,14 +96,10 @@
 		}
 	});
 	Promise.all = function(iterable) {
-		return wrap(all(array.map(iterable, function(wrapped) {
-			return wrapped instanceof Promise ? wrapped.promise : wrapped;
-		})));
+		return wrap(all(array.map(iterable, function(wrapped) {return wrapped.promise;})));
 	};
 	Promise.race = function(iterable) {
-		return wrap(first(array.map(iterable, function(wrapped) {
-			return wrapped instanceof Promise ? wrapped.promise : wrapped;
-		})));
+		return wrap(first(array.map(iterable, function(wrapped) {return wrapped.promise;})));
 	};
 	Promise.reject = function(reason) {
 		return wrap((new Deferred()).reject(reason));

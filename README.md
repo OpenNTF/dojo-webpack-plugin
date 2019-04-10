@@ -20,26 +20,26 @@
 <!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+	- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-		- [async](#async)
-		- [loaderConfig](#loaderconfig)
-		- [environment](#environment)
-		- [buildEnvironment](#buildenvironment)
-		- [globalContext](#globalcontext)
-		- [loader](#loader)
-		- [locales](#locales)
-		- [cjsRequirePatterns](#cjsrequirepatterns)
-		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
-		- [noConsole](#noconsole)
+	- [async](#async)
+	- [loaderConfig](#loaderconfig)
+	- [environment](#environment)
+	- [buildEnvironment](#buildenvironment)
+	- [globalContext](#globalcontext)
+	- [loader](#loader)
+	- [locales](#locales)
+	- [cjsRequirePatterns](#cjsrequirepatterns)
+	- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+	- [noConsole](#noconsole)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
-- [ES6 Promise polyfill](#es6-promise-polyfill)
+- [ES6 Promise dependency in Webpack 2.x](#es6-promise-dependency-in-webpack-2x)
 - [Order of Plugin Registration](#order-of-plugin-registration)
 - [The global require function](#the-global-require-function)
 - [Use of run-time identifiers and expressions in dependency arrays](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays)
@@ -254,7 +254,7 @@ Promise.resolve(require('myAmdModule')).then(function(myAmdModule) {
 });
 ```
 
-Because async mode depends on ES6 `Promise`, you need to provide a polyfill on platforms that don't support `Promise` natively (e.g. IE11).  You can use the [Dojo ES6 Promise](eS6-promise-polyfill) polyfill for this purpose.
+Because async mode depends on ES6 Promise, you need to provide a polyfill on platforms that don't support Promise natively (e.g. IE9).  Note that the amd/dojoES6Promise polyfill provided by this package cannot be used for this purpose because the AMD modules that implement the polyfill (dojo/Deferred, etc.) cannot be loaded without the Promise support.
 
 ##### Wrapped promises
 
@@ -378,9 +378,9 @@ There are two ways to use the embedded Dojo loader without the config API.
 
 This plugin supports the `dojo-undef-api` feature.  If this feature is enabled in the Dojo loader config's `has` property at build time, then `require.undef` may be called at runtime to remove a module from the list of defined modules.  This generally works only with AMD modules, not CommonJS modules. `require.undef` is primarily useful for test frameworks that need to load and unload modules without having to reload the entire application.
 
-# ES6 Promise polyfill
+# ES6 Promise dependency in Webpack 2.x
 
-Webpack 2.x and greater includes code in your packed application that uses ES6 `Promise`.  If you need to support browsers that lack ES6 `Promise` support (e.g. IE 11), then you will need to provide this capability in your application.  This plugin provides a tiny wrapper module named [dojoES6Promise](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/amd/dojoES6Promise.js) that implements ES6 `Promise` using `dojo/Deferred`.  All you need to do is include this module as an AMD dependency in your application.  See [bootstrap.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/bootstrap.js) in the sample application for an example.
+Webpack 2.x includes code in your packed application that uses ES6 Promise.  If you need to support browsers that lack ES6 Promise support (e.g. IE 11), then you will need to provide this capability in your application.  This plugin provides a tiny wrapper module named [dojoES6Promise](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/amd/dojoES6Promise.js) that implements ES6 Promise using dojo/Deferred.  All you need to do is include this module as an AMD dependency in your application.  See [bootstrap.js](https://github.com/OpenNTF/dojo-webpack-plugin-sample/blob/master/js/bootstrap.js) in the sample application for an example.
 
 # Order of Plugin Registration
 
