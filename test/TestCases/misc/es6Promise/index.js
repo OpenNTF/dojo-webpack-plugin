@@ -89,24 +89,6 @@ define(['amd/dojoES6Promise.js'], function(Promise) {
 		});
 	});
 
-	it("Promise.race should resolve correctly with non-promise entry", function(done) {
-		var promise1 = new Promise(function(resolve) {
-			window.setTimeout(function() {
-				resolve("resolve1");
-			}, 10);
-		});
-		Promise.race([promise1, "resolve2"]).then(function(data) {
-			try {
-				data.should.be.eql("resolve2");
-				done();
-			} catch (err) {
-				done(err);
-			}
-		}).catch(function() {
-			done(new Error("Promise rejected"));
-		});
-	});
-
 	it("Promise.all should resolve correctly" , function(done) {
 		var promise1 = new Promise(function(resolve) {
 			window.setTimeout(function() {
@@ -118,11 +100,10 @@ define(['amd/dojoES6Promise.js'], function(Promise) {
 				resolve("resolve2");
 			}, 100);
 		});
-		Promise.all([promise1, promise2, "resolve3"]).then(function(data) {
+		Promise.all([promise1, promise2]).then(function(data) {
 			try {
 				data[0].should.be.eql("resolve1");
 				data[1].should.be.eql("resolve2");
-				data[2].should.be.eql("resolve3");
 				done();
 			} catch (err) {
 				done(err);

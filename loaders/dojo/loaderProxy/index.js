@@ -40,19 +40,31 @@ module.exports = function() {
  or else use the 'name' query arg.`);
 		}
 	}
-	this._module.addAbsMid(`${toAbsMid(loader)}!${toAbsMid(name)}`);;
+	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
+	const deps = query.deps ? query.deps.split(",") : [];
+	const buf = [];
+	const runner = require.resolve(pluginOptions.async ? "./asyncRunner.js" : "./runner.js").replace(/\\/g, "/");
+	this._module.addAbsMid(`${toAbsMid(loader)}!${toAbsMid(name)}`);
+	buf.push("var runner = require(\"" + runner + "\");");
+	buf.push("var loader = require(\"" + loader + "?absMid=" + toAbsMid(loader)  + "\");");
+	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
+	deps.forEach((dep) => {
+		dep = decodeURIComponent(dep);
+		dep = dep.split("!").map((segment) => {
+			return toAbsMid(segment);
+		}).join("!");
+		buf.push("require(\"" + dep + "?absMid=" + dep.replace(/\!/g, "%21") + "\");");
+	});
+	if (pluginOptions.async) {
+		buf.push(`module.exports = Promise.resolve(runner(loader, "${name}", req)).then(function(m){return module.exports=m});`);
+		buf.push('module.exports.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;');
+	} else {
+		buf.push(`module.exports = runner(loader, "${name}", req);`);
+	}
+
 	this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
 		return !/loaderProxy/.test(absMid);
 	});
-
-	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
-	const buf = [];
-	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
-	const req  = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
-	const deps = query.deps ? query.deps.split(",") : [];
-	buf.push(`define(["${loader}","${runner}","${deps.join("\",\"")}"], function(loader, runner) {`);
-	buf.push(`   return runner(loader, "${name}", ${req}, ${(!!pluginOptions.async).toString()});`);
-	buf.push('});');
 
 	return buf.join("\n");
 };
