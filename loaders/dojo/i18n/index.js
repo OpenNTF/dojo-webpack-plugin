@@ -26,6 +26,7 @@ module.exports = function(content) {
 	// the requested locale.  For example if the requested locale is en-us, then bundle
 	// locales en and en-us and en-us-xyz all match.
 	function getAvailableLocales(requestedLocale, bundle) {
+		/* istanbul ignore if */
 		if (!bundle.root || typeof bundle.root !== 'object') {
 			return [];
 		}
@@ -67,7 +68,7 @@ module.exports = function(content) {
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
 
 	// Determine if this is the default bundle or a locale specific bundle
-	const buf = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*?)$/;
+	const buf = [], deps = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*?)$/;
 	const resMatch = regex.exec(res);
 	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const requestedLocales = pluginOptions.locales;
@@ -98,20 +99,19 @@ module.exports = function(content) {
 					localeAbsMid = localeAbsMid.substring(0, localeAbsMid.length-3);
 				}
 				bundledLocales.push(loc);
-				buf.push(`require("${localeRes}?absMid=${localeAbsMid}");`);
+				deps.push(`${localeRes}?absMid=${localeAbsMid}`);
 			});
 		});
 
 	}
-	const runner = require.resolve(pluginOptions.async ? "./asyncRunner" : "./runner.js").replace(/\\/g, "/");
-	buf.push(`require("${res}?absMid=${absMid}");`);
-	buf.push(`var req = ${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c();`);
-	if (pluginOptions.async) {
-		buf.push(`module.exports = Promise.resolve(require("${runner}")("${absMid}", req)).then(function(m){return module.exports=m});`);
-		buf.push('module.exports.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;');
-	} else {
-		buf.push(`module.exports = require("${runner}")("${absMid}", req);`);
-	}
+	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
+	deps.push(`${res}?absMid=${absMid}`);
+	const req = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
+	buf.push(`define(["dojo/i18n", "${runner}"`);
+	deps.forEach(dep => buf.push(`,"${dep}"`));
+	buf.push('], function(loader, runner) {');
+	buf.push(`   return runner(loader, "${absMid}", ${req}, ${(!!pluginOptions.async).toString()});`);
+	buf.push('});');
 	return buf.join("\n");
 };
 

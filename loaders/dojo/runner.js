@@ -1,5 +1,5 @@
 /*
- * (C) Copyright HCL Technologies Ltd. 2018
+ * (C) Copyright HCL Technologies Ltd. 2019
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module.exports = function(ldr, name, req) {
-	return Promise.resolve(ldr).then(function(loader) {
-		return new Promise(function(resolve) {
-			loader.load(req.toAbsMid(name),  req, function(data) {
-				resolve(data);
-			}, {isBuild:true});
+define([], function() {
+	return function(ldr, name, req, async) {
+		var resolveFn, result, resultSet;
+		ldr.load(name,  req, function(data) {
+			result = data;
+			resultSet = true;
+			if (resolveFn) {
+				resolveFn(data);
+			}
+		}, {isBuild:true});
+		if (resultSet) {
+			return result;
+		} else if (!async) {
+			throw new Error(name + ' unavailable');
+		}
+		result = new Promise(function(resolve) {
+			resolveFn = resolve;
 		});
-	});
-};
+		result.__DOJO_WEBPACK_DEFINE_PROMISE__ = true;
+		return result;
+	};
+});

@@ -5,12 +5,13 @@
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
     "lint": "eslint . --ext .json --ext .md --ext .js",
-    "pretest": "npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
+    "pretest": "npm run clean:test && npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
     "test": "nyc mocha",
     "nopretest": "mocha",
     "travis:test": "npm run -s test",
-    "cover": "nyc report --reporter=html",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "cover": "clean:cover && nyc report --reporter=html",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "clean:test": "rimraf test/js .nyc_output"
   },
   "dependencies": {
     "loader-utils": "1.1.0",
@@ -38,10 +39,11 @@
     "eslint-plugin-json": "^1.4.0",
     "eslint-plugin-markdown": "^1.0.0",
     "fs-extra": "^4.0.2",
-    "nyc": "^13.3.0",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
+    "nyc": "^13.3.0",
     "proxyquire": "^1.8.0",
+    "rimraf": "^2.6.3",
     "should": "^13.2.1",
     "webpack": "4.28.4"
   },
