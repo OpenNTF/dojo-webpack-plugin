@@ -14,35 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const path = require("path");
 const loaderUtils = require("loader-utils");
 const {callSyncBail} = require("webpack-plugin-compat");
 
 module.exports = function() {
 	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
 	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
-
-	function toAbsMid(mid) {
-		let notAbsMid = false;
-		const absMid = mid.split("!").map(part => {
-			const a = part.split('?');
-			a[0] = dojoRequire.toAbsMid(a[0], {mid:issuerAbsMid});
-			notAbsMid = notAbsMid || /^[./\\]/.test(a[0]) || path.isAbsolute(a[0]);
-			return a.join('?');
-		}).join('!');
-		return notAbsMid ? null : absMid;
+	function toAbsMid(request) {
+		return dojoRequire.toAbsMid(request, {mid:issuerAbsMid});
 	}
-	function encode(uri) {
-		return uri.replace(/[!?&]/g, match => '%' + match.charCodeAt(0).toString(16));
-	}
-
-	function decode(url) {
-		return url.replace(/%[0-9A-Fa-f]{2}/g, match => {
-			const code = parseInt(match.substring(1), 16);
-			return (code === 0x21 || code === 0x3F) ? String.fromCharCode(code) : match;
-		});
-	}
-
 	this.cacheable && this.cacheable();
 	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
 	const loader = query.loader;
@@ -60,28 +40,17 @@ module.exports = function() {
  or else use the 'name' query arg.`);
 		}
 	}
-	const loaderAbsMid = toAbsMid(loader);
-	const nameAbsMid = toAbsMid(name);
-	if (loaderAbsMid && nameAbsMid) {
-		this._module.addAbsMid(`${loaderAbsMid}!${nameAbsMid}`);;
-		this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
-			return !/loaderProxy/.test(absMid);
-		});
+	if (typeof query.name === 'string') {
+		this._module.addAbsMid(`${toAbsMid(loader)}!${toAbsMid(name)}`);
 	}
-
+	this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
+		return !/loaderProxy/.test(absMid);
+	});
 	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const buf = [];
 	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
 	const req  = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
-
-	// Get dependencies from query arg.  Note that we set the absMid for the dependency using the
-	// absMid query arg in the request so that we'll be able to find the module at runtime using
-	// the absMid name even if the module has been renamed by aliasing or the NormalModuleReplacement
-	// plugin.
-	const deps = (query.deps ? query.deps.split(",") : []).map(dep => {
-		const absMid = toAbsMid(decode(dep));
-		return dep + (absMid ? '?absMid=' + encode(absMid) : '');
-	});
+	const deps = query.deps ? query.deps.split(",") : [];
 
 	buf.push(`define(["${loader}","${runner}","${deps.join("\",\"")}"], function(loader, runner) {`);
 	buf.push(`   return runner(loader, "${name}", ${req}, ${(!!pluginOptions.async).toString()});`);
