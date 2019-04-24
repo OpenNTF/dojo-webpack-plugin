@@ -21,7 +21,7 @@ module.exports = function() {
 	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
 	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
 	function toAbsMid(request) {
-		return dojoRequire.toAbsMid(request, {mid:issuerAbsMid});
+		return request.split('!').map(part => dojoRequire.toAbsMid(part, {mid:issuerAbsMid})).join('!');
 	}
 	this.cacheable && this.cacheable();
 	const query = this.query ? loaderUtils.parseQuery(this.query) : {};
@@ -50,8 +50,10 @@ module.exports = function() {
 	const buf = [];
 	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
 	const req  = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
-	const deps = query.deps ? query.deps.split(",") : [];
-
+	const deps = (query.deps ? query.deps.split(",") : []).map(dep => {
+		dep = decodeURIComponent(dep);
+		return `${dep}?absMid=${toAbsMid(dep).replace(/\!/g, "%21")}`;
+	});
 	buf.push(`define(["${loader}","${runner}","${deps.join("\",\"")}"], function(loader, runner) {`);
 	buf.push(`   return runner(loader, "${name}", ${req}, ${(!!pluginOptions.async).toString()});`);
 	buf.push('});');
