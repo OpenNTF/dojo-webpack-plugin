@@ -258,7 +258,7 @@ Because async mode depends on ES6 `Promise`, you need to provide a polyfill on p
 
 ##### Wrapped promises
 
-This section is for the special (and hopefully rare) case of requiring, from CommonJS code, an AMD module that itself returns a promise as the module value.  If you're not doing this in your code, then you can ignore this section.
+This section is for the special (and hopefully rare) case of requiring, from CommonJS code, an AMD module that itself returns a promise as the module value.  It applies only when the `async` option is true.  If you're not doing this in your code, then you can ignore this section.
 
 dojo-webpack-plugin wraps module value promises (actually, any thenable) in a non-promise object.  This is done in order to prevent promise chaining from replacing the promise with the resolved value before it is provided to the caller.  Promise wrapping and unwrapping happens transparently within AMD modules, so you don't need to be concerned with it.  When an AMD module is required from CommonJS code, however, then the promise wrapper can be exposed and you need to take steps to deal with it, as shown in the following example:
 
