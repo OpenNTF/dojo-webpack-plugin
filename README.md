@@ -1,4 +1,3 @@
-[![npm][npm]][npm-url]
 [![builds][builds]][builds-url]
 [![coverage][cover]][cover-url]
 [![licenses][licenses]][licenses-url]
@@ -13,6 +12,7 @@
   <img width="200" height="200" vspace="" hspace="25" alt="webpack" title="webpack"
       src="https://cdn.worldvectorlogo.com/logos/webpack-icon.svg">
   </a>
+	[![npm][npm]][npm-url]
   <h1>dojo-webpack-plugin</h1>
   <p>Build Dojo 1.x applications with webpack<p>
 </div>
@@ -20,22 +20,23 @@
 <!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-    - [async](#async)
-    - [loaderConfig](#loaderconfig)
-    - [environment](#environment)
-    - [buildEnvironment](#buildenvironment)
-    - [globalContext](#globalcontext)
-    - [loader](#loader)
-    - [locales](#locales)
-    - [cjsRequirePatterns](#cjsrequirepatterns)
-    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
-    - [noConsole](#noconsole)
+		- [async](#async)
+		- [loaderConfig](#loaderconfig)
+		- [environment](#environment)
+		- [buildEnvironment](#buildenvironment)
+		- [globalContext](#globalcontext)
+		- [loader](#loader)
+		- [locales](#locales)
+		- [cjsRequirePatterns](#cjsrequirepatterns)
+		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+		- [noConsole](#noconsole)
+		- [runtimeFeatures](#runtimefeatures)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -183,7 +184,9 @@ For complex feature expressions that contain a mixture of defined and undefined 
 
 This plugin defines the `webpack` feature with a value of true if it is not already defined by the app.
 
-The **dojo-webpack-plugin** option `coerceUndefinedToFalse` can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
+The [coerceUndefinedToFalse](#coerceundefinedtofalse) option can be used to cause undefined features to evaluate to false at build time.  If this options is true, then there will be no conditional load expressions in the generated code.
+
+The [runtimeFeatures](#runtimeFeatures) option allows you to change the values of selected, statically defined, features at runtime for testing purposes.
 
 You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-plugin) if you want to perform has.js filtering of source code at build time using statically defined features.  
 
@@ -317,6 +320,12 @@ This property is optional.  If the value is truthy, then undefined features will
 ### noConsole
 
 This property is optional.  If the value is truthy, then console output from building the Dojo loader will be suppressed.
+
+### runtimeFeatures
+
+This property is optional.  If specified, it is an array of strings which specifies the names of features (`has!` loader conditionals) that are to be evaluated at run time rather than at build time, even if the feature is assigned a value at build time.
+
+You would typically want to specify this option when running unit tests and your tests use `require.undef()` to undefine modules and then load them again using `require()` with different values for the features.  Normally, if a feature is given a value at build time (e.g. in the loader config), then the `has!` loader conditional is fixed and cannot be changed at run time.  With this option, the initial values of the specified features will be those assigned by the build, but you'll be able to change the values of these features and the `has!` loader conditionals in the dependency array of the module that's being loaded or reloaded will work as expected.  
 
 # Building the Dojo loader
 
