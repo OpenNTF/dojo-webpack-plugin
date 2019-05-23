@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /* globals module loaderScope __webpack_require__ __async__ installedModules globalRequireContext Promise */
+ /* globals module loaderScope __webpack_require__ __async__ installedModules Promise */
 
 module.exports = {
 	main: function() {
@@ -252,9 +252,6 @@ module.exports = {
 
 	undef: function() {
 		function undef(mid, referenceModule) { // eslint-disable-line no-unused-vars
-			if (!referenceModule && globalRequireContext) {
-				referenceModule = globalRequireContext + 'x';		// global require
-			}
 			var module = findModule(mid, referenceModule, true, true); // eslint-disable-line no-undef
 			if (module) {
 				delete installedModules[module.i];
