@@ -219,8 +219,8 @@ module.exports = {
 			if (!isDefinePromise(defArray)) {
 				return defModule(defArray);
 			} else {
-				return setDefinePromise(Promise.all(wrapPromises(defArray)).then(function(deps) {
-					return unwrapPromises(defModule(unwrapPromises(deps)));
+				return setDefinePromise(Promise.all(defArray).then(function(deps) {
+					return wrapPromises(defModule(unwrapPromises(deps)));
 				}));
 			}
 		}
