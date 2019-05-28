@@ -22,11 +22,15 @@
  * the package directory (e.g. ../../something), then toAbsMid returns an
  * irrational path.  To work around this issue, we do the following:
  *
- * 1. Replace the main path used by Dojo with 'main', saving the real
+ * 1. Replace the main path used by Dojo with an empty string, saving the real
  *    main path in the 'realMain' property.  The causes Dojo's toAbsMid to return
- *    an absMid like 'packageName/main'.
+ *    an absMid like 'packageName/'.
  *
- * 2. In our patched implementation of toUrl, we call the Dojo implementation
+ * 2. In our patched implementation of toAbsMid, we remove the traling slash
+ *    before returning the result to the user so that the absMid for a package
+ *    is just the package name.
+ *
+ * 3. In our patched implementation of toUrl, we call the Dojo implementation
  *    and fixup the url using the path saved in the 'realMain' property.
  */
 module.exports = function() {
@@ -40,14 +44,23 @@ module.exports = function() {
 				&& typeof pkg.realMain === 'undefined'	// hasn't already been adjusted
 		) {
 			pkg.realMain = pkg.main;
-			pkg.main = 'main';
+			pkg.main = '';
 		}
 	});
+	function toAbsMid(name, referenceModule) {
+		var absMid = loaderScope.require.originalToAbsMid(name, referenceModule);
+		if (absMid.indexOf('/') === absMid.length-1) {
+			var pkgName = absMid.substring(0, absMid.length-1);
+			var pkg = loaderScope.require.packs[pkgName];
+			if (pkg && pkg.realMain) {
+				absMid = pkgName;
+			}
+		}
+		return absMid;
+	}
 	function toUrl(name, referenceModule) {
-		var absMid = loaderScope.require.toAbsMid(name, referenceModule);
-		var url = loaderScope.require.originalToUrl(absMid, referenceModule);
-		var match = /^([^/]*)\/main$/.exec(absMid);
-		var pkg = match && match[1] && loaderScope.require.packs[match[1]];
+		var url = loaderScope.require.originalToUrl(name, referenceModule);
+		var pkg = loaderScope.require.packs[name];
 		if (pkg && pkg.realMain) {
 			var parts = url.split('?');
 			if (/(^\/)|(\:)/.test(pkg.realMain)) {
@@ -55,7 +68,7 @@ module.exports = function() {
 				parts[0] = pkg.realMain;
 			} else {
 				// relative URL
-				parts[0] = parts[0].replace(/main$/, '') + pkg.realMain;
+				parts[0] = parts[0] + '/' + pkg.realMain;
 			}
 			url = parts.join('?');
 		}
@@ -63,5 +76,6 @@ module.exports = function() {
 	}
 	loaderScope.require.originalToAbsMid = loaderScope.require.toAbsMid;
 	loaderScope.require.originalToUrl = loaderScope.require.toUrl;
+	loaderScope.require.toAbsMid = toAbsMid;
 	loaderScope.require.toUrl = toUrl;
 };
