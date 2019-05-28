@@ -5,8 +5,12 @@ define(['dojo/has', 'foo', 'bar', 'foo/relPathTests', 'bar/relPathTests'], funct
 	});
 
 	it("should return correct value from toUrl", function()  {
-		require.toUrl("foo/main").should.be.eql('sub/foo/../../sub/bar/main');
-		require.toUrl("bar/main").should.be.eql('sub/bar/main');
+		var fooAbsMid = require.toAbsMid("foo");
+		var barAbsMid = require.toAbsMid("bar");
+		fooAbsMid.should.be.eql("foo");
+		barAbsMid.should.be.eql("bar/main");
+		require.toUrl(fooAbsMid).should.be.eql('sub/foo/../../sub/bar/main');
+		require.toUrl(barAbsMid).should.be.eql('sub/bar/main');
 	});
 
 	it ("should run relPath tests successfully", function() {
