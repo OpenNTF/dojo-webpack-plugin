@@ -18,7 +18,7 @@
     "node-stringify": "0.2.1",
     "raw-loader": "0.5.1",
     "tmp": "0.0.30",
-    "webpack-plugin-compat": "1.0.1"
+    "webpack-plugin-compat": "1.0.3"
   },
   "peerDependencies": {
     "webpack": ">= 2.2.0 < 4.0.0 || >= 4.2.0",
