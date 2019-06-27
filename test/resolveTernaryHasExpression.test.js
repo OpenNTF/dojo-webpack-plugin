@@ -176,6 +176,12 @@ describe("resolveTernaryHasExpression", function() {
 		deps.length.should.be.eql(1);
 		deps[0].should.be.eql("^f1^f2");
 
+		features = {f2:false};
+		result = resolve(expression, deps, props);
+		result.should.be.eql("f1?:%%0");
+		deps.length.should.be.eql(1);
+		deps[0].should.be.eql("^f1^f2");
+
 		features = {f1: true, f2: true};
 		var result = resolve(expression, deps, props);
 		result.should.be.eql("f1f2");
@@ -217,6 +223,18 @@ describe("resolveTernaryHasExpression", function() {
 		deps.length.should.be.eql(1);
 		deps[0].should.be.eql("^f1f2");
 
+		features = {f2:true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("f1?:%%0");
+		deps.length.should.be.eql(1);
+		deps[0].should.be.eql("^f1f2");
+
+		features = {f2:false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("f1?%%0");
+		deps.length.should.be.eql(1);
+		deps[0].should.be.eql("f1^f2");
+
 		features = {f1: true, f2: true};
 		var result = resolve(expression, deps, props);
 		result.should.be.eql("");
@@ -236,6 +254,78 @@ describe("resolveTernaryHasExpression", function() {
 		var result = resolve(expression, deps, props);
 		result.should.be.eql("^f1f2");
 		deps.length.should.be.eql(0);
+
+	});
+
+	it("Should resolve no-module expressions correctly", function() {
+		var deps = [];
+
+		var expression = "has!f1?f1";
+		features = {f1: false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		var expression = "has!f1?f2?f1f2";
+		features = {f1: false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		features = {f2: false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		expression = "has!f1?f2?f3?f1f2f3";
+		features = {f1: false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		features = {f2: false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		features = {f3: false};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		var expression = "has!f1?:^f1";
+		features = {f1: true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		var expression = "has!f1?:f2?:^f1^f2";
+		features = {f1: true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		features = {f2: true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		expression = "has!f1?:f2?:f3?:^f1^f2^f3";
+		features = {f1: true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		features = {f2: true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
+		features = {f3: true};
+		var result = resolve(expression, deps, props);
+		result.should.be.eql("");
+		deps.length.should.be.eql(0);
+
 
 	});
 });
