@@ -5,6 +5,7 @@ define([], function() {
 	  }),
 		"fr":true,
 		"es":false,
-		"de":true
+		"de":true,
+		"it":true
 	};
 });

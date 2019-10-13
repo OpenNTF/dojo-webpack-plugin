@@ -28,6 +28,8 @@ define([
 				case 'es':	hello = "Hola"; break;
 				case 'es-us':	hello = "Hola (US)"; break;
 				case 'en-au': hello = "G'day";
+				case 'it': hello = "Ciao"; goodby = "Bene da"; break;
+				case 'it-ch': hello = "Ciao (ch)"; goodby = "Bene da"; break;
 			}
 		}
 		strings1.hello.should.be.eql(hello);

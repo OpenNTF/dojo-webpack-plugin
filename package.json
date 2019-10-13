@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint . --ext .json --ext .md --ext .js",
     "pretest": "npm run clean:test && npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
-    "test": "nyc mocha",
+    "test": "nyc node_modules/mocha/bin/mocha",
     "nopretest": "mocha",
     "travis:test": "npm run -s test",
     "cover": "clean:cover && nyc report --reporter=html",

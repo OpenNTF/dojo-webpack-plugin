@@ -43,12 +43,16 @@ module.exports = function(content) {
 		return content;
 	}
 
+	function isLocaleMatch(a, b) {
+		return a === b || a.startsWith(b + '-') || b.startsWith(a + '-');
+	}
+
 	const requestedLocales = query.bundledLocales.split("|");
 	let modified = false;
 	Object.keys(bundle).forEach(bundleLocale => {
 		if (bundleLocale === "root" || !localeRegexp.test(bundleLocale)) return;
 		if (bundle[bundleLocale]) {
-			if (!requestedLocales.find(loc => loc === bundleLocale || bundleLocale.startsWith(loc + '-'))) {
+			if (!requestedLocales.find(loc => isLocaleMatch(loc, bundleLocale))) {
 				bundle[bundleLocale] = false;
 				modified = true;
 			}
