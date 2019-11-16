@@ -20,23 +20,23 @@
 <!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+	- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-    - [async](#async)
-    - [loaderConfig](#loaderconfig)
-    - [environment](#environment)
-    - [buildEnvironment](#buildenvironment)
-    - [globalContext](#globalcontext)
-    - [loader](#loader)
-    - [locales](#locales)
-    - [cjsRequirePatterns](#cjsrequirepatterns)
-    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
-    - [noConsole](#noconsole)
-    - [runtimeFeatures](#runtimefeatures)
+	- [async](#async)
+	- [loaderConfig](#loaderconfig)
+	- [environment](#environment)
+	- [buildEnvironment](#buildenvironment)
+	- [globalContext](#globalcontext)
+	- [loader](#loader)
+	- [locales](#locales)
+	- [cjsRequirePatterns](#cjsrequirepatterns)
+	- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+	- [noConsole](#noconsole)
+	- [runtimeFeatures](#runtimefeatures)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -335,7 +335,21 @@ If you do not want to build the Dojo loader every time Webpack is run, then you 
 
         node node_modules/dojo-webpack-plugin/buildDojo/build.js node_modules/dojo/dojo.js ./release
 
-The example above will build the loader and place it in the `./release` directory, relative to the current directory.  
+You can also build the loader from a Node script as shown below.  Note that `buildLoader` is declared `async` and so can also be called with `await`.
+
+```javascript
+const buildLoader = require('dojo-webpack-loader').buildLoader;
+buildLoader({
+	dojoPath: "node_modules/dojo/dojo.js",
+	releaseDir: "./release"
+}).then(() => {
+  console.log("loader built");
+}).catch(err => {
+  console.error(err);
+});
+```
+
+The examples above will build the loader and place it in the `./release` directory, relative to the current directory.  
 
 To have Webpack use the built loader, specify the location of the loader in the plugin options as follows:
 
@@ -355,6 +369,8 @@ plugins: [
 By default, the embedded loader is built using the static features defined [here](https://github.com/OpenNTF/dojo-webpack-plugin/blob/master/buildDojo/loaderDefaultFeatures.js).  You may override these features by providing an optional, third argument to the build script which specifies the features you want to override as a JSON string.  For example, if you specify the [loaderConfig](#loaderconfig) option as an object, or a function that returns an object (as opposed to specifying it as a module name), then you can make the embedded loader smaller by omitting the config api.  See [The `dojo-config-api` feature](#the-dojo-config-api-feature).  This would be done as follows:
 
       node node_modules/dojo-webpack-plugin/buildDojo/build.js node_modules/dojo/dojo.js ./release {\"dojo-config-api\":false}
+
+Or, if calling the `buildLoader` function in Node, specify the `has` property as an object map of feature name/value pairs.
 
 # The `dojo-config-api` feature
 

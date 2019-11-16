@@ -37,7 +37,7 @@ async function buildLoader(params) {
 			"--releaseDir",
 			path.resolve(params.releaseDir),
 			"--has",
-			JSON.stringify(params.featureOverrides || {})
+			JSON.stringify(params.has || {})
 		],
 		{
 			silent: true
