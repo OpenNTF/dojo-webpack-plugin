@@ -9,11 +9,10 @@
 const proxyquire = require("proxyquire");
 const {reg, tap, Tapable} = require("webpack-plugin-compat").for("DojoLoaderPlugin.test");
 
-const tmpStub = {}, child_processStub = {};
+const tmpStub = {};
 
 const DojoLoaderPlugin = proxyquire("../lib/DojoLoaderPlugin", {
-	tmp: tmpStub,
-	child_process: child_processStub
+	tmp: tmpStub
 });
 var plugin;
 describe("DojoLoaderPlugin tests", function() {
@@ -32,10 +31,6 @@ describe("DojoLoaderPlugin tests", function() {
 		Object.keys(tmpStub).forEach(key => {
 			delete tmpStub[key];
 		});
-		Object.keys(child_processStub).forEach(key => {
-			delete child_processStub[key];
-		});
-
 	});
 	describe("getOrCreateEmbeddedLoader edge cases", function() {
 
@@ -50,12 +45,8 @@ describe("DojoLoaderPlugin tests", function() {
 			});
 		});
 		it("Should call callback with error returned by exec", function(done) {
-			var error = new Error("Error from execFile");
-			child_processStub.execFile = function(executable__, options__, callback) {
-				callback(error, "", "Error from execFile");
-			};
 			plugin.getOrCreateEmbeddedLoader("path", {baseUrl:'.'}, {}, err => {
-				err.should.be.eql(error);
+				err.message.should.match(/Cannot find module/);
 				done();
 			});
 		});
