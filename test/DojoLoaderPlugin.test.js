@@ -46,7 +46,7 @@ describe("DojoLoaderPlugin tests", function() {
 		});
 		it("Should call callback with error returned by exec", function(done) {
 			plugin.getOrCreateEmbeddedLoader("path", {baseUrl:'.'}, {}, err => {
-				err.message.should.match(/Cannot find module/);
+				err.message.should.match(/Cannot find module|ENOENT/);
 				done();
 			});
 		});
