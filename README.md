@@ -2,6 +2,7 @@
 [![coverage][cover]][cover-url]
 [![licenses][licenses]][licenses-url]
 [![Apache 2.0 License][apache2]][apache2-url]
+[![npm][npm]][npm-url]
 
 <div align="center">
   <a href="https://dojotoolkit.org">
@@ -12,7 +13,6 @@
   <img width="200" height="200" vspace="" hspace="25" alt="webpack" title="webpack"
       src="https://cdn.worldvectorlogo.com/logos/webpack-icon.svg">
   </a>
-	[![npm][npm]][npm-url]
   <h1>dojo-webpack-plugin</h1>
   <p>Build Dojo 1.x applications with webpack<p>
 </div>
