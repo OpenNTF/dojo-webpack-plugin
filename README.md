@@ -335,7 +335,7 @@ If you do not want to build the Dojo loader every time Webpack is run, then you 
 
         node node_modules/dojo-webpack-plugin/buildDojo/build.js node_modules/dojo/dojo.js ./release
 
-You can also build the loader from a Node script as shown below.  Note that `buildLoader` is declared `async` and so can also be called with `await`.
+You can also build the loader from a Node script as shown below.
 
 ```javascript
 const buildLoader = require('dojo-webpack-loader').buildLoader;

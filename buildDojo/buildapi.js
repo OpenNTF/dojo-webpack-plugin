@@ -24,7 +24,7 @@ const fork = require("child_process").fork;
  *  featureOverrides - Overrides to ./loaderDefaultFeatures.js
  *  noConsole  - True to suppress stdout from the builder
  */
-async function buildLoader(params) {
+function buildLoader(params) {
 	const ls = fork(
 		path.resolve(__dirname, "buildRunner.js"),
 		[
