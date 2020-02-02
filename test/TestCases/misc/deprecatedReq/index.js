@@ -6,24 +6,25 @@ define(["test/dep"], function(dep) {
 	it("should compile", function(done) {
 		done();
 	});
-	it("should output console warning for use of deprecated req", function() {
+	describe("Test use of deprecated ScopeRequirePlugin", function() {
 		var msg;
-		console.warn = function(message) {
-			msg = message;
-		};
-		dep.should.be.eql("dep");
-		require("test/dep").should.be.eql(dep);
-		msg.should.containEql("req is deprecated");
-	});
+		beforeEach(function() {
+			msg = null;
+			console.warn = function(message) {
+				msg = message;
+			};
+		});
+		it("should output console warning for use of deprecated req", function() {
+			dep.should.be.eql("dep");
+			require("test/dep").should.be.eql(dep);
+			msg.should.containEql("req is deprecated");
+		});
 
-	it("should output console warning for accessing deprecated property", function() {
-		// make sure accessing a property emits console warning
-		var msg;
-		console.warn = function(message) {
-			msg = message;
-		};
-		var rawConfig = require.rawConfig;
-		msg.should.containEql("req is deprecated");
-		rawConfig.paths.test.should.be.eql('.');
+		it("should output console warning for accessing deprecated property", function() {
+			// make sure accessing a property emits console warning
+			var rawConfig = require.rawConfig;
+			msg.should.containEql("req is deprecated");
+			rawConfig.paths.test.should.be.eql('.');
+		});
 	});
 });
