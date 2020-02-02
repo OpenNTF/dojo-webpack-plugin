@@ -24,6 +24,7 @@ var path = require("path");
 var fs = require("fs");
 var vm = require("vm");
 var Test = require("mocha/lib/test");
+var Suite = require("mocha/lib/suite");
 var cloneDeep = require("clone-deep");
 var DojoWebackPlugin = require("../index");
 
@@ -130,11 +131,32 @@ function runTestCases(casesName) {
 								if(checkArrayExpectation(testDirectory, jsonStats, "warning", "Warning", done)) return;
 								var exportedTests = 0;
 
+								const suites = [suite];
 								function _it(title, fn) {
 									var test = new Test(title, fn);
-									suite.addTest(test);
+									suites[0].addTest(test);
 									exportedTests++;
 									return test;
+								}
+								function _describe(title, fn) {
+									const newSuite = new Suite(title, fn);
+									suites[0].addSuite(newSuite);
+									suites.unshift(newSuite);
+									fn();
+									suites.shift();
+									return newSuite;
+								}
+								function _beforeEach(fn) {
+									suites[0].beforeEach(fn);
+								}
+								function _beforeAll(fn) {
+									suites[0].beforeAll(fn);
+								}
+								function _afterEach(fn) {
+									suites[0].afterEach(fn);
+								}
+								function _afterAll(fn) {
+									suites[0].afterAll(fn);
 								}
 
 								var filesCount = 0;
@@ -156,10 +178,15 @@ function runTestCases(casesName) {
 											setInterval: setInterval,
 											clearTimeout: clearTimeout,
 											clearInterval: clearInterval,
-											Promise: Promise
+											Promise: Promise,
+											it: _it,
+											describe: _describe,
+											beforeEach: _beforeEach,
+											beforeAll: _beforeAll,
+											afterEach: _afterEach,
+											afterAll: _afterAll
 										});
 										context.global = context;
-										context.it = _it;
 										Object.defineProperty(context, "should", {
 									    set: function() {},
 									    get: function() {
