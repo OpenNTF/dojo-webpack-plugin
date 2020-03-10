@@ -32,7 +32,7 @@
   "devDependencies": {
     "clone-deep": "^3.0.1",
     "coveralls": "^3.0.5",
-    "dojo": "1.16.0",
+    "dojo": "1.16.2",
     "dojo-util": "1.16.0",
     "eslint": "^5.16.0",
     "eslint-plugin-es5": "^1.4.1",
