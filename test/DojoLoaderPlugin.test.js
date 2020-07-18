@@ -7,25 +7,30 @@
  * changes are not related to the paths being tested.
  */
 const proxyquire = require("proxyquire");
-const {reg, tap, Tapable} = require("webpack-plugin-compat").for("DojoLoaderPlugin.test");
+const {reg, tap, callSync, Tapable} = require("webpack-plugin-compat").for("DojoLoaderPlugin.test");
 
 const tmpStub = {};
 
 const DojoLoaderPlugin = proxyquire("../lib/DojoLoaderPlugin", {
 	tmp: tmpStub
 });
-var plugin;
+var plugin, options;
 describe("DojoLoaderPlugin tests", function() {
 	var compiler;
 	beforeEach(function() {
-		plugin = new DojoLoaderPlugin({loaderConfig:{}, noConsole:true});
+		options = {loaderConfig:{}, noConsole:true};
+		plugin = new DojoLoaderPlugin(options);
 		compiler = new Tapable();
 		compiler.context = '.';
-		reg(compiler, {"get dojo config" : ["SyncBail"]});
+		reg(compiler, {
+			"compilation" : ["Sync", "compilation", "params"],
+			"run" : ["AsyncSeries"],
+			"watch-run" : ["AsyncSeries"]
+		});
+		plugin.apply(compiler);
 		tap(compiler, {"get dojo config" : () => {
 			return {};
 		}});
-		plugin.compiler = compiler;
 	});
 	afterEach(function() {
 		Object.keys(tmpStub).forEach(key => {
@@ -131,6 +136,17 @@ describe("DojoLoaderPlugin tests", function() {
 		it("should return typeof string for loader expression when no expression object is passed", function() {
 			const result = plugin.evaluateTypeofLoader();
 			result.string.should.be.eql("string");
+		});
+	});
+	describe("skip compilation step", function() {
+		it("should skip compilation step", function() {
+			var isSkipCompilationsCalled;
+			options.isSkipCompilation = () => {
+				isSkipCompilationsCalled = true;
+				return true;
+			};
+			callSync(compiler, "compilation", {});
+			isSkipCompilationsCalled.should.be.eql(true);
 		});
 	});
 });

@@ -7,41 +7,56 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDMainTemplatePlugin = require("../lib/DojoAMDMainTemplatePlugin");
-const {reg, Tapable} = require("webpack-plugin-compat");
-const plugin = new DojoAMDMainTemplatePlugin({});
+const {reg,callSync, Tapable} = require("webpack-plugin-compat");
 
 describe("DojoAMDMainTemplatePlugin tests", function() {
-	const compilation = new Tapable();
-	compilation.chunkTemplate = new Tapable();
-	compilation.modules = {
-		find: function() { return null; }
-	};
-	reg(compilation.chunkTemplate, {"renderAbsMids" : ["SyncWaterfall", "source", "chunk"]});
-	compilation.mainTemplate = Object.assign(new Tapable(), {
-		requireFn:  "__webpack_require__",
-		outputOptions: {
-			jsonpFunction: "webpackJsonpFunction",
-			globalObject: "window"
-		}
-	});
-	reg(compilation.mainTemplate, {
-		"dojo-global-require" : ["SyncWaterfall", "source"]
-	});
-	const chunk = {
-		groupsIterable: []
-	};
-	plugin.indent = (string) => string,
-
-	plugin.compilation = compilation;
-	describe("dojo-require-extensions test", function() {
-		it("Should throw if dojo loader is not available", function(done) {
-			try {
-				plugin.dojoRequireExtensions("", chunk);
-				done(new Error("Shouldn't get here"));
-			} catch (err) {
-				err.message.should.match(/Can't locate [^\s]+ in compilation/);
-				done();
+	it("Should throw if dojo loader is not available", function(done) {
+		const plugin = new DojoAMDMainTemplatePlugin({});
+		const compilation = new Tapable();
+		compilation.chunkTemplate = new Tapable();
+		compilation.modules = {
+			find: function() { return null; }
+		};
+		reg(compilation.chunkTemplate, {"renderAbsMids" : ["SyncWaterfall", "source", "chunk"]});
+		compilation.mainTemplate = Object.assign(new Tapable(), {
+			requireFn:  "__webpack_require__",
+			outputOptions: {
+				jsonpFunction: "webpackJsonpFunction",
+				globalObject: "window"
 			}
 		});
+		reg(compilation.mainTemplate, {
+			"dojo-global-require" : ["SyncWaterfall", "source"]
+		});
+		const chunk = {
+			groupsIterable: []
+		};
+		plugin.indent = (string) => string,
+		plugin.compilation = compilation;
+		try {
+			plugin.dojoRequireExtensions("", chunk);
+			done(new Error("Shouldn't get here"));
+		} catch (err) {
+			err.message.should.match(/Can't locate [^\s]+ in compilation/);
+			done();
+		}
+	});
+	it("should skip compilation", function() {
+		var isSkipCompilationCalled = false;
+		const options = {
+			isSkipCompilation: () => {
+				isSkipCompilationCalled = true;
+				return true;
+			}
+		};
+		var compiler = new Tapable();
+		reg(compiler, {
+			"embedded-dojo-loader": ["Sync"],
+			"compilation": ["Sync", "compilation", "params"]
+		});
+		const plugin = new DojoAMDMainTemplatePlugin(options);
+		plugin.apply(compiler);
+		callSync(compiler, "compilation", {});
+		isSkipCompilationCalled.should.be.eql(true);
 	});
 });
