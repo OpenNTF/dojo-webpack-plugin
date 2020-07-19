@@ -8,7 +8,7 @@
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
 const {Tapable, tap, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat").for("DojoAMDModuleFactoryPlugin.tests");
-const plugin = new DojoAMDModuleFactoryPlugin({});
+var plugin = new DojoAMDModuleFactoryPlugin({isSkipCompilation: () => false});
 
 class Factory extends Tapable {
 	constructor() {
@@ -44,6 +44,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		});
 		plugin.apply(compiler);
 		plugin.factory = factory;
+		this.options = {isSkipCompilation: () => false};
 		callSync(compiler, "normal-module-factory", factory);
 		callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
 	});
@@ -278,6 +279,54 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	describe("toAbsMid tests", function() {
 		it("Should return undefined for undefined request", function() {
 			(typeof plugin.toAbsMid()).should.be.eql('undefined');
+		});
+	});
+
+	describe("Skip compilation", function() {
+		it("should not skip compilation", function() {
+			var trimAbsMidsCalled = false;
+			factory = new Factory();
+			compiler = new Tapable();
+			compilation = new Tapable();
+			reg(compiler, {
+				"normal-module-factory" : ["Sync", "factory"],
+				"compilation"         : ["Sync", "compilation", "params"],
+				"get dojo require"		: ["SyncBail"]
+			});
+			reg(compilation, {
+				"seal" : ["Sync"],
+				"build-module"  : ["SyncBail", "module"]
+			});
+			plugin.apply(compiler);
+			plugin.factory = factory;
+			plugin.trimAbsMids = () => trimAbsMidsCalled = true;
+			this.options = {isSkipCompilation: () => false};
+			callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
+			callSync(compilation, "seal");
+			trimAbsMidsCalled.should.be.eql(true);
+		});
+		it("should skip compilation", function() {
+			plugin = new DojoAMDModuleFactoryPlugin({isSkipCompilation: () => true});
+			var trimAbsMidsCalled = false;
+			factory = new Factory();
+			compiler = new Tapable();
+			compilation = new Tapable();
+			reg(compiler, {
+				"normal-module-factory" : ["Sync", "factory"],
+				"compilation"         : ["Sync", "compilation", "params"],
+				"get dojo require"		: ["SyncBail"]
+			});
+			reg(compilation, {
+				"seal" : ["Sync"],
+				"build-module"  : ["SyncBail", "module"]
+			});
+			plugin.apply(compiler);
+			plugin.factory = factory;
+			plugin.trimAbsMids = () => trimAbsMidsCalled = true;
+			this.options = {isSkipCompilation: () => false};
+			callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
+			callSync(compilation, "seal");
+			trimAbsMidsCalled.should.be.eql(false);
 		});
 	});
 });

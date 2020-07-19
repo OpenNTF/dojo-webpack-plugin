@@ -13,8 +13,8 @@ const {Tapable, reg, callSync} = require("webpack-plugin-compat").for("DojoAMDPl
 class I18nExtractorItemDependency {
 }
 describe("DojoAMDPlugin tests", function() {
-	const plugin = new DojoAMDPlugin({});
 	it("should set resolveLoader aliases even if no resolverLoader is defined", function() {
+		const plugin = new DojoAMDPlugin({});
 		const compiler = {
 			options: {}
 		};
@@ -24,6 +24,7 @@ describe("DojoAMDPlugin tests", function() {
 	});
 
 	it("should throw exception for down-level version of webpack-i18n-extractor plugin", function() {
+		const plugin = new DojoAMDPlugin({});
 		var compilation = new Tapable();
 		reg(compilation, {"seal" : ["Sync"]});
 		compilation.dependencyFactories = new Map();
@@ -56,5 +57,26 @@ describe("DojoAMDPlugin tests", function() {
 		callSeal("2.0.6", false);
 		callSeal("2.1.0", false);
 		callSeal("3.0.0", false);
+	});
+
+	it("should set resolveLoader aliases even if no resolverLoader is defined", function() {
+		let plugin = new DojoAMDPlugin({});
+		plugin.isSkipCompilation({name: "HtmlWebpackCompiler"}).should.be.eql(true);
+		plugin = new DojoAMDPlugin({ignoredCompilationNames:["foo", /bar$/]});
+		plugin.isSkipCompilation({name: "foo"}).should.be.eql(true);
+		plugin.isSkipCompilation({name: "foobar"}).should.be.eql(true);
+		plugin.isSkipCompilation({name: "foobarbaz"}).should.be.eql(false);
+	});
+
+	it("should skip compilation step", function() {
+		var isSkipCompilationCalled;
+		const options = {};
+		const plugin = new DojoAMDPlugin(options);
+		options.isSkipCompilation = () => {
+			isSkipCompilationCalled = true;
+			return true;
+		};
+		plugin.compilationPlugins({});
+		isSkipCompilationCalled.should.be.eql(true);
 	});
 });

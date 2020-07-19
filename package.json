@@ -9,7 +9,7 @@
     "test": "nyc node_modules/mocha/bin/mocha",
     "nopretest": "mocha",
     "travis:test": "npm run -s test",
-    "cover": "clean:cover && nyc report --reporter=html",
+    "cover": "nyc report --reporter=html",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "clean:test": "rimraf test/js .nyc_output"
   },
