@@ -69,7 +69,14 @@ describe("DojoAMDPlugin tests", function() {
 	});
 
 	it("should skip compilation step", function() {
-		const plugin = new DojoAMDPlugin({ignoredCompilationNames:["foo"]});
-		plugin.compilationPlugins({name: "foo"}); // will throw if not skipped
+		var isSkipCompilationCalled;
+		const options = {};
+		const plugin = new DojoAMDPlugin(options);
+		options.isSkipCompilation = () => {
+			isSkipCompilationCalled = true;
+			return true;
+		};
+		plugin.compilationPlugins({});
+		isSkipCompilationCalled.should.be.eql(true);
 	});
 });
