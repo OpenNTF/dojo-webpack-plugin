@@ -10,7 +10,7 @@
     "nopretest": "mocha",
     "travis:test": "npm run -s test",
     "cover": "nyc report --reporter=html",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls -v",
     "clean:test": "rimraf test/js .nyc_output"
   },
   "dependencies": {
