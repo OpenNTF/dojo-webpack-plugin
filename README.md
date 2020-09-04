@@ -359,7 +359,7 @@ plugins: [
 	new require("dojo-webpack-plugin")({
 		loaderConfig: require("./loaderConfig"),
 		locales: ["en"],
-		loader: path.join(__directory, "./release/dojo/dojo.js")
+		loader: path.join(__dirname, "./release/dojo/dojo.js")
 	}),
 ]
 ```
