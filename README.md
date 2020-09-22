@@ -455,7 +455,34 @@ Note that you can also specify the require dependency array as a run-time identi
 
 Dojo's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) feature allows the parser to automatically require the modules for widgets that are declared by templates.  This can be problematic with webpack for the reasons discussed [above](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays), if your modules do not explicitly specify dependencies for the widgets that they contain.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
+# I18n and TypeScript
+dojo-webpack-plugin has support for i18n using typescript. This helps for example Jetbrains IDEA to support syntax completion.
+
+Please refer to [this blog](https://www.sitepen.com/blog/what-typescript-can-offer-to-dojo-1-x) for an introductory example.
+
+The following i18n file format supports dialects as well:
+
+nls/main.ts: 
+```javascript 
+export = {
+    'de-de' : true,
+    root : { users: "Users" }
+}
+```
+
+nls/de-de/main.ts:
+```javascript
+export = { users: "Benutzer" }
+```
+
+Note: We need to import our i18n-language files explicitly inside our application, so that it is bundled with webpack.
+```javascript
+import 'nls/de-de/mmain';
+```
 # Dependency requirements
+
+Note: There is dojo-magic around the file extension .js in the imports. Please do remove the extension as .ts is not treated like that.
+
 
 **dojo-webpack-plugin** has a peer dependency on webpack.  **dojo-webpack-plugin**'s webpack dependencies must resolve to the same modules as your application's webpack dependencies, otherwise you may encounter errors similar to the following when building.
 
