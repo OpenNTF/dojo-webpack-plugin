@@ -462,8 +462,9 @@ Please refer to [this blog](https://www.sitepen.com/blog/what-typescript-can-off
 
 The following i18n file format supports dialects as well:
 
-nls/main.ts: 
-```javascript 
+nls/main.ts:
+ 
+```typescript
 export = {
     'de-de' : true,
     root : { users: "Users" }
@@ -471,13 +472,13 @@ export = {
 ```
 
 nls/de-de/main.ts:
-```javascript
+```typescript
 export = { users: "Benutzer" }
 ```
 
 Note: We need to import our i18n-language files explicitly inside our application, so that it is bundled with webpack.
 ```javascript
-import 'nls/de-de/mmain';
+import 'nls/de-de/main';
 ```
 # Dependency requirements
 
