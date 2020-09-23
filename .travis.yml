@@ -23,8 +23,5 @@ sudo: false
 after_success:
   - npm run coveralls
 
-after_script:
-  - curl -k https://coveralls.io/webhook?repo_token=N318s7If94kLwqhEyj5Sz8QddBuCJznZC -d "payload[build_num]=$TRAVIS_BUILD_NUMBER&payload[status]=done"
-
 notifications:
   webhooks: https://coveralls.io/webhook
