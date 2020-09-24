@@ -37,8 +37,9 @@ module.exports = function(bundle) {
 			// Special case for typescript generated i18n files
 			// tsc is adding virtual dependencies for require and exports
 			// we need the latter as our result
-			let exp = {};
-			arg2(null, exp); // require must not be
+			var exp = {};
+			var requireFun = function() { throw new Error("require() is not supported in language files"); };
+			arg2(requireFun, exp);
 			result = exp;
 
 		} else {
