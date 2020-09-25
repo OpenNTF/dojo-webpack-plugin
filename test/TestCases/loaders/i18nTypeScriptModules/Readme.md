@@ -5,12 +5,9 @@ data.
 
 This needs to be addressed by dojo-webpack-plugin.
 
-# How to use the *.ts typescript files?
-Install Typescript with its tsc transpiler somewhere.
+# How to generate out of the *.ts typescript files?
+Install Typescript (>3) and call tsc here.
 
-Go to this folder.
-
-tsc
-
-Edit the generated nls/* files and adapt for esLint with a line comment:
-eslint-disable-next-line no-unused-vars
+# EsLintIgnore
+The generated files nls/* are ignored for eslint, because otherwise 
+no-unused-vars will error.

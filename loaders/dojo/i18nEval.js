@@ -39,8 +39,10 @@ module.exports = function(bundle) {
 			// we need the latter as our result
 			var exp = {};
 			var requireFun = function() { throw new Error("require() is not supported in language files"); };
-			arg2(requireFun, exp);
-			result = exp;
+			result = arg2(requireFun, exp);
+			if (typeof result === 'undefined') {
+				result = exp;
+			}
 
 		} else {
 			throw new Error("define dependencies not supported in langauge files!");
