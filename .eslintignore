@@ -1,4 +1,6 @@
 node/**
 node_modules/**
 test/js/**
+test/TestCases/loaders/i18nTypeScriptModules/nls/**
 coverage/**
+

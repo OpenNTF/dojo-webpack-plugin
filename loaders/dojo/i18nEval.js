@@ -15,26 +15,45 @@
  * limitations under the License.
  */
 
- /*
-  * Evaluates a Dojo i18n resource bundle and returns the bundle object
-  */
+/*
+ * Evaluates a Dojo i18n resource bundle and returns the bundle object
+ */
 module.exports = function(bundle) {
 	var result, isAmd;
 	function define(arg1, arg2) {
 		isAmd = true;
+
 		if (!arg2) {
+			// overwriting language files may define an easy object
 			result = arg1;
-		} else {
-			if (arg1.length !== 0) {
-				throw new Error("define dependencies not supported in langauge files!");
-			}
+
+		} else if (arg1.length === 0) {
+
+			// without dependencies we can easily call the empty factory function
 			result = arg2(); // call factory function
+
+		} else if (arg1.length === 2 && arg1[0] === "require" && arg1[1] === "exports") {
+
+			// Special case for typescript generated i18n files
+			// tsc is adding virtual dependencies for require and exports
+			// we need the latter as our result
+			var exp = {};
+			var requireFun = function() { throw new Error("require() is not supported in language files"); };
+			result = arg2(requireFun, exp);
+			if (typeof result === 'undefined') {
+				result = exp;
+			}
+
+		} else {
+			throw new Error("define dependencies not supported in langauge files!");
 		}
 	}
+
 	define.amd = true;
 	eval(bundle);
 	if (!isAmd) {
 		throw new Error("Non-AMD nls bundles are not supported by dojo-webpack-plugin");
 	}
+
 	return result;
 };
