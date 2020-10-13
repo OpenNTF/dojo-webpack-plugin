@@ -6,10 +6,12 @@ node_js:
 env:
   global:
     - COVERALLS_PARALLEL=true
-  jobs:
-    - WEBPACK_VERSION=V4
-    - WEBPACK_VERSION=V3
-    - WEBPACK_VERSION=V2
+
+jobs:
+  include:
+    - script: WEBPACK_VERSION=V4 && npm run test && npm run coveralls
+    - script: WEBPACK_VERSION=V3 && npm run test && npm run coveralls
+    - script: WEBPACK_VERSION=V2 && npm run test && npm run coveralls
 
 before_install:
   - if [ "$WEBPACK_VERSION" = "V3" ]; then  rm -f package-lock.json; sed "s/\"webpack\":\s*\"4\.[0-9]\+\.[0-9]\+\"/\"webpack\":\"3.11.0\"/" package.json >package.webpack3.json; cp -f ./package.webpack3.json ./package.json; fi
@@ -19,9 +21,6 @@ cache:
     - node_modules
 
 sudo: false
-
-after_success:
-  - npm run coveralls
 
 notifications:
   webhooks: https://coveralls.io/webhook
