@@ -44,6 +44,7 @@
 - [Order of Plugin Registration](#order-of-plugin-registration)
 - [The global require function](#the-global-require-function)
 - [Use of run-time identifiers and expressions in dependency arrays](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays)
+- [Using a dojo-webpack javascript plugin bundle inside a dojo application](#Using--dojo-webpack-javascript-plugin-bundle-inside-a-dojo-application)
 - [Use of Dojo's Auto-Require feature](#use-of-dojos-auto-require-feature)
 - [Dependency requirements](#dependency-requirements)
 - [Related plugins](#related-plugins)
@@ -450,6 +451,27 @@ require([fooName, getBarName(), 'baz'], function(foo, bar, baz) {
 In order for the above code to execute successfully, the modules `foo` and `bar` must be available on the client when the callback is invoked, otherwise, an exception will be thrown.  This means that the modules must have been included in a previously loaded chunk, or they must be direct or indirect dependencies of `baz` so that they are included in the chunk(s) being loaded.  Since values of run-time identifiers or expressions, in general, cannot be known at build time, webpack cannot manage the loading of these modules or their dependencies.
 
 Note that you can also specify the require dependency array as a run-time identifier, with the same restrictions applying to all the modules in the array.
+
+# Using a dojo-webpack javascript plugin bundle inside a dojo application
+
+If you want to support a javascript plugin interface of a dojo application, you might have put your code inside the 
+calling namespace and as both were compatible dojo applications, it worked.
+
+However, by using dojo-webpack-plugin you have added an additional dojo instance, which will use variables and data from
+the global scope.
+
+Firstly, you will need to use the ScopedRequirePlugin to have require() not being overriden.
+
+Secondly, you will need to configure "noGlobals" in the loaderConfig, so that dojo, dijit and dojox variables 
+(of global scope) are not overwritten.
+
+Thirdly, you still have global namespace conflicts inside Dijit, namely domConstruct::toDom tries to use a cache
+in document while having an inside registry/cache. As the destination application has filled the cache of the document,
+the plugin application will not be able to use Dijit, even for something easy like new TextBox().
+
+You might want to ignore dojo-webpack for your javascript plugin completely, by integrating the plugin fully into
+the destination's registry. Or you write an iframe based wrapper around your javascript plugin, but get into trouble
+with origin configurations.  
 
 # Use of Dojo's Auto-Require feature
 
