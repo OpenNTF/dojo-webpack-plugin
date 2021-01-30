@@ -99,7 +99,7 @@ module.exports = function(content) {
 					localeAbsMid = localeAbsMid.substring(0, localeAbsMid.length-3);
 				}
 				bundledLocales.push(loc);
-				deps.push(`${localeRes}?absMid=${localeAbsMid}`);
+				deps.push(localeAbsMid);
 			});
 		});
 
