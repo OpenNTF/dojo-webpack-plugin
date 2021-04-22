@@ -7,6 +7,7 @@
     "lint": "eslint . --ext .json --ext .md --ext .js",
     "pretest": "npm run clean:test && npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
     "test": "nyc node_modules/mocha/bin/mocha",
+		"test:debug": "node node_modules/mocha/bin/mocha --inspect-brk",
     "nopretest": "mocha",
     "travis:test": "npm run -s test",
     "cover": "nyc report --reporter=html",
@@ -45,7 +46,7 @@
     "proxyquire": "^1.8.0",
     "rimraf": "^2.6.3",
     "should": "^13.2.3",
-    "webpack": "4.43.0"
+    "webpack": "5.28.0"
   },
   "nyc": {
     "reporter": [

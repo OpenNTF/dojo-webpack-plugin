@@ -28,7 +28,6 @@ var Suite = require("mocha/lib/suite");
 var cloneDeep = require("clone-deep");
 var DojoWebackPlugin = require("../index");
 
-var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
@@ -36,13 +35,14 @@ var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprec
 var webpackMajorVersion = parseInt(require("webpack/package.json").version.split(".")[0]);
 
 var testGroups = {
-	default: {},
-	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}}
+	default: {}
+//	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}}
 };
+/*
 if (webpackMajorVersion >= 4) {
 	testGroups.async = {pluginOptions: {async:true}};
 }
-
+*/
 
 describe("TestCases", () => {
 	runTestCases("TestCases");
@@ -84,7 +84,7 @@ function runTestCases(casesName) {
 						if (testConfig.mode && testConfig.mode !== testGroup) {
 							return process.nextTick(done);
 						}
-
+						process.traceDeprecation = true;
 						var options = cloneDeep(require(path.join(testDirectory, "webpack.config.js")));
 						var optionsArr = [].concat(options);
 						optionsArr.forEach(function(options, idx) {
@@ -95,7 +95,7 @@ function runTestCases(casesName) {
 							if(typeof options.output.pathinfo === "undefined") options.output.pathinfo = true;
 							if(!options.output.filename) options.output.filename = "bundle" + idx + ".js";
 							if(!options.output.chunkFilename) options.output.chunkFilename = "[id].bundle" + idx + ".js";
-							if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
+							//if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
 							options.output.path = outputDirectory;
 						  options.plugins = options.plugins || [];
@@ -121,7 +121,7 @@ function runTestCases(casesName) {
 									console.error(err);
 									return;
 								}
-								var statOptions = Stats.presetToOptions("verbose");
+								var statOptions = {};
 								statOptions.colors = false;
 								fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
 								var jsonStats = stats.toJson({
@@ -187,6 +187,8 @@ function runTestCases(casesName) {
 											afterAll: _afterAll
 										});
 										context.global = context;
+										context.global.location = outputDirectory;
+										context.global.importScripts = true;
 										Object.defineProperty(context, "should", {
 									    set: function() {},
 									    get: function() {
@@ -204,8 +206,8 @@ function runTestCases(casesName) {
 	should.extend('should', Object.prototype);\n
 	Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
 
-											var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
-											fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
+											var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window, self) {\n" + prologue + content + "\n})", context, p);
+											fn.call(context, require, module, module.exports, path.dirname(p), p, context, context, context);
 										});
 									}
 								}
@@ -285,6 +287,6 @@ function checkArrayExpectation(testDirectory, object, kind, filename, upperCaseK
 		}
 		return done(), true;
 	} else if(array.length > 0) {
-		return done(new Error(`${upperCaseKind}s while compiling:\n\n${array.join("\n\n")}`)), true;
+		return done(new Error(`${upperCaseKind}s while compiling:\n\n${array.map(e => `${e.details}\n${e.stack}`).join("\n\n")}`)), true;
 	}
 }
