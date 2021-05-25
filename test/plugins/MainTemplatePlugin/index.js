@@ -21,70 +21,56 @@
 "use strict";
 const {tap, callSyncWaterfall} = require("webpack-plugin-compat").for("MainTemplatePlugin - tests");
 const Template = require("webpack/lib/Template");
+const RuntimeGlobals = require('webpack/lib/RuntimeGlobals');
+const HelperRuntimeModule = require("webpack/lib/runtime/HelperRuntimeModule");
 
-module.exports = class MainTemplatePlugin {
+const fn = RuntimeGlobals.loadScript;
+
+module.exports = class MainTemplatePlugin extends HelperRuntimeModule {
+	constructor() {
+		super("load script in VM");
+	}
+
 	apply(compiler) {
 		tap(compiler, {"compilation" : compilation => {
-
-			tap(compilation.mainTemplate, {"require-ensure": (__, chunk, hash) => {
-				this.indent = compilation.mainTemplate.indent || Template.indent;
-				this.asString = compilation.mainTemplate.asString || Template.asString;
-				const chunkFilename = compilation.mainTemplate.outputOptions.chunkFilename;
-				const chunkMaps = chunk.getChunkMaps();
-				return this.asString([
-					"var installedChunkData = installedChunks[chunkId];",
-					"if(installedChunkData === 0) {",
-					this.indent([
-						"return new Promise(function(resolve) { resolve(); });"
-					]),
-					"}",
-					"",
-					"// a Promise means \"currently loading\".",
-					"if(installedChunkData) {",
-					this.indent([
-						"return installedChunkData[2];"
-					]),
-					"}",
-					"",
-					"// setup Promise in chunk cache",
-					"var promise = new Promise(function(resolve, reject) {",
-					this.indent([
-						"installedChunkData = installedChunks[chunkId] = [resolve, reject];"
-					]),
-					"});",
-					"installedChunkData[2] = promise;",
-					"",
-					"// start chunk loading",
-					"var filename = __dirname + " + callSyncWaterfall(compilation.mainTemplate, "asset-path", JSON.stringify(`/${chunkFilename}`), {
-						hash: `" + ${compilation.mainTemplate.renderCurrentHashCode(hash)} + "`,
-						hashWithLength: (length) => `" + ${compilation.mainTemplate.renderCurrentHashCode(hash, length)} + "`,
-						chunk: {
-							id: "\" + chunkId + \"",
-							hash: `" + ${JSON.stringify(chunkMaps.hash)}[chunkId] + "`,
-							hashWithLength: (length) => {
-								const shortChunkHashMap = {};
-								Object.keys(chunkMaps.hash).forEach((chunkId) => {
-									if(typeof chunkMaps.hash[chunkId] === "string")
-										shortChunkHashMap[chunkId] = chunkMaps.hash[chunkId].substr(0, length);
-								});
-								return `" + ${JSON.stringify(shortChunkHashMap)}[chunkId] + "`;
-							},
-							name: `" + (${JSON.stringify(chunkMaps.name)}[chunkId]||chunkId) + "`
-						}
-					}) + ";",
-					"require('fs').readFile(filename, 'utf-8',  function(err, content) {",
-					this.indent([
-						"if(err) return reject(err);",
-						"var chunk = {}, i;",
-						"var vm = require('vm');",
-						"var context = vm.createContext(global);",
-						"vm.runInContext('(function(exports, require, __dirname, __filename, global, window) {' + content + '\\n})', context, filename)" +
-						".call(global, chunk, require, require('path').dirname(filename), filename, context, context);"
-					]),
-					"});",
-					"return promise;"
-				]);
-			}});
+			compilation.hooks.runtimeRequirementInTree
+				.for(RuntimeGlobals.loadScript)
+				.tap("domino-webpack-plugin", (chunk, set__) => {
+					compilation.addRuntimeModule(chunk, this);
+					return true;
+				});
 		}});
+	}
+	generate() {
+		const { compilation } = this;
+		const { runtimeTemplate } = compilation;
+		return Template.asString([
+			"var inProgress = {};",
+			`${fn} = ${runtimeTemplate.basicFunction("filename, done, key, chunkId", [
+				"if(inProgress[filename]) { inProgress[filename].push(done); return; }",
+				"inProgress[filename] = [done];",
+				`nodeRequire('fs').readFile(filename, 'utf-8',  ${runtimeTemplate.basicFunction("error, content", [
+					"var event = {type: 'load', target:{src: filename}}",
+					"if(error) {",
+					Template.indent([
+						"event.type = 'error'"
+					]),
+					"} else {",
+					Template.indent([
+						"var vm = nodeRequire('vm');",
+						"var context = vm.createContext(global);",
+						"vm.runInContext('(function(nodeRequire, __dirname, __filename, global, window, self) {' + content + '\\n})', context, filename)" +
+						".call(global, nodeRequire, nodeRequire('path').dirname(filename), filename, context, context, context);"
+					]),
+					"}",
+					"var doneFns = inProgress[filename];",
+					"delete inProgress[filename];",
+					`doneFns && doneFns.forEach(${runtimeTemplate.returningFunction(
+						"fn(event)",
+						"fn"
+					)});`
+				])});`
+			])};`
+		]);
 	}
 };

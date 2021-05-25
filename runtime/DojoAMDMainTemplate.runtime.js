@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /* globals module loaderScope __webpack_require__ __async__ installedModules Promise */
+ /* globals module loaderScope __webpack_require__ __async__ __webpack_module_cache__ Promise */
 
 module.exports = {
 	main: function() {
@@ -94,8 +94,8 @@ module.exports = {
 			var result;
 			if (mid in req.absMids && __webpack_require__.m[req.absMids[mid]]) {
 				if (noInstall) {
-					var module = installedModules[req.absMids[mid]];
-					result = module && module.l && (asModuleObj ? module : module.exports);
+					var module = __webpack_module_cache__[req.absMids[mid]];
+					result = module && (asModuleObj ? module : module.exports);
 				} else {
 					result = __webpack_require__(req.absMids[mid]);
 				}
@@ -107,6 +107,12 @@ module.exports = {
 		}
 
 		function dojoModuleFromWebpackModule(webpackModule) { // eslint-disable-line no-unused-vars
+			if (!webpackModule.i) {
+				const [key, value] = Object.entries(__webpack_module_cache__).find(([key, value]) => value === webpackModule);
+				if (key) {
+					webpackModule.i = key;
+				}
+			}
 			var result = {i:webpackModule.i};
 			var id = req.absMidsById[webpackModule.i];
 			if (id) {
@@ -254,7 +260,7 @@ module.exports = {
 		function undef(mid, referenceModule) { // eslint-disable-line no-unused-vars
 			var module = findModule(mid, referenceModule, true, true); // eslint-disable-line no-undef
 			if (module) {
-				delete installedModules[module.i];
+				delete __webpack_module_cache__[module.i];
 			}
 		}
 	}

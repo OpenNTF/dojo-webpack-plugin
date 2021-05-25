@@ -27,6 +27,7 @@ var Test = require("mocha/lib/test");
 var Suite = require("mocha/lib/suite");
 var cloneDeep = require("clone-deep");
 var DojoWebackPlugin = require("../index");
+var Window = require("window");
 
 var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
@@ -98,6 +99,7 @@ function runTestCases(casesName) {
 							//if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
 							options.output.path = outputDirectory;
+							options.output.publicPath = `${options.output.path}${path.sep}`;
 						  options.plugins = options.plugins || [];
 							if (!options.plugins.some(plugin => {
 								return plugin instanceof ScopedRequirePluginDeprecated;
@@ -171,24 +173,14 @@ function runTestCases(casesName) {
 									var bundlePath = testConfig.findBundle(i, optionsArr[i]);
 									if(bundlePath) {
 										filesCount++;
-										var context = vm.createContext({
-											console: console,
-											process: process,
-											setTimeout: setTimeout,
-											setInterval: setInterval,
-											clearTimeout: clearTimeout,
-											clearInterval: clearInterval,
-											Promise: Promise,
-											it: _it,
-											describe: _describe,
-											beforeEach: _beforeEach,
-											beforeAll: _beforeAll,
-											afterEach: _afterEach,
-											afterAll: _afterAll
-										});
-										context.global = context;
-										context.global.location = outputDirectory;
-										context.global.importScripts = true;
+										var context = vm.createContext(new Window());
+										context.it = _it,
+										context.describe = _describe,
+										context.beforeEach = _beforeEach,
+										context.beforeAll = _beforeAll,
+										context.afterEach = _afterEach,
+										context.afterAll = _afterAll;
+										context.importScripts = true;
 										Object.defineProperty(context, "should", {
 									    set: function() {},
 									    get: function() {
@@ -201,13 +193,11 @@ function runTestCases(casesName) {
 											var content;
 											var p = path.join(outputDirectory, bundlePath);
 											content = fs.readFileSync(p, "utf-8");
-											var module = {exports: {}};
 											const prologue = `
 	should.extend('should', Object.prototype);\n
 	Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
-
-											var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window, self) {\n" + prologue + content + "\n})", context, p);
-											fn.call(context, require, module, module.exports, path.dirname(p), p, context, context, context);
+											var fn = vm.runInContext("(function(nodeRequire, __dirname, __filename, global, window, self) {\n" + prologue + content + "\n})", context, p);
+											fn.call(context, require, path.dirname(p), p, context, context, context);
 										});
 									}
 								}
