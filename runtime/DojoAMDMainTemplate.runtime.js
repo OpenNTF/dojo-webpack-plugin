@@ -36,9 +36,10 @@ module.exports = {
 			return contextRequire(config, dependencies, callback, 0, req);
 		};
 
-		function createContextRequire(moduleId) { // eslint-disable-line no-unused-vars
-			if (req.absMidsById[moduleId]) {
-				moduleId = req.absMidsById[moduleId];
+		function createContextRequire(module) { // eslint-disable-line no-unused-vars
+			var moduleId = module.absMid;
+			if (!moduleId && req.absMidsById[module.id]) {
+				moduleId = req.absMidsById[module.id];
 			}
 			if (!moduleId) return req;
 			var result = function(a1, a2, a3) {
@@ -107,16 +108,11 @@ module.exports = {
 		}
 
 		function dojoModuleFromWebpackModule(webpackModule) { // eslint-disable-line no-unused-vars
-			if (!webpackModule.i) {
-				const [key, value] = Object.entries(__webpack_module_cache__).find(([key, value]) => value === webpackModule);
-				if (key) {
-					webpackModule.i = key;
-				}
-			}
-			var result = {i:webpackModule.i};
-			var id = req.absMidsById[webpackModule.i];
+			if (webpackModule.absMid) return webpackModule;  // Already converted
+			var result = {i:webpackModule.id};
+			var id = req.absMidsById[webpackModule.id];
 			if (id) {
-				result.id = id;
+				result.id = result.absMid = id;
 			}
 			Object.defineProperty(result, "exports", {
 				get: function() { return webpackModule.exports;},

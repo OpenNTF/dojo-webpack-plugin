@@ -19,7 +19,7 @@
  */
 
 "use strict";
-const {tap, callSyncWaterfall} = require("webpack-plugin-compat").for("MainTemplatePlugin - tests");
+const {tap} = require("webpack-plugin-compat").for("MainTemplatePlugin - tests");
 const Template = require("webpack/lib/Template");
 const RuntimeGlobals = require('webpack/lib/RuntimeGlobals');
 const HelperRuntimeModule = require("webpack/lib/runtime/HelperRuntimeModule");
