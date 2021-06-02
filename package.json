@@ -15,7 +15,7 @@
     "clean:test": "rimraf test/js .nyc_output"
   },
   "dependencies": {
-    "loader-utils": "1.1.0",
+    "loader-utils": "2.0.0",
     "node-stringify": "0.2.1",
     "raw-loader": "0.5.1",
     "tmp": "0.0.30",
