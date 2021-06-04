@@ -37,6 +37,7 @@ module.exports = {
 		};
 
 		function createContextRequire(module) { // eslint-disable-line no-unused-vars
+			if (!module) return req;
 			var moduleId = module.absMid;
 			if (!moduleId && req.absMidsById[module.id]) {
 				moduleId = req.absMidsById[module.id];
@@ -256,7 +257,7 @@ module.exports = {
 		function undef(mid, referenceModule) { // eslint-disable-line no-unused-vars
 			var module = findModule(mid, referenceModule, true, true); // eslint-disable-line no-undef
 			if (module) {
-				delete __webpack_module_cache__[module.i];
+				delete __webpack_module_cache__[module.id];
 			}
 		}
 	}

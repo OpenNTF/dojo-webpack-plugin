@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 const loaderUtils = require("loader-utils");
-const {callSyncBail} = require("webpack-plugin-compat");
+const {callSyncBail} = require("webpack-plugin-compat").for('dojo-webpack-plugin');
 
 module.exports = function() {
 	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
-	const issuerAbsMid = this._module.issuer && this._module.issuer.absMid || this._module.absMid || "";
+	const issuer = this._compilation.moduleGraph.getIssuer(this._module);
+	const issuerAbsMid = issuer && issuer.absMid || this._module.absMid || "";
 	function toAbsMid(request) {
 		return request.split('!').map(part => dojoRequire.toAbsMid(part, {mid:issuerAbsMid})).join('!');
 	}
@@ -49,7 +50,7 @@ module.exports = function() {
 	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
 	const buf = [];
 	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
-	const req  = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
+	const req  = `__webpack_require__.${pluginOptions.requireFnPropName}.c()`;
 	const deps = (query.deps ? query.deps.split(",") : []).map(dep => {
 		dep = decodeURIComponent(dep);
 		return `${dep}?absMid=${toAbsMid(dep).replace(/\!/g, "%21")}`;

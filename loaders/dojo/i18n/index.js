@@ -16,7 +16,7 @@
  */
 const path = require("path");
 const i18nEval = require("../i18nEval");
-const {callSyncBail} = require("webpack-plugin-compat");
+const {callSyncBail} = require("webpack-plugin-compat").for('dojo-webpack-plugin');
 
 module.exports = function(content) {
 	this.cacheable && this.cacheable();
@@ -106,7 +106,7 @@ module.exports = function(content) {
 	}
 	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
 	deps.push(`${res}?absMid=${absMid}`);
-	const req = `${this._compilation.mainTemplate.requireFn}.${pluginOptions.requireFnPropName}.c()`;
+	const req = `__webpack_require__.${pluginOptions.requireFnPropName}.c()`;
 	buf.push(`define(["dojo/i18n", "${runner}"`);
 	deps.forEach(dep => buf.push(`,"${dep}"`));
 	buf.push('], function(loader, runner) {');
