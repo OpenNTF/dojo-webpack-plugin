@@ -8,14 +8,13 @@
  */
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
 const {Tapable, tap, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat").for("DojoAMDModuleFactoryPlugin.tests");
-var plugin = new DojoAMDModuleFactoryPlugin({isSkipCompilation: () => false});
 
 class Factory extends Tapable {
 	constructor() {
 		super();
 		reg(this, {
 			"beforeResolve" : ["AsyncSeriesWaterfall", "data"],
-			"resolver"      : ["SyncWaterfall", "resolver"],
+			"resolve"       : ["SyncWaterfall", "resolver"],
 			"createModule"  : ["SyncBail", "data"],
 			"module"        : ["SyncWaterfall", "module", "data"]
 		});
@@ -26,10 +25,12 @@ class Factory extends Tapable {
 }
 
 describe("DojoAMDModuleFactoryPlugin tests", function() {
+	var plugin;
 	var factory;
 	var compiler;
 	var compilation;
 	beforeEach(function() {
+		plugin = new DojoAMDModuleFactoryPlugin({isSkipCompilation: () => false});
 		factory = new Factory();
 		compiler = new Tapable();
 		compilation = new Tapable();
@@ -261,13 +262,11 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	});
 
 	describe("'module' event tests", function() {
-		it("Should gracefully handle missing absMidAliases in data object", function() {
-			const module = {absMid: 'a'};
-			const existing = {};
+		it("Should return existing module", function() {
+			const existing = callSyncWaterfall(factory, "module", {absMid: 'a', request:'./a'});;
 			var absMids = [];
-			compilation.findModule = function() { return existing; };
-			const result = callSyncWaterfall(factory, "module", module, {});
-			result.should.be.eql(module);
+			const result = callSyncWaterfall(factory, "module", {request:'./a'});
+			result.should.be.equal(existing);
 			(typeof result.addAbsMid).should.be.eql('function');
 			(typeof result.filterAbsMids).should.be.eql('function');
 			existing.absMid.should.eql('a');

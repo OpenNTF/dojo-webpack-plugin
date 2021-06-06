@@ -102,9 +102,7 @@ describe("DojoLoaderPlugin tests", function() {
 			plugin.options.loader = "loader";
 			plugin.options.loaderConfig = "loaderConfig";
 			plugin.compilation =  {
-				modules: {
-					find() {}
-				}
+				modules: []
 			};
 		});
 		it("Should throw if embedded loader not found in compilation", function(done) {
@@ -118,10 +116,7 @@ describe("DojoLoaderPlugin tests", function() {
 		});
 		it("Should throw if config module not found in compilation", function(done) {
 			try {
-				var count = 0;
-				plugin.compilation.modules.find = function() {
-					return count++ === 0 ? {} : null;
-				};
+				plugin.compilation.modules.push({rawRequest:'loader'});
 				plugin.afterOptimizeChunks([{hasRuntime:function(){return true;}}]);
 				done(new Error("Exception not thrown"));
 			} catch (err) {

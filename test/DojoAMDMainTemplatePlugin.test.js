@@ -18,13 +18,11 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 			find: function() { return null; }
 		};
 		reg(compilation.chunkTemplate, {"renderAbsMids" : ["SyncWaterfall", "source", "chunk"]});
-		compilation.mainTemplate = Object.assign(new Tapable(), {
-			requireFn:  "__webpack_require__",
-			outputOptions: {
-				jsonpFunction: "webpackJsonpFunction",
-				globalObject: "window"
-			}
-		});
+		compilation.mainTemplate = Object.assign(new Tapable());
+		compilation.outputOptions = {
+			jsonpFunction: "webpackJsonpFunction",
+			globalObject: "window"
+		};
 		reg(compilation.mainTemplate, {
 			"dojo-global-require" : ["SyncWaterfall", "source"]
 		});
@@ -34,7 +32,7 @@ describe("DojoAMDMainTemplatePlugin tests", function() {
 		plugin.indent = (string) => string,
 		plugin.compilation = compilation;
 		try {
-			plugin.dojoRequireExtensions("", chunk);
+			plugin.dojoRequireExtensions("", null, {chunk: chunk});
 			done(new Error("Shouldn't get here"));
 		} catch (err) {
 			err.message.should.match(/Can't locate [^\s]+ in compilation/);

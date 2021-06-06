@@ -269,11 +269,11 @@ function checkArrayExpectation(testDirectory, object, kind, filename, upperCaseK
 		for(let i = 0; i < array.length; i++) {
 			if(Array.isArray(expected[i])) {
 				for(let j = 0; j < expected[i].length; j++) {
-					if(!expected[i][j].test(array[i]))
-						return done(new Error(`${upperCaseKind} ${i}: ${array[i]} doesn't match ${expected[i][j].toString()}`)), true;
+					if(!expected[i][j].test(array[i].message))
+						return done(new Error(`${upperCaseKind} ${i}: ${array[i].message} doesn't match ${expected[i][j].toString()}`)), true;
 				}
-			} else if(!expected[i].test(array[i]))
-				return done(new Error(`${upperCaseKind} ${i}: ${array[i]} doesn't match ${expected[i].toString()}`)), true;
+			} else if(!expected[i].test(array[i].message))
+				return done(new Error(`${upperCaseKind} ${i}: ${array[i].message} doesn't match ${expected[i].toString()}`)), true;
 		}
 		return done(), true;
 	} else if(array.length > 0) {
