@@ -36,14 +36,10 @@ var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprec
 var webpackMajorVersion = parseInt(require("webpack/package.json").version.split(".")[0]);
 
 var testGroups = {
-	default: {}
-//	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}}
+	default: {},
+	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}},
+	async: {pluginOptions: {async:true}}
 };
-/*
-if (webpackMajorVersion >= 4) {
-	testGroups.async = {pluginOptions: {async:true}};
-}
-*/
 
 describe("TestCases", () => {
 	runTestCases("TestCases");
