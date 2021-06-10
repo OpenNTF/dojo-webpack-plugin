@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 const loaderUtils = require("loader-utils");
-const {callSyncBail} = require("webpack-plugin-compat").for('dojo-webpack-plugin');
+const {getPluginProps} = require('../../../lib/DojoAMDPlugin');
 
 module.exports = function() {
-	const dojoRequire = callSyncBail(this._compiler, "get dojo require");
+	const dojoRequire = getPluginProps(this._compiler).dojoRequire;
 	const issuer = this._compilation.moduleGraph.getIssuer(this._module);
 	const issuerAbsMid = issuer && issuer.absMid || this._module.absMid || "";
 	function toAbsMid(request) {
@@ -47,7 +47,7 @@ module.exports = function() {
 	this._module.filterAbsMids && this._module.filterAbsMids(absMid => {
 		return !/loaderProxy/.test(absMid);
 	});
-	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
+	const pluginOptions = getPluginProps(this._compiler).options;
 	const buf = [];
 	const runner = require.resolve("../runner.js").replace(/\\/g, "/");
 	const req  = `__webpack_require__.${pluginOptions.requireFnPropName}.c()`;

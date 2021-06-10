@@ -6,18 +6,16 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
+const {pluginName, getPluginProps} = require("../lib/DojoAMDPlugin");
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
-const {Tapable, tap, reg, callSync, callSyncWaterfall} = require("webpack-plugin-compat").for("DojoAMDModuleFactoryPlugin.tests");
+const {AsyncSeriesWaterfallHook, SyncWaterfallHook, SyncHook, SyncBailHook} = require("tapable");
 
-class Factory extends Tapable {
+class Factory {
 	constructor() {
-		super();
-		reg(this, {
-			"beforeResolve" : ["AsyncSeriesWaterfall", "data"],
-			"resolve"       : ["SyncWaterfall", "resolver"],
-			"createModule"  : ["SyncBail", "data"],
-			"module"        : ["SyncWaterfall", "module", "data"]
-		});
+		this.hooks = {};
+		this.hooks.beforeResolve = new AsyncSeriesWaterfallHook(['data']);
+		this.hooks.resolve = new AsyncSeriesWaterfallHook(['data']);
+		this.hooks.module = new SyncWaterfallHook(['module', 'data']);
 	}
 	addAbsMid(data, absMid) {
 		return this.events["add absMid"](data, absMid);
@@ -32,22 +30,18 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	beforeEach(function() {
 		plugin = new DojoAMDModuleFactoryPlugin({isSkipCompilation: () => false});
 		factory = new Factory();
-		compiler = new Tapable();
-		compilation = new Tapable();
-		reg(compiler, {
-			"normal-module-factory" : ["Sync", "factory"],
-			"compilation"         : ["Sync", "compilation", "params"],
-			"get dojo require"		: ["SyncBail"]
-		});
-		reg(compilation, {
-			"seal" : ["Sync"],
-			"build-module"  : ["SyncBail", "module"]
-		});
+		compiler = {hooks: {}};
+		compilation = {hooks:{}};
+		compiler[pluginName] = {};
+		compiler.hooks.normalModuleFactory = new SyncHook(['factory']);
+		compiler.hooks.compilation = new SyncHook(['compilation', 'params']);
+		compilation.hooks.seal = new SyncHook();
+		compilation.hooks.buildModule = new SyncBailHook(['module']);
 		plugin.apply(compiler);
 		plugin.factory = factory;
 		this.options = {isSkipCompilation: () => false};
-		callSync(compiler, "normal-module-factory", factory);
-		callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
+		compiler.hooks.normalModuleFactory.call(factory);
+		compiler.hooks.compilation.call(compilation, {normalModuleFactory: factory});
 	});
 	function getAbsMids(data) {
 		var result = [];
@@ -239,7 +233,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 	describe("'add absMids from request event' tests", function() {
 		it("should gracefully handle undefined data object", function(done) {
 			try {
-				callSync(factory, "add absMids from request", null);
+				plugin.addAbsMidsFromRequest(null);
 				done();
 			} catch (err) {
 				done(err);
@@ -247,12 +241,10 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		});
 
 		it("should gracefully handle undefined data.dependencies object", function(done) {
-			tap(compiler, {"get dojo require" : function() {
-				return {toAbsMid: function(a) {return a;}};
-			}});
+			getPluginProps(compiler).dojoRequire = {toAbsMid: function(a) {return a;}};
 			try {
 				const data = {request: "foo/bar"};
-				callSync(factory, "add absMids from request", data);
+				plugin.addAbsMidsFromRequest(data);
 				data.absMid.should.be.eql(data.request);
 				done();
 			} catch (err) {
@@ -263,9 +255,9 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 
 	describe("'module' event tests", function() {
 		it("Should return existing module", function() {
-			const existing = callSyncWaterfall(factory, "module", {absMid: 'a', request:'./a'});;
+			const existing = factory.hooks.module.call({absMid: 'a', request:'./a'});
 			var absMids = [];
-			const result = callSyncWaterfall(factory, "module", {request:'./a'});
+			const result = factory.hooks.module.call({request:'./a'});
 			result.should.be.equal(existing);
 			(typeof result.addAbsMid).should.be.eql('function');
 			(typeof result.filterAbsMids).should.be.eql('function');
@@ -285,46 +277,36 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		it("should not skip compilation", function() {
 			var trimAbsMidsCalled = false;
 			factory = new Factory();
-			compiler = new Tapable();
-			compilation = new Tapable();
-			reg(compiler, {
-				"normal-module-factory" : ["Sync", "factory"],
-				"compilation"         : ["Sync", "compilation", "params"],
-				"get dojo require"		: ["SyncBail"]
-			});
-			reg(compilation, {
-				"seal" : ["Sync"],
-				"build-module"  : ["SyncBail", "module"]
-			});
+			compiler = {hooks: {}};
+			compilation = {hooks: {}};
+			compiler.hooks.normalModuleFactory = new SyncHook(['factory']);
+			compiler.hooks.compilation = new SyncHook(['compilation', 'params']);
+			compilation.hooks.seal = new SyncHook();
+			compilation.hooks.buildModule = new SyncBailHook(['module']);
 			plugin.apply(compiler);
 			plugin.factory = factory;
 			plugin.trimAbsMids = () => trimAbsMidsCalled = true;
 			this.options = {isSkipCompilation: () => false};
-			callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
-			callSync(compilation, "seal");
+			compiler.hooks.compilation.call(compilation, {normalModuleFactory: factory});
+			compilation.hooks.seal.call();
 			trimAbsMidsCalled.should.be.eql(true);
 		});
 		it("should skip compilation", function() {
 			plugin = new DojoAMDModuleFactoryPlugin({isSkipCompilation: () => true});
 			var trimAbsMidsCalled = false;
 			factory = new Factory();
-			compiler = new Tapable();
-			compilation = new Tapable();
-			reg(compiler, {
-				"normal-module-factory" : ["Sync", "factory"],
-				"compilation"         : ["Sync", "compilation", "params"],
-				"get dojo require"		: ["SyncBail"]
-			});
-			reg(compilation, {
-				"seal" : ["Sync"],
-				"build-module"  : ["SyncBail", "module"]
-			});
+			compiler = {hooks: {}};
+			compilation = {hooks: {}};
+			compiler.hooks.normalModuleFactory = new SyncHook(['factory']);
+			compiler.hooks.compilation = new SyncHook(['compilation', 'params']);
+			compilation.hooks.seal = new SyncHook();
+			compilation.hooks.buildModule = new SyncBailHook(['module']);
 			plugin.apply(compiler);
 			plugin.factory = factory;
 			plugin.trimAbsMids = () => trimAbsMidsCalled = true;
 			this.options = {isSkipCompilation: () => false};
-			callSync(compiler, "compilation", compilation, {normalModuleFactory: factory});
-			callSync(compilation, "seal");
+			compiler.hooks.compilation.call(compilation, {normalModuleFactory: factory});
+			compilation.hooks.seal.call();
 			trimAbsMidsCalled.should.be.eql(false);
 		});
 	});

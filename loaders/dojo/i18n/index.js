@@ -16,7 +16,7 @@
  */
 const path = require("path");
 const i18nEval = require("../i18nEval");
-const {callSyncBail} = require("webpack-plugin-compat").for('dojo-webpack-plugin');
+const {getPluginProps} = require('../../../lib/DojoAMDPlugin');
 
 module.exports = function(content) {
 	this.cacheable && this.cacheable();
@@ -70,7 +70,7 @@ module.exports = function(content) {
 	// Determine if this is the default bundle or a locale specific bundle
 	const buf = [], deps = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*?)$/;
 	const resMatch = regex.exec(res);
-	const pluginOptions = callSyncBail(this._compiler, "dojo-webpack-plugin-options");
+	const pluginOptions = getPluginProps(this._compiler).options;
 	const requestedLocales = pluginOptions.locales;
 	const bundledLocales = [];
 

@@ -32,7 +32,6 @@ var Window = require("window");
 var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
-var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprecated");
 var webpackMajorVersion = parseInt(require("webpack/package.json").version.split(".")[0]);
 
 var testGroups = {
@@ -97,11 +96,7 @@ function runTestCases(casesName) {
 							options.output.path = outputDirectory;
 							options.output.publicPath = `${options.output.path}${path.sep}`;
 						  options.plugins = options.plugins || [];
-							if (!options.plugins.some(plugin => {
-								return plugin instanceof ScopedRequirePluginDeprecated;
-							})) {
-								options.plugins.push(new ScopedRequirePlugin());
-							}
+							options.plugins.push(new ScopedRequirePlugin());
 							options.plugins.forEach(plugin => {
 								if (plugin instanceof DojoWebackPlugin) {
 									Object.assign(plugin.options, testGroups[testGroup].pluginOptions);

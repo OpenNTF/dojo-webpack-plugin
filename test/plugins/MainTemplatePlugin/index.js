@@ -19,7 +19,7 @@
  */
 
 "use strict";
-const {tap} = require("webpack-plugin-compat").for("MainTemplatePlugin - tests");
+const {pluginName} = require("../../../lib/DojoAMDPlugin");
 const Template = require("webpack/lib/Template");
 const RuntimeGlobals = require('webpack/lib/RuntimeGlobals');
 const HelperRuntimeModule = require("webpack/lib/runtime/HelperRuntimeModule");
@@ -32,14 +32,14 @@ module.exports = class MainTemplatePlugin extends HelperRuntimeModule {
 	}
 
 	apply(compiler) {
-		tap(compiler, {"compilation" : compilation => {
+		compiler.hooks.compilation.tap(pluginName, compilation => {
 			compilation.hooks.runtimeRequirementInTree
 				.for(RuntimeGlobals.loadScript)
 				.tap("domino-webpack-plugin", (chunk, set__) => {
 					compilation.addRuntimeModule(chunk, this);
 					return true;
 				});
-		}});
+		});
 	}
 	generate() {
 		const { compilation } = this;
