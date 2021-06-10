@@ -37,7 +37,7 @@
     "dojo": "1.16.2",
     "dojo-util": "1.16.0",
     "eslint": "^7.28.0",
-    "eslint-plugin-es6": "^1.0.0",
+    "eslint-plugin-es5": "^1.5.0",
     "eslint-plugin-json": "^1.4.0",
     "eslint-plugin-markdown": "^1.0.0",
     "fs-extra": "^4.0.2",
