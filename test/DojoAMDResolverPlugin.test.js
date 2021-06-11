@@ -6,8 +6,8 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
-const DojoAMDResolverPluginBase = require("../lib/DojoAMDResolverPluginBase");
-const plugin = new DojoAMDResolverPluginBase();
+const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
+const plugin = new DojoAMDResolverPlugin();
 
 describe("DojoAMDResolverPlugin tests", function() {
 	const compiler = {hooks: {}};

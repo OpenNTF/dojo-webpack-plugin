@@ -15,7 +15,7 @@ class Factory {
 		this.hooks = {};
 		this.hooks.beforeResolve = new AsyncSeriesWaterfallHook(['data']);
 		this.hooks.resolve = new AsyncSeriesWaterfallHook(['data']);
-		this.hooks.module = new SyncWaterfallHook(['module', 'data']);
+		this.hooks.module = new SyncWaterfallHook(['module', 'createData', 'resolveData']);
 	}
 	addAbsMid(data, absMid) {
 		return this.events["add absMid"](data, absMid);
@@ -255,9 +255,9 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 
 	describe("'module' event tests", function() {
 		it("Should return existing module", function() {
-			const existing = factory.hooks.module.call({absMid: 'a', request:'./a'});
+			const existing = factory.hooks.module.call({}, null, {absMid: 'a', request:'./a'});
 			var absMids = [];
-			const result = factory.hooks.module.call({request:'./a'});
+			const result = factory.hooks.module.call({}, null, {request:'./a'});
 			result.should.be.equal(existing);
 			(typeof result.addAbsMid).should.be.eql('function');
 			(typeof result.filterAbsMids).should.be.eql('function');
