@@ -501,7 +501,7 @@ The best way to ensure that the requirement is met is to make sure that both thi
 
 # Sample application
 
-See the sample application at https://github.com/OpenNTF/dojo-webpack-plugin-sample.
+See the sample application at https://github.com/OpenNTF/dojo-webpack-plugin-sample/tree/v2.
 
 https://openntf.github.io/dojo-webpack-plugin-sample/test.html.
 
