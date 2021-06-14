@@ -6,4 +6,5 @@ define([], function() {
 		__webpack_require__(req.resolve("./cjsModule2")).should.be.eql("cjs2");
 		__webpack_require__(req.resolve("./cjsModule3")).should.be.eql("cjs3");
 	});
+
 });

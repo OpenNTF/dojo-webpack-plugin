@@ -1,11 +1,11 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "2.8.19",
+  "version": "3.0.0",
   "author": "Chuck Dumont",
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
     "lint": "eslint . --ext .json --ext .md --ext .js",
-    "pretest": "npm run clean:test && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
+    "pretest": "npm run clean:test && npm run lint && node buildDojo/build.js node_modules/dojo/dojo.js test/js && node buildDojo/build.js node_modules/dojo/dojo.js test/js/noconfig {\\\"dojo-config-api\\\":0}",
     "test": "nyc node_modules/mocha/bin/mocha",
     "test:debug": "node node_modules/mocha/bin/mocha --inspect-brk",
     "nopretest": "mocha",
@@ -21,9 +21,9 @@
     "tmp": "0.0.30"
   },
   "peerDependencies": {
-    "webpack": ">= 5.0.0",
+    "webpack": ">=5.0.0",
     "tapable": ">=2.0",
-    "webpack-sources": ">=1.0.1"
+    "webpack-sources": ">=2.0.0"
   },
   "license": "(MIT OR Apache-2.0)",
   "repository": {

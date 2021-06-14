@@ -8,7 +8,7 @@
  */
 const {pluginName, getPluginProps} = require("../lib/DojoAMDPlugin");
 const DojoAMDModuleFactoryPlugin = require("../lib/DojoAMDModuleFactoryPlugin");
-const {AsyncSeriesWaterfallHook, SyncWaterfallHook, SyncHook, SyncBailHook} = require("tapable");
+const {AsyncSeriesHook, AsyncSeriesWaterfallHook, SyncWaterfallHook, SyncHook, SyncBailHook} = require("tapable");
 
 class Factory {
 	constructor() {
@@ -35,6 +35,7 @@ describe("DojoAMDModuleFactoryPlugin tests", function() {
 		compiler[pluginName] = {};
 		compiler.hooks.normalModuleFactory = new SyncHook(['factory']);
 		compiler.hooks.compilation = new SyncHook(['compilation', 'params']);
+		compiler.hooks.run = compiler.hooks.watchRun = new AsyncSeriesHook(['compiler']);
 		compilation.hooks.seal = new SyncHook();
 		compilation.hooks.buildModule = new SyncBailHook(['module']);
 		plugin.apply(compiler);

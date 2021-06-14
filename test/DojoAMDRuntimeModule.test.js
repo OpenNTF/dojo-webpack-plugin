@@ -6,7 +6,7 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
-const DojoAMDRuntimeTemplate = require("../lib/DojoAMDRuntimeTemplate");
+const DojoAMDRuntimeModule = require("../lib/DojoAMDRuntimeModule");
 const {pluginName} = require("../lib/DojoAMDPlugin");
 const {SyncHook} = require("tapable");
 
@@ -15,7 +15,7 @@ describe("DojoAMDRuntimeModule tests", function() {
 		const compiler = {[pluginName]: {hooks:{}, embeddedLoaderFileName: 'testEmbeddedLoader'}, hooks: {}};
 		const compilation = {hooks:{}};
 		compiler.hooks.afterCompile = new SyncHook();
-		const runtimeModule = new DojoAMDRuntimeTemplate({}, {}, compiler);
+		const runtimeModule = new DojoAMDRuntimeModule({}, {}, compiler);
 		compilation.modules = {
 			find: function() { return null; }
 		};

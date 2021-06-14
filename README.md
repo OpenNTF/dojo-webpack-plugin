@@ -20,23 +20,23 @@
 <!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-	- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-	- [async](#async)
-	- [loaderConfig](#loaderconfig)
-	- [environment](#environment)
-	- [buildEnvironment](#buildenvironment)
-	- [globalContext](#globalcontext)
-	- [loader](#loader)
-	- [locales](#locales)
-	- [cjsRequirePatterns](#cjsrequirepatterns)
-	- [coerceUndefinedToFalse](#coerceundefinedtofalse)
-	- [noConsole](#noconsole)
-	- [runtimeFeatures](#runtimefeatures)
+		- [async](#async)
+		- [loaderConfig](#loaderconfig)
+		- [environment](#environment)
+		- [buildEnvironment](#buildenvironment)
+		- [globalContext](#globalcontext)
+		- [loader](#loader)
+		- [locales](#locales)
+		- [cjsRequirePatterns](#cjsrequirepatterns)
+		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
+		- [noConsole](#noconsole)
+		- [runtimeFeatures](#runtimefeatures)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -46,27 +46,21 @@
 - [Use of run-time identifiers and expressions in dependency arrays](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays)
 - [Use of Dojo's Auto-Require feature](#use-of-dojos-auto-require-feature)
 - [Dependency requirements](#dependency-requirements)
-- [Related plugins](#related-plugins)
 - [Sample application](#sample-application)
-- [Release Notes](#release-notes)
-- [Known Issues](#known-issues)
-- [Footnotes](#footnotes)
 <!-- TOC END -->
 
 # Introduction
 
-**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 2 through Webpack 4 (Webpack 4 must be 4.2.0 or greater), and Dojo versions 1.10 and greater.  Features include:
+**dojo-webpack-plugin** is a [Webpack](https://webpack.github.io/) plugin that supports using Webpack to build Dojo 1.x applications that use Asyncronous Module Definition (AMD).  This version supports Webpack 5 and Dojo versions 1.10 and greater (see the v2x branch for Webpack 4 support).  Features include:
 
 * Support for Dojo loader config properties, including `baseUrl`, `paths`, `packages`, `map` and `aliases`
 * Support for client-side synchronous and asynchronous `require()` calls for packed modules.
 * Webpack loader implementations of standard Dojo loaders (e.g. `dojo/text`, `dojo/has`, `dojo/i18n`).
 * Limited support for client side execution of some Dojo loader extensions.
 
-See the [Release Notes](#release-notes) for important information about upgrading to from earlier versions of this plugin to 2.1+.
-
 # The Dojo loader
 
-**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader (~1.5KB after uglify and gzip)<sup>[<a href="#user-content-foot1">1</a>]</sup>, and optionally the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables), as well as Dojo's `require.toAbsMid()` and `require.toUrl()` functions.
+**dojo-webpack-plugin** uses the Dojo loader (dojo.js) at build time to resolve modules based on the properties specified in the Dojo loader config.  In addition, a stripped-down build of the loader (~1.5KB after minifying and gzip) and optionally the loader config, are embedded in the packed application to support client-side execution of `require()` calls that have not been transformed by Webpack at build time (i.e. `require()` calls that reference non-stactic variables), as well as Dojo's `require.toAbsMid()` and `require.toUrl()` functions.
 
 This package does not include the Dojo loader.  A custom build of the Dojo loader is built by Webpack based on the location of Dojo specified in the Dojo loader config.  Alternatively, the location of a previously built loader may be specified using the [loader](#loader) option.  See [Building the Dojo loader](#building-the-dojo-loader).
 
@@ -190,20 +184,20 @@ The [runtimeFeatures](#runtimeFeatures) option allows you to change the values o
 
 You may use [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-plugin) if you want to perform has.js filtering of source code at build time using statically defined features.  
 
-#### namedModules
+#### moduleIds
 
 By default, webpack uses the resource path of the module as the module id in development builds.  In production builds, integer modules ids are used.  Using named module ids helps with debugging, but can trip up the parsing of dojo/has loader expressions when the module ids contains `?` and `:` characters.  For this reason, it is recommended to disable the use of named module ids with the following option in your webpack config:
 
 <!-- eslint-disable semi-->
 ```javascript
 optimization: {
-	namedModules: false
+	moduleIds: 'natrual'
 }
 ```
 
 # The dojo/loaderProxy loader extension
 
-`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  Not all Dojo loader extensions may be used this way.  Webpack requires that loader extensions complete synchronously whereas Dojo uses an asynchronous architecture for loader extensions.  When using `dojo/loaderProcy` to proxy a Dojo loader extension in Webpack, the basic requirement is that the Dojo loader extension's `load` method invokes its callback in-line, before returning from the `load` method (see update below on use of the [`async`](#async) option to relax this requirement).  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.  By ensuring that the delegated resources are included in the packed assets, `dojo/loaderProxy` is able to ensure that resolution of the delgated resources by the Dojo loader extension will occur synchronously.
+`dojo/loaderProxy` is a Webpack loader extension that enables Dojo loader extensions to run on the client.  If the dojo loader is asynchronous (i.e. does not invoke its load callback in-line), then you must specify the [`async`](#async) option.  The most common use cases are loader extensions that delegate to `dojo/text` or another supported loader extension to load the resource before doing some processing on the result.
 
 Consider a simple svg loader extension that loads the specified svg file and fixes up the contents by removing the xml header in the content.  The implementation of the load method might look like this:
 
@@ -216,7 +210,7 @@ function load(name, req, callback) {
 }
 ```
 
-Here, the load method delegates to a loader extension that is supported by Webpack to load the resource.  If the resource is included in the packed modules, then the `req` callback will be invoked in-line, and thus the `load` method's callback will be invoke in-line.  If the `load` method's callback is not invoked before the `load` method returns, then an exception will be thrown.
+Here, the load method delegates to a loader extension that is supported by Webpack to load the resource.  If the resource is included in the packed modules, then the `req` callback will be invoked in-line, and thus the `load` method's callback will be invoke in-line.  If the `load` method's callback is not invoked before the `load` method returns, then an exception will be thrown if the [`async`](#async) option is not used.
 
 You can use `dojo/loaderProxy` with the Webpack NormalModuleReplacementPlugin as follows:
 
@@ -236,15 +230,13 @@ Specifying `dojo/text!closeBtn.svg` as a dependency ensures that when it is requ
 
 The *name* query arg is optional and is provided for cases where the resource name (the text to the right of the "!") does not represent the name of a module that can be resolved at build time.  Since webpack requires the resource name to represent a valid module, you can use the *name* query arg to specify non-module resources or resources that are not available at build time (see notes on the [`async`](#async) option below).  For example, the loaderProxy URL for `dojo/query!css2` would be `dojo/loaderProxy?loader=dojo/query&name=css2!`.
 
-**Update** - Version 2.8 of this plugin introduces the [`async`](#async) option.  When this option is specified, the requirement that the Dojo loader extension invoke its `load` callback synchronously is lifted.  Loader extensions can use `XMLHttpRequest`, `dojo/request`, `dojo/script`, etc. to asynchronously load resources from web sites at runtime.  Note, though, that `require` (the global instance as well as the function passed to the loader extension's load method) may **not** be used to asynchronously load external resources as it maps to webpack's implementation which can only be used to load packed resources.
-
 # Options
 
 The plugin is instantiated with a properties map specifying the following options:
 
 ### async
 
-This property specifies that AMD modules should be defined asynchronously.  The default (false) is to define AMD modules synchronously.  This option is supported in version 2.8 or greater and requires webpack version 4.28.4 or greater.
+This property specifies that AMD modules should be defined asynchronously.
 
 Using async mode allows the [`dojo/loaderProxy`](#the-dojoloaderproxy-loader-extension) plugin to support Dojo loader extensions that resolve asynchronously.
 
@@ -455,35 +447,7 @@ Note that you can also specify the require dependency array as a run-time identi
 
 Dojo's [Auto-Require](https://dojotoolkit.org/documentation/tutorials/1.10/declarative/#auto-require) feature allows the parser to automatically require the modules for widgets that are declared by templates.  This can be problematic with webpack for the reasons discussed [above](#use-of-run-time-identifiers-and-expressions-in-dependency-arrays), if your modules do not explicitly specify dependencies for the widgets that they contain.  Although useful for prototyping and demo purposes, Dojo itself recommends against using Auto-Require for production code because of it's negative performance consequences, and to instead be explicit about your application's dependencies.
 
-# I18n and TypeScript
-dojo-webpack-plugin has support for i18n using typescript. This helps for example Jetbrains IDEA to support syntax completion.
-
-Please refer to [this blog](https://www.sitepen.com/blog/what-typescript-can-offer-to-dojo-1-x) for an introductory example.
-
-The following i18n file format supports dialects as well:
-
-nls/main.ts:
- 
-```typescript
-export = {
-    'de-de' : true,
-    root : { users: "Users" }
-}
-```
-
-nls/de-de/main.ts:
-```typescript
-export = { users: "Benutzer" }
-```
-
-Note: We need to import our i18n-language files explicitly inside our application, so that it is bundled with webpack.
-```javascript
-import 'nls/de-de/main';
-```
 # Dependency requirements
-
-Note: There is dojo-magic around the file extension .js in the imports. Please do remove the extension as .ts is not treated like that.
-
 
 **dojo-webpack-plugin** has a peer dependency on webpack.  **dojo-webpack-plugin**'s webpack dependencies must resolve to the same modules as your application's webpack dependencies, otherwise you may encounter errors similar to the following when building.
 
@@ -493,36 +457,11 @@ Error: Cannot find module 'webpack-core/lib/ConcatSource'
 
 The best way to ensure that the requirement is met is to make sure that both this plugin and webpack are installed in the same `node_modules` directory, and to use flat, rather than hierarchical, tree dependency resolution (the default for npm v3 and above) when using npm to install the packages.
 
-# Related plugins
-
-* [webpack-hasjs-plugin](https://www.npmjs.com/package/webpack-hasjs-plugin) - Performs has.js filtering of source code at build time based on statically defined features.
-
-* [webpack-i18n-extractor-plugin](https://www.npmjs.com/package/webpack-i18n-extractor-plugin) - Extracts NLS resources from the application chunks and places them in language/chunk specific bundles that are automatically loaded as needed for the current locale.
-
 # Sample application
 
 See the sample application at https://github.com/OpenNTF/dojo-webpack-plugin-sample.
 
 https://openntf.github.io/dojo-webpack-plugin-sample/test.html.
-
-# Release Notes
-
-The versions of Dojo listed below require version 2.1.0 or later of this plugin to work correctly.  Attempting to use earlier versions of this plugin with the listed versions of Dojo will result in the error "Dojo require not yet initialized" when building.  The newer versions of this plugin should continue to work with older patch releases of the listed versions of Dojo.
-
-* 1.13.0 and later
-* 1.12.3 and later
-* 1.11.5 and later
-* 1.10.9 and later
-
-In addition, Dojo loaders built with earlier versions of the plugin will not work with 2.1.0 or later, even if you have not changed the version of Dojo you are building with.  If you are using a pre-built loader with the [loader](#loader) config option, then you will need to rebuild it when upgrading to 2.1.
-
-# Known Issues
-
-There is a known issue with incrementally upgrading some versions of webpack to newer versions when using this plugin.  If, after upgrading webpack, you encounter the error "No hook for resolver normal in object ResolverFactory", try deletig your `node_modules` directory **and** your `package-lock.json` file and running `npm install` again to resolve the issue.
-
-# Footnotes
-
-<a name="foot1">1.</a>&nbsp; Embedded loader sizes are determined using a stand-alone embedded loader that has been uglified and gzipped.  The loader was produced as described in [Building the Dojo loader](#building-the-dojo-loader), with [the Dojo config API excluded](#the-dojo-config-api-feature) and using the 2.2.2 version of this plugin and the 1.14 Dojo loader, both of which support the new [`foreign-loader`](https://github.com/dojo/dojo/pull/279) has.js feature conditional.  Embedded loader sizes for earlier versions vary depending on the version of this plugin and of Dojo, up to a max of about 4KB when the Dojo config API is included.
 
 [npm]: https://img.shields.io/npm/v/dojo-webpack-plugin.svg
 [npm-url]: https://npmjs.com/package/dojo-webpack-plugin
