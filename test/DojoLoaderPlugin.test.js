@@ -7,7 +7,8 @@
  * changes are not related to the paths being tested.
  */
 const proxyquire = require("proxyquire");
-const {reg, tap, callSync, Tapable} = require("webpack-plugin-compat").for("DojoLoaderPlugin.test");
+const {pluginName} = require("../lib/DojoAMDPlugin");
+const {SyncHook, AsyncSeriesHook} = require("tapable");
 
 const tmpStub = {};
 
@@ -20,17 +21,16 @@ describe("DojoLoaderPlugin tests", function() {
 	beforeEach(function() {
 		options = {loaderConfig:{}, noConsole:true};
 		plugin = new DojoLoaderPlugin(options);
-		compiler = new Tapable();
+		compiler = {hooks: {}};
+		var pluginProps = compiler[pluginName] = {hooks:{}};
 		compiler.context = '.';
-		reg(compiler, {
-			"compilation" : ["Sync", "compilation", "params"],
-			"run" : ["AsyncSeries"],
-			"watch-run" : ["AsyncSeries"]
-		});
+		compiler.hooks.compilation = new SyncHook(['compilation', 'params']);
+		compiler.hooks.run = new AsyncSeriesHook();
+		compiler.hooks.watchRun = new AsyncSeriesHook();
 		plugin.apply(compiler);
-		tap(compiler, {"get dojo config" : () => {
+		pluginProps.hooks.getDojoConfig.tap(pluginName, () => {
 			return {};
-		}});
+		});
 	});
 	afterEach(function() {
 		Object.keys(tmpStub).forEach(key => {
@@ -102,9 +102,7 @@ describe("DojoLoaderPlugin tests", function() {
 			plugin.options.loader = "loader";
 			plugin.options.loaderConfig = "loaderConfig";
 			plugin.compilation =  {
-				modules: {
-					find() {}
-				}
+				modules: []
 			};
 		});
 		it("Should throw if embedded loader not found in compilation", function(done) {
@@ -118,10 +116,7 @@ describe("DojoLoaderPlugin tests", function() {
 		});
 		it("Should throw if config module not found in compilation", function(done) {
 			try {
-				var count = 0;
-				plugin.compilation.modules.find = function() {
-					return count++ === 0 ? {} : null;
-				};
+				plugin.compilation.modules.push({rawRequest:'loader'});
 				plugin.afterOptimizeChunks([{hasRuntime:function(){return true;}}]);
 				done(new Error("Exception not thrown"));
 			} catch (err) {
@@ -145,7 +140,7 @@ describe("DojoLoaderPlugin tests", function() {
 				isSkipCompilationsCalled = true;
 				return true;
 			};
-			callSync(compiler, "compilation", {});
+			compiler.hooks.compilation.call({});
 			isSkipCompilationsCalled.should.be.eql(true);
 		});
 	});

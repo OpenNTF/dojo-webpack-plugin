@@ -7,7 +7,7 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDChunkTemplatePlugin = require("../lib/DojoAMDChunkTemplatePlugin");
-const {reg,callSync, Tapable} = require("webpack-plugin-compat");
+const {SyncHook} = require("tapable");
 
 describe("DojoAMDChunkTemplatePlugin tests", function() {
 	it("should skip compilation", function() {
@@ -19,13 +19,11 @@ describe("DojoAMDChunkTemplatePlugin tests", function() {
 					return true;
 				}
 			};
-			var compiler = new Tapable();
-			reg(compiler, {
-				"compilation": ["Sync", "compilation", "params"]
-			});
+			var compiler = {hooks:{}};
+			compiler.hooks.compilation = new SyncHook(['compilation', 'params']);
 			const plugin = new DojoAMDChunkTemplatePlugin(options);
 			plugin.apply(compiler);
-			callSync(compiler, "compilation", {});
+			compiler.hooks.compilation.call({});
 			isSkipCompilationCalled.should.be.eql(true);
 		});
 	});

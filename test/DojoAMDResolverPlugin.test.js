@@ -6,20 +6,19 @@
  * test may require additional scafolding in this file, even if the code
  * changes are not related to the paths being tested.
  */
-const DojoAMDResolverPluginBase = require("../lib/DojoAMDResolverPluginBase");
-const {Tapable, reg, tap} = require("webpack-plugin-compat").for("DojoAMDResolverPlugin.test");
-const plugin = new DojoAMDResolverPluginBase();
+const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
+const plugin = new DojoAMDResolverPlugin();
 
 describe("DojoAMDResolverPlugin tests", function() {
-	const compiler = new Tapable();
-	reg(compiler, {"get dojo require" : ["SyncBail"]});
-	tap(compiler, {"get dojo require" : () => {
-		return {
+	const compiler = {hooks: {}};
+	compiler['dojo-webpack-plugin'] = {
+		hooks: {},
+		dojoRequire: {
 			toUrl: (request) => {
 				return request.request === "null" ? null : request.request;
 			}
-		};
-	}});
+		}
+	};
 	plugin.compiler = compiler;
 	describe("resolver tests", () => {
 		it("Should invoke callback with no args for directory request", done => {

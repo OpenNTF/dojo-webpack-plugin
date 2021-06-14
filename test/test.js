@@ -27,22 +27,18 @@ var Test = require("mocha/lib/test");
 var Suite = require("mocha/lib/suite");
 var cloneDeep = require("clone-deep");
 var DojoWebackPlugin = require("../index");
+var Window = require("window");
 
-var Stats = require("webpack/lib/Stats");
 var webpack = require("webpack");
 var ScopedRequirePlugin = require('../').ScopedRequirePlugin;
 var MainTemplatePlugin = require("./plugins/MainTemplatePlugin");
-var ScopedRequirePluginDeprecated = require("./plugins/ScopedRequirePluginDeprecated");
 var webpackMajorVersion = parseInt(require("webpack/package.json").version.split(".")[0]);
 
 var testGroups = {
 	default: {},
-	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}}
+	djPropRenamed: {pluginOptions: {requireFnPropName: "djPropRenamed"}},
+	async: {pluginOptions: {async:true}}
 };
-if (webpackMajorVersion >= 4) {
-	testGroups.async = {pluginOptions: {async:true}};
-}
-
 
 describe("TestCases", () => {
 	runTestCases("TestCases");
@@ -84,7 +80,7 @@ function runTestCases(casesName) {
 						if (testConfig.mode && testConfig.mode !== testGroup) {
 							return process.nextTick(done);
 						}
-
+						process.traceDeprecation = true;
 						var options = cloneDeep(require(path.join(testDirectory, "webpack.config.js")));
 						var optionsArr = [].concat(options);
 						optionsArr.forEach(function(options, idx) {
@@ -95,15 +91,12 @@ function runTestCases(casesName) {
 							if(typeof options.output.pathinfo === "undefined") options.output.pathinfo = true;
 							if(!options.output.filename) options.output.filename = "bundle" + idx + ".js";
 							if(!options.output.chunkFilename) options.output.chunkFilename = "[id].bundle" + idx + ".js";
-							if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
+							//if(!options.node) options.node = 	{process: false, global: false, Buffer: false};
 
 							options.output.path = outputDirectory;
+							options.output.publicPath = `${options.output.path}${path.sep}`;
 						  options.plugins = options.plugins || [];
-							if (!options.plugins.some(plugin => {
-								return plugin instanceof ScopedRequirePluginDeprecated;
-							})) {
-								options.plugins.push(new ScopedRequirePlugin());
-							}
+							options.plugins.push(new ScopedRequirePlugin());
 							options.plugins.forEach(plugin => {
 								if (plugin instanceof DojoWebackPlugin) {
 									Object.assign(plugin.options, testGroups[testGroup].pluginOptions);
@@ -121,7 +114,7 @@ function runTestCases(casesName) {
 									console.error(err);
 									return;
 								}
-								var statOptions = Stats.presetToOptions("verbose");
+								var statOptions = {};
 								statOptions.colors = false;
 								fs.writeFileSync(path.join(outputDirectory, "stats.txt"), stats.toString(statOptions), "utf-8");
 								var jsonStats = stats.toJson({
@@ -171,22 +164,14 @@ function runTestCases(casesName) {
 									var bundlePath = testConfig.findBundle(i, optionsArr[i]);
 									if(bundlePath) {
 										filesCount++;
-										var context = vm.createContext({
-											console: console,
-											process: process,
-											setTimeout: setTimeout,
-											setInterval: setInterval,
-											clearTimeout: clearTimeout,
-											clearInterval: clearInterval,
-											Promise: Promise,
-											it: _it,
-											describe: _describe,
-											beforeEach: _beforeEach,
-											beforeAll: _beforeAll,
-											afterEach: _afterEach,
-											afterAll: _afterAll
-										});
-										context.global = context;
+										var context = vm.createContext(new Window());
+										context.it = _it,
+										context.describe = _describe,
+										context.beforeEach = _beforeEach,
+										context.beforeAll = _beforeAll,
+										context.afterEach = _afterEach,
+										context.afterAll = _afterAll;
+										context.importScripts = true;
 										Object.defineProperty(context, "should", {
 									    set: function() {},
 									    get: function() {
@@ -199,13 +184,11 @@ function runTestCases(casesName) {
 											var content;
 											var p = path.join(outputDirectory, bundlePath);
 											content = fs.readFileSync(p, "utf-8");
-											var module = {exports: {}};
 											const prologue = `
 	should.extend('should', Object.prototype);\n
 	Object.assign = function() { throw new Error(\"Don't use Object.assign (not supported in all browsers).\");};\n`;
-
-											var fn = vm.runInContext("(function(require, module, exports, __dirname, __filename, global, window) {\n" + prologue + content + "\n})", context, p);
-											fn.call(context, require, module, module.exports, path.dirname(p), p, context, context);
+											var fn = vm.runInContext("(function(nodeRequire, __dirname, __filename, global, window, self) {\n" + prologue + content + "\n})", context, p);
+											fn.call(context, require, path.dirname(p), p, context, context, context);
 										});
 									}
 								}
@@ -277,14 +260,14 @@ function checkArrayExpectation(testDirectory, object, kind, filename, upperCaseK
 		for(let i = 0; i < array.length; i++) {
 			if(Array.isArray(expected[i])) {
 				for(let j = 0; j < expected[i].length; j++) {
-					if(!expected[i][j].test(array[i]))
-						return done(new Error(`${upperCaseKind} ${i}: ${array[i]} doesn't match ${expected[i][j].toString()}`)), true;
+					if(!expected[i][j].test(array[i].message))
+						return done(new Error(`${upperCaseKind} ${i}: ${array[i].message} doesn't match ${expected[i][j].toString()}`)), true;
 				}
-			} else if(!expected[i].test(array[i]))
-				return done(new Error(`${upperCaseKind} ${i}: ${array[i]} doesn't match ${expected[i].toString()}`)), true;
+			} else if(!expected[i].test(array[i].message))
+				return done(new Error(`${upperCaseKind} ${i}: ${array[i].message} doesn't match ${expected[i].toString()}`)), true;
 		}
 		return done(), true;
 	} else if(array.length > 0) {
-		return done(new Error(`${upperCaseKind}s while compiling:\n\n${array.join("\n\n")}`)), true;
+		return done(new Error(`${upperCaseKind}s while compiling:\n\n${array.map(e => `${e.details}\n${e.stack}`).join("\n\n")}`)), true;
 	}
 }

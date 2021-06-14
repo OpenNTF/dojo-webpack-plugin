@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /* globals module loaderScope __webpack_require__ __async__ installedModules Promise */
+ /* globals module loaderScope __webpack_require__ __async__ __webpack_module_cache__ Promise */
 
 module.exports = {
 	main: function() {
@@ -36,9 +36,11 @@ module.exports = {
 			return contextRequire(config, dependencies, callback, 0, req);
 		};
 
-		function createContextRequire(moduleId) { // eslint-disable-line no-unused-vars
-			if (req.absMidsById[moduleId]) {
-				moduleId = req.absMidsById[moduleId];
+		function createContextRequire(module) { // eslint-disable-line no-unused-vars
+			if (!module) return req;
+			var moduleId = module.absMid;
+			if (!moduleId && req.absMidsById[module.id]) {
+				moduleId = req.absMidsById[module.id];
 			}
 			if (!moduleId) return req;
 			var result = function(a1, a2, a3) {
@@ -94,8 +96,8 @@ module.exports = {
 			var result;
 			if (mid in req.absMids && __webpack_require__.m[req.absMids[mid]]) {
 				if (noInstall) {
-					var module = installedModules[req.absMids[mid]];
-					result = module && module.l && (asModuleObj ? module : module.exports);
+					var module = __webpack_module_cache__[req.absMids[mid]];
+					result = module && (asModuleObj ? module : module.exports);
 				} else {
 					result = __webpack_require__(req.absMids[mid]);
 				}
@@ -107,10 +109,11 @@ module.exports = {
 		}
 
 		function dojoModuleFromWebpackModule(webpackModule) { // eslint-disable-line no-unused-vars
-			var result = {i:webpackModule.i};
-			var id = req.absMidsById[webpackModule.i];
+			if (webpackModule.absMid) return webpackModule;  // Already converted
+			var result = {i:webpackModule.id};
+			var id = req.absMidsById[webpackModule.id];
 			if (id) {
-				result.id = id;
+				result.id = result.absMid = id;
 			}
 			Object.defineProperty(result, "exports", {
 				get: function() { return webpackModule.exports;},
@@ -254,7 +257,7 @@ module.exports = {
 		function undef(mid, referenceModule) { // eslint-disable-line no-unused-vars
 			var module = findModule(mid, referenceModule, true, true); // eslint-disable-line no-undef
 			if (module) {
-				delete installedModules[module.i];
+				delete __webpack_module_cache__[module.id];
 			}
 		}
 	}

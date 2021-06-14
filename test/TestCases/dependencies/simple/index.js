@@ -1,7 +1,9 @@
 define(["exports", "module", "./dep"], function(exports, module, dep) {
+
 	it("should compile", function(done) {
 		done();
 	});
+
 	it("require scoping", function() {
 		// verify require function hasn't been renamed
 		var name = "req";
@@ -26,7 +28,8 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 			exceptionThrown = true;
 		}
 		exceptionThrown.should.be.true();
-		/* global require */
+		// global require
+
 		try {
 			require(['require', 'module', 'exports', 'asyncDep', 'test/asyncDep'], function(req, reqModule, reqExports, asyncDep) {
 				reqModule.id.should.be.eql(module.id);
@@ -92,12 +95,7 @@ define(["exports", "module", "./dep"], function(exports, module, dep) {
 			waitForError.then(function() {
 				// Call webpack's require.ensure to load the chunk containing test/asyncDep2
 				require.ensure(["test/asyncDep2"], function() {
-					// Synchonous require should still fail because module hasn't been defined.
-					try {
-						require('test/asyncDep2');
-						return done(new Error("Expected exception thrown"));
-					} catch(ignore) {}
-
+					require('test/asyncDep2').should.be.eql("asyncDep2");
 					waitForError = new Promise(function(resolve) {
 						var handle = require.on("error", function(error) {
 							handle.remove();
