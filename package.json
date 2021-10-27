@@ -1,6 +1,6 @@
 {
   "name": "dojo-webpack-plugin",
-  "version": "3.0.2",
+  "version": "3.0.3-rc1",
   "author": "Chuck Dumont",
   "description": "Supports using webpack with Dojo 1.x applications",
   "scripts": {
@@ -34,8 +34,8 @@
     "@babel/eslint-parser": "^7.14.4",
     "clone-deep": "^3.0.1",
     "coveralls": "^3.0.5",
-    "dojo": "1.16.2",
-    "dojo-util": "1.16.0",
+    "dojo": "1.16.4",
+    "dojo-util": "1.16.4",
     "eslint": "^7.28.0",
     "eslint-plugin-es5": "^1.5.0",
     "eslint-plugin-json": "^1.4.0",
@@ -47,7 +47,7 @@
     "proxyquire": "^1.8.0",
     "rimraf": "^2.6.3",
     "should": "^13.2.3",
-    "webpack": "5.28.0",
+    "webpack": "5.60.0",
     "window": "^4.2"
   },
   "nyc": {
