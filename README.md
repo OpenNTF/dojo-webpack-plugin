@@ -20,23 +20,24 @@
 <!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [Introduction](#introduction)
 - [The Dojo loader](#the-dojo-loader)
-		- [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
+    - [CommonJS require vs. Dojo synchronous require](#commonjs-require-vs-dojo-synchronous-require)
 - [The Dojo loader config](#the-dojo-loader-config)
 - [Dojo loader extensions](#dojo-loader-extensions)
 - [The dojo/has loader extension](#the-dojohas-loader-extension)
 - [The dojo/loaderProxy loader extension](#the-dojoloaderproxy-loader-extension)
 - [Options](#options)
-		- [async](#async)
-		- [loaderConfig](#loaderconfig)
-		- [environment](#environment)
-		- [buildEnvironment](#buildenvironment)
-		- [globalContext](#globalcontext)
-		- [loader](#loader)
-		- [locales](#locales)
-		- [cjsRequirePatterns](#cjsrequirepatterns)
-		- [coerceUndefinedToFalse](#coerceundefinedtofalse)
-		- [noConsole](#noconsole)
-		- [runtimeFeatures](#runtimefeatures)
+    - [async](#async)
+    - [loaderConfig](#loaderconfig)
+    - [environment](#environment)
+    - [buildEnvironment](#buildenvironment)
+    - [globalContext](#globalcontext)
+    - [loader](#loader)
+    - [locales](#locales)
+    - [cjsRequirePatterns](#cjsrequirepatterns)
+    - [coerceUndefinedToFalse](#coerceundefinedtofalse)
+    - [noConsole](#noconsole)
+    - [runtimeFeatures](#runtimefeatures)
+    - [ignoreNonModuleResources](#ignorenonmoduleresources)
 - [Building the Dojo loader](#building-the-dojo-loader)
 - [The `dojo-config-api` feature](#the-dojo-config-api-feature)
 - [The `dojo-undef-api` feature](#the-dojo-undef-api-feature)
@@ -318,6 +319,16 @@ This property is optional.  If the value is truthy, then console output from bui
 This property is optional.  If specified, it is an array of strings which specifies the names of features (`has!` loader conditionals) that are to be evaluated at run time rather than at build time, even if the feature is assigned a value at build time.
 
 You would typically want to specify this option when running unit tests and your tests use `require.undef()` to undefine modules and then load them again using `require()` with different values for the features.  Normally, if a feature is given a value at build time (e.g. in the loader config), then the `has!` loader conditional is fixed and cannot be changed at run time.  With this option, the initial values of the specified features will be those assigned by the build, but you'll be able to change the values of these features and the `has!` loader conditionals in the dependency array of the module that's being loaded or reloaded will work as expected.  
+
+### ignoreNonModuleResources
+
+This optional property is a boolean value (default = false) which specifies that the plugin should not attempt to resolve non-module resources.  By default, this plugin attempts to resolve both module and non-module resources using the Dojo loader config.  Any resources not resolved using the Dojo loader config are resolved using the Webpack config.  An example of non-module resources that may be resolved in this way is less/css imports where the url is preceded by a tilde.
+
+```css
+@import '~myStylesPakage/styles.css';
+```
+
+The tilde tells Webpack to resolve the import 'like a module'.  If you do not want dojo-webpack-plugin to resolve non-module resources and instead let let Webpack resolve them using the Webpack config, then set this option to true.
 
 # Building the Dojo loader
 
