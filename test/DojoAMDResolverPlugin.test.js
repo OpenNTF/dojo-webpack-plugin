@@ -7,36 +7,88 @@
  * changes are not related to the paths being tested.
  */
 const DojoAMDResolverPlugin = require("../lib/DojoAMDResolverPlugin");
-const plugin = new DojoAMDResolverPlugin();
 
 describe("DojoAMDResolverPlugin tests", function() {
-	const compiler = {hooks: {}};
-	compiler['dojo-webpack-plugin'] = {
-		hooks: {},
-		dojoRequire: {
-			toUrl: (request) => {
-				return request.request === "null" ? null : request.request;
+	let compiler, plugin, resolverCallback;
+	beforeEach(() => {
+		resolverCallback = undefined;
+		plugin = new DojoAMDResolverPlugin({});
+		compiler = {
+			hooks: {},
+			resolverFactory: {
+				hooks: {
+					resolver: {
+						for() {
+							return {
+								tap(pluginName__, callback) {
+									resolverCallback = callback;
+								}
+							};
+						}
+					}
+				}
 			}
-		}
-	};
-	plugin.compiler = compiler;
+		};
+		compiler['dojo-webpack-plugin'] = {
+			hooks: {},
+			dojoRequire: {
+				toUrl: (request) => {
+					return request.request === "null" ? null : request.request;
+				}
+			}
+		};
+		plugin.compiler = compiler;
+	});
+	describe("apply tests", () => {
+		it("Should tap resolve hook", () => {
+			let resolveCalled = false;
+			plugin.apply(compiler);
+			const resolver = {
+				hooks: {
+					resolve: {
+						tapAsync() {
+							resolveCalled = true;
+						}
+					}
+				}
+			};
+			resolverCallback(resolver);
+			resolveCalled.should.be.eql(true);
+		});
+		it("Should tap module hook", () => {
+			let moduleCalled = false;
+			plugin.options.ignoreNonModuleResources = true;
+			plugin.apply(compiler);
+			const resolver = {
+				hooks: {
+					module: {
+						tapAsync() {
+							moduleCalled = true;
+						}
+					}
+				}
+			};
+			resolverCallback(resolver);
+			moduleCalled.should.be.eql(true);
+		});
+	});
 	describe("resolver tests", () => {
 		it("Should invoke callback with no args for directory request", done => {
-			plugin.module({directory:true}, null, (err, data) => {
+			plugin.resolve({directory:true}, null, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
 		});
 		it("Should invoke callback with no args for null request", done => {
-			plugin.module({request: "null", path:"."}, null, (err, data) => {
+			plugin.resolve({request: "null", path:"."}, null, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
 			});
 		});
 		it("Should invoke callback with no args for identity request", done => {
-			plugin.module({request: "null", path:"."}, null, (err, data) => {
+			plugin.resolve({request: "null", path:"."}, null, (err, data) => {
 				(typeof err).should.be.eql('undefined');
 				(typeof data).should.be.eql('undefined');
 				done();
