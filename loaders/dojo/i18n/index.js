@@ -68,7 +68,7 @@ module.exports = function(content) {
 	var res = this._module.request.replace(/\\/g, "/").split("!").pop();
 
 	// Determine if this is the default bundle or a locale specific bundle
-	const buf = [], deps = [], regex = /^(.+)\/nls\/([^/]+)\/?(.*?)$/;
+	const buf = [], deps = [], regex = /^(.+\/)?nls\/([^/]+)\/?(.*?)$/;
 	const resMatch = regex.exec(res);
 	const pluginOptions = getPluginProps(this._compiler).options;
 	const requestedLocales = pluginOptions.locales;
@@ -88,10 +88,10 @@ module.exports = function(content) {
 		(requestedLocales || ["*"]).forEach(requestedLocale => {
 			const availableLocales = getAvailableLocales(requestedLocale, bundle);
 			availableLocales.forEach(loc => {
-				const localeRes = `${resMatch[1]}/nls/${loc}/${resMatch[2]}`;
+				const localeRes = `${resMatch[1]||''}nls/${loc}/${resMatch[2]}`;
 				var localeAbsMid;
 				if (absMidMatch) {
-					localeAbsMid = `${absMidMatch[1]}/nls/${loc}/${absMidMatch[2]}`;
+					localeAbsMid = `${absMidMatch[1]||''}nls/${loc}/${absMidMatch[2]}`;
 				} else {
 					localeAbsMid = path.relative(this._compiler.context, localeRes).replace(/[\\]/g, '/');
 				}
