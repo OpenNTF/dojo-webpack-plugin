@@ -3,10 +3,10 @@ define([
 	"require",
 	"dojo/_base/config",
 	"dojo/has",
-	"dojo/i18n!./nls/strings1",
+	"dojo/i18n!nls/strings1",
 	"dojo/i18n!./nls/strings2",
 	"dojo/i18n!./nls/fr/strings1",
-	"dojo/i18n!./nls/de/strings1",
+	"dojo/i18n!nls/de/strings1",
 	"./nls/strings1"
 ], function(
 	require,
