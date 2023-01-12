@@ -476,8 +476,8 @@ https://openntf.github.io/dojo-webpack-plugin-sample/test.html.
 
 [npm]: https://img.shields.io/npm/v/dojo-webpack-plugin.svg
 [npm-url]: https://npmjs.com/package/dojo-webpack-plugin
-[builds-url]: https://travis-ci.org/OpenNTF/dojo-webpack-plugin
-[builds]: https://travis-ci.org/OpenNTF/dojo-webpack-plugin.svg?branch=master
+[builds-url]: https://app.travis-ci.com/github/OpenNTF/dojo-webpack-plugin
+[builds]: https://app.travis-ci.com/OpenNTF/dojo-webpack-plugin.svg?branch=master
 [cover-url]: https://coveralls.io/github/OpenNTF/dojo-webpack-plugin?branch=master
 [cover]: https://coveralls.io/repos/github/OpenNTF/dojo-webpack-plugin/badge.svg?branch=master
 [licenses-url]: https://app.fossa.io/api/projects/git%2Bgithub.com%2FOpenNTF%2Fdojo-webpack-plugin
