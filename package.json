@@ -47,7 +47,7 @@
     "proxyquire": "^1.8.0",
     "rimraf": "^2.6.3",
     "should": "^13.2.3",
-    "webpack": "5.60.0",
+    "webpack": "5.99.5",
     "window": "^4.2"
   },
   "nyc": {
