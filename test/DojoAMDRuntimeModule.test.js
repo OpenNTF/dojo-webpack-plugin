@@ -9,6 +9,11 @@
 const DojoAMDRuntimeModule = require("../lib/DojoAMDRuntimeModule");
 const {pluginName} = require("../lib/DojoAMDPlugin");
 const {SyncHook} = require("tapable");
+const {WebpackError} = require("webpack");
+
+function createCompiler() {
+	return {[pluginName]: {hooks:{}}, hooks: {afterCompile: new SyncHook(["compilation"])}};
+}
 
 describe("DojoAMDRuntimeModule tests", function() {
 	it("Should throw if dojo loader is not available", function(done) {
@@ -28,5 +33,25 @@ describe("DojoAMDRuntimeModule tests", function() {
 			runtimeModule.getErrors()[0].should.match(/Can't locate [^\s]+ in compilation/);
 			done();
 		}
+	});
+
+	it("Should tap afterCompile once per compiler, not once per runtime module", function() {
+		// Watch mode creates a runtime module per compilation; a tap per instance kept every
+		// previous compilation reachable from the compiler.
+		const compiler = createCompiler();
+		new DojoAMDRuntimeModule({}, {}, compiler);
+		new DojoAMDRuntimeModule({}, {}, compiler);
+		new DojoAMDRuntimeModule({}, {}, compiler);
+		compiler.hooks.afterCompile.taps.length.should.equal(1);
+	});
+
+	it("Should throw only the current compilation's runtime module errors after compile", function() {
+		const compiler = createCompiler();
+		const firstBuildModule = new DojoAMDRuntimeModule({}, {}, compiler);
+		firstBuildModule.addError(new WebpackError("first build error"));
+		(() => compiler.hooks.afterCompile.call({modules: new Set([firstBuildModule])})).should.throw(/first build error/);
+
+		const secondBuildModule = new DojoAMDRuntimeModule({}, {}, compiler);
+		(() => compiler.hooks.afterCompile.call({modules: new Set([secondBuildModule])})).should.not.throw();
 	});
 });
